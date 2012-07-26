@@ -1,0 +1,37 @@
+table.stats
+{text-align: center;
+font-family: Verdana, Geneva, Arial, Helvetica, sans-serif ;
+font-weight: normal;
+font-size: 11px;
+color: #fff;
+width: 550px;
+background-color: #666;
+border: 0px;
+border-collapse: collapse;
+border-spacing: 0px;}
+
+table.stats td
+{background-color: #CCC;
+color: #000;
+padding: 4px;
+text-align: center;
+border: 1px #fff solid;}
+
+table.stats td.hed
+{background-color: #666;
+color: #fff;
+padding: 4px;
+text-align: center;
+border-bottom: 2px #fff solid;
+font-size: 12px;
+font-weight: bold;} 
+
+table.stats td.hedextra
+{background-color: #666;
+color: #fff;
+padding: 4px;
+text-align: center;
+border-bottom: 2px #fff solid;
+font-size: 12px;
+font-weight: bold;
+width:250px;} 
