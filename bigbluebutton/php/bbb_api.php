@@ -24,6 +24,9 @@ Versions:
                     (email : seb DOT sschneider [ a t ] g m ail DOT com)
    1.2  --  Updated by Omar Shammas
                     (email : omar DOT shammas [a t ] g m ail DOT com)
+   1.3  --  Updated by Jesus Federico
+                    (email : jesus [a t ] blind side n e t w o rks DOT com)
+
 */
 
 function bbb_wrap_simplexml_load_file($url){
@@ -146,15 +149,25 @@ class BigBlueButton {
 	*
 	*@return The url to join the meeting
 	*/
-	public function createMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome, $logoutURL, $SALT, $URL ) {
+	public function createMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome, $logoutURL, $SALT, $URL, $record = 'false', $duration=0, $voiceBridge=0, $metadata = array() ) {
 		$url_create = $URL."api/create?";
-		$voiceBridge = 70000 + rand(0, 9999);
-
-		$params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&voiceBridge='.$voiceBridge.'&logoutURL='.urlencode($logoutURL);
-
-		if( trim( $welcome ) ) 
+		if ( $voiceBridge == 0)
+			$voiceBridge = 70000 + rand(0, 9999);
+	
+		$meta = '';
+		foreach ($metadata as $key => $value) {
+			$meta = $meta.'&'.$key.'='.urlencode($value);
+		}
+	
+		$params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&voiceBridge='.$voiceBridge.'&logoutURL='.urlencode($logoutURL).'&record='.$record.$meta;
+	
+		$duration = intval($duration);
+		if( $duration > 0 )
+			$params .= '&duration='.$duration;
+	
+		if( trim( $welcome ) )
 			$params .= '&welcome='.urlencode($welcome);
-
+	
 		return ( $url_create.$params.'&checksum='.sha1("create".$params.$SALT) );
 	}
 	
@@ -235,9 +248,9 @@ class BigBlueButton {
 	*
 	*@return The joinURL if successful or an error message if unsuccessful
 	*/
-	public function createMeetingAndGetJoinURL( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL ) {
+	public function createMeetingAndGetJoinURL( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
 
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::createMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL ) );
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::createMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata ) );
 		
 		if( $xml && $xml->returncode == 'SUCCESS' ) {
 			return ( BigBlueButton::joinURL( $meetingID, $username, $mPW, $SALT, $URL ) );
@@ -267,10 +280,10 @@ class BigBlueButton {
 	*	- If failed it returns an array containing a returncode, messageKey, message. 
 	*	- If success it returns an array containing a returncode, messageKey, message, meetingID, attendeePW, moderatorPW, hasBeenForciblyEnded.
 	*/
-	public function createMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL ) {
-
-		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::createMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL ) );
-
+	public function createMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
+	
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::createMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata ) );
+	
 		if( $xml ) {
 			if($xml->meetingID) return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded );
 			else return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
@@ -278,7 +291,7 @@ class BigBlueButton {
 		else {
 			return null;
 		}
-	}	
+	}
 	
 	//-------------------------------------------getMeetingInfo---------------------------------------------------
 	/**
