@@ -70,9 +70,8 @@ _log('Loading the plugin');
 //================================================================================
 require('php/bbb_api.php');
 
-global $bigbluebutton_plugin_release;
 global $bigbluebutton_plugin_version;
-$bigbluebutton_plugin_version = 2012073100;
+//$bigbluebutton_plugin_version = 2012073100;
 
 $url_name = 'bigbluebutton_url';
 $salt_name = 'bigbluebutton_salt';
@@ -90,11 +89,12 @@ $recorded_name = 'recorded';
 if (!class_exists("bigbluebuttonPlugin")) {
 	class bigbluebuttonPlugin {
 		function bigbluebuttonPlugin() { //constructor
-			
+		    global $bigbluebutton_plugin_version;
+		    $bigbluebutton_plugin_version = bigbluebuttonPlugin::plugin_get_version();
 		}
 		
 		//Inserts the plugin pages in the admin panel
-		function mt_add_pages() {
+		function plugin_add_pages() {
 
 			//Add a new submenu under Settings
 			$page = add_options_page(__('BigBlueButton','menu-test'), __('BigBlueButton','menu-test'), 'manage_options', 'bigbluebutton_general', 'bigbluebutton_general_options');
@@ -117,7 +117,7 @@ if (!class_exists("bigbluebuttonPlugin")) {
 		//Sets up the bigbluebutton table to store meetings in the wordpress database
 		function plugin_install () {
 			
-			global $wpdb, $bigbluebutton_plugin_release, $bigbluebutton_plugin_version, $salt_name, $url_name;
+			global $wpdb, $bigbluebutton_plugin_version, $salt_name, $url_name;
 			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 				
 			//Sets the name of the table
@@ -152,7 +152,7 @@ if (!class_exists("bigbluebuttonPlugin")) {
 		}
 
 		function plugin_update_check() {
-			global $wpdb, $bigbluebutton_plugin_release, $bigbluebutton_plugin_version, $salt_name, $url_name;
+			global $wpdb, $bigbluebutton_plugin_version, $salt_name, $url_name;
 			
 			//Sets the name of the table
 			$table_name = $wpdb->prefix . "bigbluebutton";
@@ -197,8 +197,12 @@ if (!class_exists("bigbluebuttonPlugin")) {
 				
 			////////////////// Updates for version 1.0.3 and larter //////////////////
 			$bigbluebutton_plugin_version_installed = get_option('bigbluebutton_plugin_version');
-			if( $bigbluebutton_plugin_version_installed && $bigbluebutton_plugin_version_installed < 2012073100 ){
+			if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.0.3") == 0 ){
 					
+			}
+			
+			if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.0.4") == 0 ){
+			    	
 			}
 				
 			////////////////// Set new bigbluebutton_plugin_version value //////////////////
@@ -256,7 +260,7 @@ if (class_exists("bigbluebuttonPlugin")) {
 
 if (isset($bigbluebutton_plugin)) {
 
-	add_action('admin_menu', array(&$bigbluebutton_plugin, 'mt_add_pages'), 1);
+	add_action('admin_menu', array(&$bigbluebutton_plugin, 'plugin_add_pages'), 1);
 	
 	add_action('admin_init', array(&$bigbluebutton_plugin, 'plugin_admin_init'), 1);
 	
