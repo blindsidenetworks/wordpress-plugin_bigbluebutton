@@ -510,7 +510,10 @@ function bigbluebutton_general_options() {
 		bigbluebutton_create_meetings();
 
 		bigbluebutton_list_meetings();
-	}
+
+		bigbluebutton_list_recordings();
+		
+    }
 
 }
 
@@ -736,7 +739,6 @@ function bigbluebutton_list_meetings() {
 				bigbluebutton_print_table_header();
 				$printed = true;
 			}
-			//_log($meeting);
 			?>
 			<form name="form1" method="post" action="">
 				<input type="hidden" name="<?php echo $meetingID_name; ?>" value="<?php echo $meeting->meetingID; ?>">
@@ -816,12 +818,33 @@ function bigbluebutton_list_meetings() {
 	?>
 		</table>
 		</div>
+	<hr />
+		
 	<?php
 }
-		
+
+//================================================================================
+//---------------------------------List Recordings----------------------------------
+//================================================================================
+// Displays all the recordings available in the bigbluebutton server
+function bigbluebutton_list_recordings() {
+	global $wpdb;
+	$table_name = $wpdb->prefix . "bigbluebutton";
+	global $url_name, $salt_name, $meetingID_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name, $current_user;
+
+	//Displays the title of the page
+	echo "<h2>List of Recordings </h2>";
+
+	$url_val = get_option($url_name);
+	$salt_val = get_option($salt_name);
+
+}
+
+
 //Begins the table of list meetings with the number of columns specified
 function bigbluebutton_print_table_header(){
 	?>
+	<div>
 	<table class="stats" cellspacing="5">
 		<th>
 			<tr>
