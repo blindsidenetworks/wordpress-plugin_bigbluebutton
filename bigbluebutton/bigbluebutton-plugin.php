@@ -28,8 +28,8 @@ Versions:
                     (email : omar DOT shammas [a t ] g m ail DOT com)
 	1.0.1 	--  version written by Omar Shammas
 	1.0.2 	--  version written by Omar Shammas
-	1.0.3 	--  version extended by Jesus Federico
-                    (email : jesus [a t ] 1 2 3 it DOT ca)
+	1.0.3 	--  version extended by Jesus Federico (email : jesus [a t ] 1 2 3 it DOT ca)
+			with assistance from Jay Donovan (email : jay [a t ] tech surgeons DOT com)
 */
 
 //================================================================================
@@ -111,7 +111,8 @@ if (!class_exists("bigbluebuttonPlugin")) {
 		
 		//Registers the bigbluebutton widget
 		function plugin_widget_init(){
-			wp_register_sidebar_widget(__('BigBlueButton'), 'bigbluebutton_sidebar');
+			//wp_register_sidebar_widget(__('BigBlueButton'), 'bigbluebutton_sidebar');
+			register_sidebar_widget(__('BigBlueButton'), 'bigbluebutton_sidebar');
 		}
 		
 		//Sets up the bigbluebutton table to store meetings in the wordpress database
@@ -362,7 +363,9 @@ function bigbluebutton_form($args) {
 				return;
 			}
 			else{ //The user can join the meeting, as it is valid
-				$bigbluebutton_joinURL = BigBlueButton::joinURL($found->meetingID."[".$found->meetingVersion."]", $name,$password, $salt_val, $url_val );
+				$bigbluebutton_joinURL = BigBlueButton::getCreateMeetingURL($name, $found->meetingID."[".$found->meetingVersion."]", $attendeePW, $moderatorPW, $welcome, $logoutURL, $salt_val, $url_val, $recorded, $duration, $voiceBridge, $metadata );
+
+				//$bigbluebutton_joinURL = BigBlueButton::joinURL($found->meetingID."[".$found->meetingVersion."]", $name,$password, $salt_val, $url_val );
 				//If the meeting is already running or the moderator is trying to join or a viewer is trying to join and the
 				//do not wait for moderator option is set to false then the user is immediately redirected to the meeting
 				if ( (BigBlueButton::isMeetingRunning( $found->meetingID."[".$found->meetingVersion."]", $url_val, $salt_val ) && ($found->moderatorPW == $password || $found->attendeePW == $password ) )
@@ -644,7 +647,8 @@ function bigbluebutton_list_meetings() {
 				}
 			}
 			else{
-				$bigbluebutton_joinURL = BigBlueButton::joinURL($meetingID."[".$meetingVersion."]", $current_user->display_name,$moderatorPW, $salt_val, $url_val );
+				$bigbluebutton_joinURL = BigBlueButton::getJoinURL($meetingID."[".$meetingVersion."]", $current_user->display_name,$moderatorPW, $salt_val, $url_val );
+//$bigbluebutton_joinURL = BigBlueButton::getCreateMeetingURL($current_user->display_name, $found->meetingID."[".$found->meetingVersion."]", $attendeePW, $moderatorPW, $welcome, $logoutURL, $salt_val, $url_val, $recorded, $duration, $voiceBridge, $metadata );
 				?><script type="text/javascript"> window.location = "<?php echo $bigbluebutton_joinURL ?>";</script><?php
 				return;
 			}
