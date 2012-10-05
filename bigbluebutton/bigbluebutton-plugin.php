@@ -364,9 +364,8 @@ function bigbluebutton_form($args) {
 				return;
 			}
 			else{ //The user can join the meeting, as it is valid
-				$bigbluebutton_joinURL = BigBlueButton::getCreateMeetingURL($name, $found->meetingID."[".$found->meetingVersion."]", $attendeePW, $moderatorPW, 'lalala welcome', $logoutURL, $salt_val, $url_val, $recorded, $duration, $voiceBridge, $metadata );
-				//$bigbluebutton_joinURL = BigBlueButton::getCreateMeetingURL($name, $found->meetingID."[".$found->meetingVersion."]", $attendeePW, $moderatorPW, $welcome, $logoutURL, $salt_val, $url_val, $recorded, $duration, $voiceBridge, $metadata );
-
+				//Join within sidebar widget
+				$bigbluebutton_joinURL = BigBlueButton::getJoinURL($found->meetingID."[".$found->meetingVersion."]", $name,$password, $salt_val, $url_val );
 				//$bigbluebutton_joinURL = BigBlueButton::joinURL($found->meetingID."[".$found->meetingVersion."]", $name,$password, $salt_val, $url_val );
 				//If the meeting is already running or the moderator is trying to join or a viewer is trying to join and the
 				//do not wait for moderator option is set to false then the user is immediately redirected to the meeting
