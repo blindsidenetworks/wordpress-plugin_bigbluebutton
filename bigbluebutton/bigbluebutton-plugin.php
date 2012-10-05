@@ -328,7 +328,7 @@ function bigbluebutton_sidebar($args) {
 
 function bigbluebutton_form($args) {
 
-	global $wpdb, $url_name, $salt_name, $meetingID_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name;
+	global $wpdb, $url_name, $salt_name, $meetingID_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name, $welcome;
 	
 	//Read in existing option value from database
 	$url_val = get_option($url_name);
@@ -354,7 +354,8 @@ function bigbluebutton_form($args) {
 		if($found->meetingID == $meetingID && ($found->moderatorPW == $password || $found->attendeePW == $password) ){
 			
 			//Calls create meeting on the bigbluebutton server
-			$response = BigBlueButton::createMeetingArray($name, $meetingID."[".$found->meetingVersion."]", "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl') );
+			$response = BigBlueButton::createMeetingArray($name, $meetingID."[".$found->meetingVersion."]", $welcome, $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl'), $logoutURL, $recorded, $duration, $voiceBridge, $metadata);
+			//$response = BigBlueButton::createMeetingArray($name, $meetingID."[".$found->meetingVersion."]", "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl') );
 
 			//Analyzes the bigbluebutton server's response
 			if(!$response || $response['returncode'] == 'FAILED' ){//If the server is unreachable, or an error occured
@@ -363,7 +364,8 @@ function bigbluebutton_form($args) {
 				return;
 			}
 			else{ //The user can join the meeting, as it is valid
-				$bigbluebutton_joinURL = BigBlueButton::getCreateMeetingURL($name, $found->meetingID."[".$found->meetingVersion."]", $attendeePW, $moderatorPW, $welcome, $logoutURL, $salt_val, $url_val, $recorded, $duration, $voiceBridge, $metadata );
+				$bigbluebutton_joinURL = BigBlueButton::getCreateMeetingURL($name, $found->meetingID."[".$found->meetingVersion."]", $attendeePW, $moderatorPW, 'lalala welcome', $logoutURL, $salt_val, $url_val, $recorded, $duration, $voiceBridge, $metadata );
+				//$bigbluebutton_joinURL = BigBlueButton::getCreateMeetingURL($name, $found->meetingID."[".$found->meetingVersion."]", $attendeePW, $moderatorPW, $welcome, $logoutURL, $salt_val, $url_val, $recorded, $duration, $voiceBridge, $metadata );
 
 				//$bigbluebutton_joinURL = BigBlueButton::joinURL($found->meetingID."[".$found->meetingVersion."]", $name,$password, $salt_val, $url_val );
 				//If the meeting is already running or the moderator is trying to join or a viewer is trying to join and the
@@ -606,7 +608,7 @@ function bigbluebutton_general_settings() {
 function bigbluebutton_list_meetings() {
 	global $wpdb;
 	$table_name = $wpdb->prefix . "bigbluebutton";
-	global $url_name, $salt_name, $meetingID_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name, $current_user;
+	global $url_name, $salt_name, $meetingID_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name, $current_user, $welcome;
 	
 	//Displays the title of the page
     echo "<h2>List of Meeting Rooms</h2>";
@@ -624,11 +626,15 @@ function bigbluebutton_list_meetings() {
 		$attendeePW = $found->attendeePW;
 		$meetingVersion = $found->meetingVersion;
 		$recorded = $found->recorded;
+		//
+		//Jay Test
+		//$welcome = 'this is a 4 test';
 		
 		if($_POST['Submit'] == 'Join'){
 			//Calls create meeting on the bigbluebutton server
-			$response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID."[".$meetingVersion."]", "", $moderatorPW, $attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false' );
-                                                       //( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
+			//This is a bug since it replicates the same line from above - 
+			$response = BigBlueButton::createMeetingArray($name, $meetingID."[".$found->meetingVersion."]", $welcome, $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl'), $logoutURL, $recorded, $duration, $voiceBridge, $metadata);
+			//$response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID."[".$meetingVersion."]", "", $moderatorPW, $attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false' );
 		
 			$createNew = false;
 			//Analyzes the bigbluebutton server's response
@@ -648,7 +654,6 @@ function bigbluebutton_list_meetings() {
 			}
 			else{
 				$bigbluebutton_joinURL = BigBlueButton::getJoinURL($meetingID."[".$meetingVersion."]", $current_user->display_name,$moderatorPW, $salt_val, $url_val );
-//$bigbluebutton_joinURL = BigBlueButton::getCreateMeetingURL($current_user->display_name, $found->meetingID."[".$found->meetingVersion."]", $attendeePW, $moderatorPW, $welcome, $logoutURL, $salt_val, $url_val, $recorded, $duration, $voiceBridge, $metadata );
 				?><script type="text/javascript"> window.location = "<?php echo $bigbluebutton_joinURL ?>";</script><?php
 				return;
 			}
