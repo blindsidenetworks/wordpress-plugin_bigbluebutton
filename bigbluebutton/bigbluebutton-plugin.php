@@ -265,6 +265,7 @@ if (isset($bigbluebutton_plugin)) {
 	add_action('admin_init', array(&$bigbluebutton_plugin, 'plugin_admin_init'), 1);
 	
 	add_action('plugins_loaded', array(&$bigbluebutton_plugin, 'plugin_update_check') );
+	
 	add_action('plugins_loaded', array(&$bigbluebutton_plugin, 'plugin_widget_init') );
 	
 	register_activation_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_install') ); //Runs the install script (including the databse and options set up)
@@ -313,7 +314,7 @@ function bigbluebutton_sidebar($args) {
 	extract($args);
 	
 	echo $before_widget;
-	echo $before_title;?>BigBlueButton<?php echo $after_title;
+	echo $before_title.'BigBlueButton'.$after_title;
 
 	bigbluebutton_form($args);
 
@@ -353,23 +354,23 @@ function bigbluebutton_form($args) {
 		if($found->meetingID == $meetingID && ($found->moderatorPW == $password || $found->attendeePW == $password) ){
 			
 			//Calls create meeting on the bigbluebutton server
-			$response = BigBlueButton::createMeetingArray($name, $meetingID."[".$found->meetingVersion."]", "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl') );
+		    $response = BigBlueButton::createMeetingArray($name, $meetingID."[".$found->meetingVersion."]", "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl') );
 
 			//Analyzes the bigbluebutton server's response
 			if(!$response || $response['returncode'] == 'FAILED' ){//If the server is unreachable, or an error occured
 				echo "Sorry an error occured while joining the meeting.";
 				echo $after_widget;
 				return;
-			}
-			else{ //The user can join the meeting, as it is valid
-				$bigbluebutton_joinURL = BigBlueButton::joinURL($found->meetingID."[".$found->meetingVersion."]", $name,$password, $salt_val, $url_val );
+			
+			} else{ //The user can join the meeting, as it is valid
+				$bigbluebutton_joinURL = BigBlueButton::getJoinURL($found->meetingID."[".$found->meetingVersion."]", $name,$password, $salt_val, $url_val );
 				//If the meeting is already running or the moderator is trying to join or a viewer is trying to join and the
 				//do not wait for moderator option is set to false then the user is immediately redirected to the meeting
 				if ( (BigBlueButton::isMeetingRunning( $found->meetingID."[".$found->meetingVersion."]", $url_val, $salt_val ) && ($found->moderatorPW == $password || $found->attendeePW == $password ) )
 					|| $response['moderatorPW'] == $password 
 					|| ($response['attendeePW'] == $password && !$found->waitForModerator)  ){
 						//If the password submitted is correct then the user gets redirected
-						?><script type="text/javascript"> window.location = "<?php echo $bigbluebutton_joinURL ?>";</script><?php
+				        echo '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
 						return;
 				}
 				//If the viewer has the correct password, but the meeting has not yet started they have to wait
@@ -644,8 +645,8 @@ function bigbluebutton_list_meetings() {
 				}
 			}
 			else{
-				$bigbluebutton_joinURL = BigBlueButton::joinURL($meetingID."[".$meetingVersion."]", $current_user->display_name,$moderatorPW, $salt_val, $url_val );
-				?><script type="text/javascript"> window.location = "<?php echo $bigbluebutton_joinURL ?>";</script><?php
+				$bigbluebutton_joinURL = BigBlueButton::getJoinURL($meetingID."[".$meetingVersion."]", $current_user->display_name,$moderatorPW, $salt_val, $url_val );
+				echo '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
 				return;
 			}
 			
