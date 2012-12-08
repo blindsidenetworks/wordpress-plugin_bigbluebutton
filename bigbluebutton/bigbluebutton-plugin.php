@@ -76,8 +76,9 @@ global $bigbluebutton_plugin_version;
 $url_name = 'bigbluebutton_url';
 $salt_name = 'bigbluebutton_salt';
 
-$meetingVersion_name = 'meetingVersion'; //The name that is used to save the meeting in the bigbluebutton server
 $meetingID_name = 'meetingID';
+$meetingName_name = 'meetingName';
+$meetingVersion_name = 'meetingVersion';
 $attendeePW_name = 'attendeePW';
 $moderatorPW_name = 'moderatorPW';
 $waitForModerator_name = 'waitForModerator';
@@ -111,7 +112,8 @@ if (!class_exists("bigbluebuttonPlugin")) {
 		
 		//Registers the bigbluebutton widget
 		function plugin_widget_init(){
-			wp_register_sidebar_widget(__('BigBlueButton'), 'bigbluebutton_sidebar');
+			//wp_register_sidebar_widget(__('BigBlueButton'), 'bigbluebutton_sidebar');
+			register_sidebar_widget(__('BigBlueButton'), 'bigbluebutton_sidebar');
 		}
 		
 		//Sets up the bigbluebutton table to store meetings in the wordpress database
@@ -131,6 +133,7 @@ if (!class_exists("bigbluebuttonPlugin")) {
 			    $sql = "CREATE TABLE " . $table_name . " (
 			    id mediumint(9) NOT NULL AUTO_INCREMENT,
 			    meetingID text NOT NULL,
+			    meetingName text NOT NULL,
 			    meetingVersion int NOT NULL,
 			    attendeePW text NOT NULL,
 			    moderatorPW text NOT NULL,
@@ -190,9 +193,13 @@ if (!class_exists("bigbluebuttonPlugin")) {
 					$wpdb->query($sql);
 				}
 				//Common update
+				$sql = "ALTER TABLE " . $table_name . " ADD meetingName TEXT NOT NULL AFTER meetingID;";
+				$wpdb->query($sql);
+				
 				$sql = "ALTER TABLE " . $table_name . " ADD recorded BOOLEAN NOT NULL DEFAULT FALSE;";
 				$wpdb->query($sql);
-								
+
+				
 			}
 				
 			////////////////// Updates for version 1.0.3 and larter //////////////////
@@ -328,7 +335,7 @@ function bigbluebutton_sidebar($args) {
 
 function bigbluebutton_form($args) {
 
-	global $wpdb, $url_name, $salt_name, $meetingID_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name;
+	global $wpdb, $url_name, $salt_name, $meetingID_name, $meetingName_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name;
 	
 	//Read in existing option value from database
 	$url_val = get_option($url_name);
@@ -336,7 +343,7 @@ function bigbluebutton_form($args) {
 	
 	//Gets all the meetings from wordpress database
 	$table_name = $wpdb->prefix . "bigbluebutton";
-	$listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingVersion, moderatorPW FROM ".$table_name." ORDER BY meetingID");
+	$listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName, meetingVersion, attendeePW, moderatorPW FROM ".$table_name." ORDER BY meetingName");
 			
 	$dataSubmitted = false;
 	$validMeeting = false;
@@ -349,12 +356,13 @@ function bigbluebutton_form($args) {
 		$name = $_POST['display_name'];
 		$password = $_POST['pwd'];
 		$meetingID = $_POST[$meetingID_name];
+		$meetingName = $_POST[$meetingName_name];
 		
 		$found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
 		if($found->meetingID == $meetingID && ($found->moderatorPW == $password || $found->attendeePW == $password) ){
 			
 			//Calls create meeting on the bigbluebutton server
-		    $response = BigBlueButton::createMeetingArray($name, $meetingID."[".$found->meetingVersion."]", "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl') );
+		    $response = BigBlueButton::createMeetingArray($name, $found->meetingID."[".$found->meetingVersion."]", $found->meetingName, "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl') );
 
 			//Analyzes the bigbluebutton server's response
 			if(!$response || $response['returncode'] == 'FAILED' ){//If the server is unreachable, or an error occured
@@ -363,7 +371,7 @@ function bigbluebutton_form($args) {
 				return;
 			
 			} else{ //The user can join the meeting, as it is valid
-				$bigbluebutton_joinURL = BigBlueButton::getJoinURL($found->meetingID."[".$found->meetingVersion."]", $name,$password, $salt_val, $url_val );
+				$bigbluebutton_joinURL = BigBlueButton::getJoinURL($found->meetingID."[".$found->meetingVersion."]", $name, $password, $salt_val, $url_val );
 				//If the meeting is already running or the moderator is trying to join or a viewer is trying to join and the
 				//do not wait for moderator option is set to false then the user is immediately redirected to the meeting
 				if ( (BigBlueButton::isMeetingRunning( $found->meetingID."[".$found->meetingVersion."]", $url_val, $salt_val ) && ($found->moderatorPW == $password || $found->attendeePW == $password ) )
@@ -449,49 +457,47 @@ function bigbluebutton_form($args) {
 //the meetingName is the meetingID[$meetingVersion]
 function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingID, $meetingName, $name){
 
-	?>
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-		<script type="text/javascript" src="<?php echo './wp-content/plugins/bigbluebutton/js/heartbeat.js'; ?>"></script>
-		<script type="text/javascript" src="<?php echo './wp-content/plugins/bigbluebutton/js/md5.js'; ?>"></script>
-		<script type="text/javascript" src="<?php echo './wp-content/plugins/bigbluebutton/js/jquery.xml2json.js'; ?>"></script>
-		<script type="text/javascript">
-			$(document).ready(function(){
-				$.jheartbeat.set({
-					url: './wp-content/plugins/bigbluebutton/php/check.php?meetingID=<?php echo urlencode($meetingName); ?>',
-					delay: 5000
-				}, function () {
-				mycallback();
-				});
-			});
+    echo '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>'."\n";
+    echo '<script type="text/javascript" src="/wp-content/plugins/bigbluebutton/js/heartbeat.js"></script>'."\n";
+    echo '<script type="text/javascript" src="/wp-content/plugins/bigbluebutton/js/md5.js"></script>'."\n";
+    echo '<script type="text/javascript" src="/wp-content/plugins/bigbluebutton/js/jquery.xml2json.js"></script>'."\n";
 
+    echo '<script type="text/javascript">
+            $(document).ready(function(){
+                $.jheartbeat.set({
+                    url: "./wp-content/plugins/bigbluebutton/php/check.php?meetingID='.urlencode($meetingName).'",
+                    delay: 5000
+                    }, function () {
+                        mycallback();
+                });
+            });
+            function mycallback() {
+                // Not elegant, but works around a bug in IE8
+                var isMeetingRunning = ($("#HeartBeatDIV").text().search("true") > 0 );
 
-			function mycallback() {
-				// Not elegant, but works around a bug in IE8
-				var isMeetingRunning = ($("#HeartBeatDIV").text().search("true") > 0 );
+                if (isMeetingRunning) {
+                    window.location = "'.$bigbluebutton_joinURL.'";
+                }
+            }
+          </script>';
 
-				if (isMeetingRunning) {
-					window.location = "<?php echo $bigbluebutton_joinURL; ?>";
-				}
-			}
-		</script>
-
-		<table>
+    echo '<table>
 			<tbody>
 				<tr>
 					<td>
 						Hi <?php echo $name; ?>,
 						<br />
 						<br />
-						Now waiting for the moderator to start <?php echo $meetingID; ?>.
+						Now waiting for the moderator to start '.$meetingID.'.
 						<br />
-						<center><img align="center" src="<?php echo './wp-content/plugins/bigbluebutton/images/polling.gif'; ?>" /></center>
+						<img align="center" src="./wp-content/plugins/bigbluebutton/images/polling.gif" />
 						<br />
 						(Your browser will automatically refresh and join the meeting when it starts.)
 					</td>
 				</tr>
 			</tbody>
-		</table>
-	<?php
+		</table>';
+
 	return;
 }
 
@@ -748,7 +754,7 @@ function bigbluebutton_list_meetings() {
 			<form name="form1" method="post" action="">
 				<input type="hidden" name="<?php echo $meetingID_name; ?>" value="<?php echo $meeting->meetingID; ?>">
 				<tr>
-					<td><?php echo $meeting->meetingID; ?></td>
+					<td><?php echo $meeting->meetingName; ?></td>
 					<td><?php echo $meeting->attendeePW; ?></td>
 					<td><?php echo $meeting->moderatorPW; ?></td>
 					<td>
@@ -781,7 +787,7 @@ function bigbluebutton_list_meetings() {
 				<input type="hidden" name="<?php echo $meetingID_name; ?>" value="<?php echo $meeting->meetingID; ?>">
 				<tr>
 				
-					<td><?php echo $meeting->meetingID; ?></td>
+					<td><?php echo $meeting->meetingName; ?></td>
 					<td><?php echo $meeting->attendeePW; ?></td>
 					<td><?php echo $meeting->moderatorPW; ?></td>
 					<td>
@@ -869,7 +875,7 @@ function bigbluebutton_print_table_header(){
 //This page allows the user to create a meeting
 function bigbluebutton_create_meetings() {
 
-	global $url_name, $salt_name, $meetingID_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name;
+	global $url_name, $salt_name, $meetingID_name, $meetingName_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name;
 	
     //Displays the title of the page
     echo "<h2>Create a Meeting Room</h2>";
@@ -880,15 +886,19 @@ function bigbluebutton_create_meetings() {
 	//Obtains the meeting information of the meeting that is going to be created
     if( isset($_POST['Submit']) && $_POST['Submit'] == 'Create' ) {
    
-		//Reads the posted values
-        $meetingID = $_POST[ $meetingID_name ];
+        /// Reads the posted values
+        $meetingName = $_POST[ $meetingName_name ];
 		$attendeePW = $_POST[ $attendeePW_name ];
 		$moderatorPW = $_POST[ $moderatorPW_name ];
 		$waitForModerator = (isset($_POST[ $waitForModerator_name ]) && $_POST[ $waitForModerator_name ] == 'True')? true: false;
 		$recorded = (isset($_POST[ $recorded_name ]) && $_POST[ $recorded_name ] == 'True')? true: false;
+		$meetingVersion = time();
+		/// Assign a random unique ID based on the name and timestamp
+		$meetingID = sha1($meetingName.strval($meetingVersion));
+		
 		
 		//Checks to see if the meeting name, attendee password or moderator password was left blank
-		if($meetingID == '' || $attendeePW == '' || $moderatorPW == ''){
+		if($meetingName == '' || $attendeePW == '' || $moderatorPW == ''){
 			//If the meeting name was left blank, the user is prompted to fill it out
 			?><div class="updated"><p><strong><?php echo "All fields must be filled."; ?></strong></p></div><?php
 		} else {
@@ -927,7 +937,7 @@ function bigbluebutton_create_meetings() {
 	
 	<form name="form1" method="post" action="">
 		<p><?php echo "Meeting Room Name:"; ?> 
-			<input type="text" name="<?php echo $meetingID_name; ?>" value="" size="20">
+			<input type="text" name="<?php echo $meetingName_name; ?>" value="" size="20">
 		</p>
 		
 		<p><?php echo "Attendee Password:"; ?> 
