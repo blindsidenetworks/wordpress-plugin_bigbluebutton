@@ -371,7 +371,7 @@ function bigbluebutton_form($args) {
         if($found->meetingID == $meetingID && ($found->moderatorPW == $password || $found->attendeePW == $password) ){
             	
             //Calls create meeting on the bigbluebutton server
-            $response = BigBlueButton::createMeetingArray($name, $found->meetingID, $found->meetingName, "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl') );
+            $response = BigBlueButton::createMeetingArray($name, $found->meetingID, $found->meetingName, "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false' );
 
             //Analyzes the bigbluebutton server's response
             if(!$response || $response['returncode'] == 'FAILED' ){//If the server is unreachable, or an error occured
@@ -816,12 +816,103 @@ function bigbluebutton_list_meetings() {
 //================================================================================
 // Displays all the recordings available in the bigbluebutton server
 function bigbluebutton_list_recordings() {
-    //Displays the title of the page
-    echo "<h2>List of Recordings </h2>";
-
+    global $wpdb;
+    $table_name = $wpdb->prefix . "bigbluebutton";
+    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+    
     $url_val = get_option('bigbluebutton_url');
     $salt_val = get_option('bigbluebutton_salt');
+    
+    //Gets all the meetings from wordpress database
+    $listOfMeetings = $wpdb->get_results("SELECT DISTINCT meetingID FROM ".$table_logs_name." WHERE recorded = 1 ORDER BY timestamp;");
+    //print_r($listOfMeetings);
+    
+    $meetingIDs = '';
+    $listOfRecordings = Array();
+    if($listOfMeetings){
+        foreach ($listOfMeetings as $meeting) {
+            if( $meetingIDs != '' ) $meetingIDs .= ', ';
+            $meetingIDs .= $meeting->meetingID;
+        }
+        
+        if( $meetingIDs != '' ){
+            $listOfRecordings = BigBlueButton::getRecordingsArray($meetingIDs, $url_val, $salt_val);
+        }
+            
+    }
+    
+    //Displays the title of the page
+    echo "<h2>List of Recordings </h2>";
+    
+    echo '
+          <div>
+            <table class="stats" cellspacing="5">
+              <tr>
+                <th class="hed" colspan="1">Recording</td>
+                <th class="hed" colspan="1">Meeting Room Name</td>
+                <th class="hed" colspan="1">Date</td>
+                <th class="hed" colspan="1">Duration</td>
+                <th class="hedextra" colspan="1">Toolbar</td>
+              </tr>';
+    $moderator = true;
+    foreach( $listOfRecordings as $recording){
+        
+        /// Prepare playback recording links
+        $type = '';
+        foreach ( $recording['playbacks'] as $playback ){
+            $type .= '<a href="'.$playback['url'].'" target="_new">'.$playback['type'].'</a>&#32;';
+        }
+        
+        /// Prepare actionbar
+        $actionbar = '';
+        if ( $moderator ) {
+            $deleteURL = BigBluebutton::getDeleteRecordingsURL($recording['recordID'], $url, $salt);
+            if ( $recording['published'] == 'true' ){
+                $publishURL = BigBluebutton::getPublishRecordingsURL($recording['recordID'], 'false', $url, $salt);
+                $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_hide."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/hide.gif' class='iconsmall' onClick='actionCall(\\\"unpublish\\\", \\\"".$recording['recordID']."\\\", \\\"".$cid."\\\")'   /></a>";
+            } else {
+                $publishURL = BigBluebutton::getPublishRecordingsURL($recording['recordID'], 'true', $url, $salt);
+                $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_show."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/show.gif' class='iconsmall' onClick='actionCall(\\\"publish\\\", \\\"".$recording['recordID']."\\\", \\\"".$cid."\\\")'   /></a>";
+            }
+            $actionbar .= "<a id='actionbar-delete-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_delete."' href='#'><img id='actionbar-delete-img-".$recording['recordID']."' src='pix/delete.gif' class='iconsmall' onClick='actionCall(\\\"delete\\\", \\\"".$recording['recordID']."\\\", \\\"".$cid."\\\")'   /></a>";
+        }
+        
+        
+        /// Prepare duration
+        $endTime = isset($recording['endTime'])? intval(str_replace('"', '\"', $recording['endTime'])):0;
+        $endTime = $endTime - ($endTime % 1000);
+        $startTime = isset($recording['startTime'])? intval(str_replace('"', '\"', $recording['startTime'])):0;
+        $startTime = $startTime - ($startTime % 1000);
+        $duration = intval(($endTime - $startTime) / 60000);
+        
+        /// Prepare date
+        //Make sure the startTime is timestamp
+        if( !is_numeric($recording['startTime']) ){
+            $date = new DateTime($recording['startTime']);
+            $recording['startTime'] = date_timestamp_get($date);
+        } else {
+            $recording['startTime'] = ($recording['startTime'] - $recording['startTime'] % 1000) / 1000;
+        }
+        
+        //Format the date
+        //$date = new DateTime($recording['startTime'] * 1000);
+        $formatedStartDate = $recording['startTime']; //$date->format('%a %h %d %H:%M:%S %Z %Y'); //userdate($recording['startTime'], $format, usertimezone(get_option('timezone_string')) );
+        
+        echo '
+              <tr>
+                <td class="hed" colspan="1">'.$type.'</td>
+                <td class="hed" colspan="1">'.$recording['meetingName'].'</td>
+                <td class="hed" colspan="1">'.$formatedStartDate.'</td>
+                <td class="hed" colspan="1">'.$duration.'</td>
+                <td class="hedextra" colspan="1">'.$actionbar.'</td>
+              </tr>';
+    }
 
+    echo '  </table>
+          </div><hr />';
+    
+    
+    
 }
 
 
@@ -829,16 +920,14 @@ function bigbluebutton_list_recordings() {
 function bigbluebutton_print_table_header(){
     echo '<div>
             <table class="stats" cellspacing="5">
-              <th>
-                <tr>
-                  <td class="hed" colspan="1">Meeting Room Name</td>
-                  <td class="hed" colspan="1">Attendee Password</td>
-                  <td class="hed" colspan="1">Moderator Password</td>
-                  <td class="hed" colspan="1">Wait for Moderator</td>
-                  <td class="hed" colspan="1">Recorded</td>
-                  <td class="hedextra" colspan="1">Actions</td>
-                </tr>
-              </th>';
+              <tr>
+                <th class="hed" colspan="1">Meeting Room Name</td>
+                <th class="hed" colspan="1">Attendee Password</td>
+                <th class="hed" colspan="1">Moderator Password</td>
+                <th class="hed" colspan="1">Wait for Moderator</td>
+                <th class="hed" colspan="1">Recorded</td>
+                <th class="hedextra" colspan="1">Actions</td>
+              </tr>';
 }
 
 //================================================================================

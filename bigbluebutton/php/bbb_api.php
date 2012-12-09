@@ -410,9 +410,7 @@ class BigBlueButton {
 		}
 		else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
 		
-			foreach ($xml->meetings->meeting as $meeting)
-			{
-            //$meetings[] = BigBlueButton::getMeetingInfo($meeting->meetingID, $meeting->moderatorPW, $URL, $SALT);
+			foreach ($xml->meetings->meeting as $meeting) {
 				$meetings[] = array( 'meetingID' => $meeting->meetingID, 'moderatorPW' => $meeting->moderatorPW, 'attendeePW' => $meeting->attendeePW, 'hasBeenForciblyEnded' => $meeting->hasBeenForciblyEnded, 'running' => $meeting->running );
 			}
 
@@ -428,7 +426,7 @@ class BigBlueButton {
 	}
 	
 	public function getRecordingsArray($meetingID, $URL, $SALT ) {
-	    $xml = bigbluebuttonbn_wrap_simplexml_load_file( BigBlueButton::getRecordingsURL( $meetingID, $URL, $SALT ) );
+	    $xml = bbb_wrap_simplexml_load_file( BigBlueButton::getRecordingsURL( $meetingID, $URL, $SALT ) );
 	    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
 	        return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
 	    } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
