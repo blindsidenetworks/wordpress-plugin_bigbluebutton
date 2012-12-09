@@ -225,9 +225,6 @@ if (!class_exists("bigbluebuttonPlugin")) {
             $plugin_file = basename( ( __FILE__ ) );
             
             return $plugin_folder[$plugin_file]['Version'];
-            
-            //return '1.0.3'; //$plugin_version;
-            
         }
 
     }//End Class bigbluebuttonPlugin
@@ -282,7 +279,7 @@ function bigbluebutton_warning_handler($errno, $errstr) {
 //================================================================================
 //Inserts a bigbluebutton form on a post or page of the blog
 function bigbluebutton_shortcode($args) {
-    //if (!session_id()) session_start();
+    if (!session_id()) session_start();
     extract($args);
 
     bigbluebutton_form($args);
@@ -290,7 +287,7 @@ function bigbluebutton_shortcode($args) {
 }
 
 function bigbluebutton_test_shortcode($args) {
-    //if (!session_id()) session_start();
+    if (!session_id()) session_start();
     extract($args);
     
     echo 'Version '.get_option('bigbluebutton_plugin_version').' is installed!!!<br>';
@@ -312,7 +309,7 @@ function bigbluebutton_test_shortcode($args) {
 //================================================================================
 //Inserts a bigbluebutton widget on the siderbar of the blog
 function bigbluebutton_sidebar($args) {
-    //if (!session_id()) session_start();
+    if (!session_id()) session_start();
     extract($args);
 
     echo $before_widget;
@@ -379,10 +376,10 @@ function bigbluebutton_form($args) {
                 //for the moderator to start the meeting
                 else if ($found->attendeePW == $password){
                     //Stores the url and salt of the bigblubutton server in the session
-                    $_SESSION['bigbluebutton_url'] = $url_val;
-                    $_SESSION['bigbluebutton_salt'] = $salt_val;
+                    $_SESSION['mt_bbb_url'] = $url_val;
+                    $_SESSION['mt_salt'] = $salt_val;
                     //Displays the javascript to automatically redirect the user when the meeting begins
-                    bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $found->meetingID."[".$found->meetingVersion."]", $found->meetingName, $name);
+                    bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $found->meetingID, $found->meetingName, $name);
                     echo $after_widget;
                     return;
                 }
@@ -457,9 +454,9 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
     echo '<script type="text/javascript" src="wp-content/plugins/bigbluebutton/js/jquery.xml2json.js"></script>'."\n";
 
     echo '<script type="text/javascript">
-            $(document).ready(function(){
+                $(document).ready(function(){
                 $.jheartbeat.set({
-                    url: "./wp-content/plugins/bigbluebutton/php/check.php?meetingID='.urlencode($meetingName).'",
+                    url: "./wp-content/plugins/bigbluebutton/php/check.php?meetingID='.urlencode($meetingID).'",
                     delay: 5000
                     }, function () {
                         mycallback();
@@ -467,7 +464,6 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
                 });
             
             function mycallback() {
-                console.debug(\'Hello\');
                 // Not elegant, but works around a bug in IE8
                 var isMeetingRunning = ($("#HeartBeatDIV").text().search("true") > 0 );
 
