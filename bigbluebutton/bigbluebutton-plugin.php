@@ -92,7 +92,8 @@ if (!class_exists("bigbluebuttonPlugin")) {
 
             //Sets the name of the table
             $table_name = $wpdb->prefix . "bigbluebutton";
-
+            $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+            
             //Installation code
             if( !get_option('bbb_db_version') && !get_option('bigbluebutton_plugin_version') ){
                 ////////////////// Create Database //////////////////
@@ -109,6 +110,18 @@ if (!class_exists("bigbluebuttonPlugin")) {
                     );";
 
                 dbDelta($sql);
+                
+                $sql = "CREATE TABLE " . $table_logs_name . " (
+                    id mediumint(9) NOT NULL AUTO_INCREMENT,
+                    meetingID text NOT NULL,
+                    recorded BOOLEAN NOT NULL DEFAULT FALSE,
+                    timestamp int NOT NULL,
+                    event text NOT NULL,
+                    UNIQUE KEY id (id)
+                    );";
+                
+                dbDelta($sql);
+                
             }
             	
             ////////////////// Initialize Settings //////////////////
@@ -131,6 +144,7 @@ if (!class_exists("bigbluebuttonPlugin")) {
             	
             //Sets the name of the table
             $table_name = $wpdb->prefix . "bigbluebutton";
+            $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
             $table_name_old = $wpdb->prefix . "bbb_meetingRooms";
 
             ////////////////// Updates for version 1.0.2 and earlier //////////////////
@@ -192,7 +206,7 @@ if (!class_exists("bigbluebuttonPlugin")) {
         //Sets up the bigbluebutton table to store meetings in the wordpress database
         function plugin_uninstall () {
             global $wpdb;
-
+            
             //In case is deactivateing an overwritten version
             if( get_option('bbb_db_version') ){
                 $table_name_old = $wpdb->prefix . "bbb_meetingRooms";
@@ -211,6 +225,9 @@ if (!class_exists("bigbluebuttonPlugin")) {
             $table_name = $wpdb->prefix . "bigbluebutton";
             $wpdb->query("DROP TABLE IF EXISTS $table_name");
 
+            $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+            $wpdb->query("DROP TABLE IF EXISTS $table_logs_name");
+            
         }
 
         /**
@@ -328,13 +345,14 @@ function bigbluebutton_sidebar($args) {
 function bigbluebutton_form($args) {
 
     global $wpdb, $after_widget;
-
+    $table_name = $wpdb->prefix . "bigbluebutton";
+    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+    
     //Read in existing option value from database
     $url_val = get_option('bigbluebutton_url');
     $salt_val = get_option('bigbluebutton_salt');
 
     //Gets all the meetings from wordpress database
-    $table_name = $wpdb->prefix . "bigbluebutton";
     $listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName, meetingVersion, attendeePW, moderatorPW FROM ".$table_name." ORDER BY meetingName");
     	
     $dataSubmitted = false;
@@ -362,6 +380,11 @@ function bigbluebutton_form($args) {
                 return;
                 	
             } else{ //The user can join the meeting, as it is valid
+                if( !isset($response['messageKey']) || $response['messageKey'] == '' ){
+                    // The meeting was just created, insert the create event to the log
+                    $rows_affected = $wpdb->insert( $table_logs_name, array( 'meetingID' => $meetingID, 'recorded' => $found->recorded, 'timestamp' => time(), 'event' => 'Create' ) );
+                }
+                    
                 $bigbluebutton_joinURL = BigBlueButton::getJoinURL($found->meetingID, $name, $password, $salt_val, $url_val );
                 //If the meeting is already running or the moderator is trying to join or a viewer is trying to join and the
                 //do not wait for moderator option is set to false then the user is immediately redirected to the meeting
@@ -369,7 +392,7 @@ function bigbluebutton_form($args) {
                         || $response['moderatorPW'] == $password
                         || ($response['attendeePW'] == $password && !$found->waitForModerator)  ){
                     //If the password submitted is correct then the user gets redirected
-                    echo '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
+                    echo '<script type="text/javascript">console.debug("'.$bigbluebutton_joinURL.'"); //window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
                     return;
                 }
                 //If the viewer has the correct password, but the meeting has not yet started they have to wait
@@ -468,7 +491,8 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
                 var isMeetingRunning = ($("#HeartBeatDIV").text().search("true") > 0 );
 
                 if (isMeetingRunning) {
-                    window.location = "'.$bigbluebutton_joinURL.'";
+                    console.debug("'.$bigbluebutton_joinURL.'");
+                    //window.location = "'.$bigbluebutton_joinURL.'";
                 }
             }
           </script>';
@@ -590,9 +614,10 @@ function bigbluebutton_general_settings() {
 // Displays all the meetings available in the bigbluebutton server
 function bigbluebutton_list_meetings() {
     global $wpdb;
-    $table_name = $wpdb->prefix . "bigbluebutton";
     global $current_user;
-
+    $table_name = $wpdb->prefix . "bigbluebutton";
+    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+    
     //Displays the title of the page
     echo "<h2>List of Meeting Rooms</h2>";
 
@@ -601,7 +626,6 @@ function bigbluebutton_list_meetings() {
 
     //---------------------------------------------------JOIN-----------------------------------------------
     if( isset($_POST['SubmitList']) ) { //Creates then joins the meeting. If any problems occur the error is displayed
-        print_r($_POST);
         // Read the posted value and delete
         $meetingID = $_POST['meetingID'];
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
@@ -614,7 +638,7 @@ function bigbluebutton_list_meetings() {
         if($_POST['SubmitList'] == 'Join'){
             //Calls create meeting on the bigbluebutton server
             $response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID, $meetingName, "", $moderatorPW, $attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false' );
-
+            
             $createNew = false;
             //Analyzes the bigbluebutton server's response
             if(!$response){//If the server is unreachable, then prompts the user of the necessary action
@@ -632,8 +656,13 @@ function bigbluebutton_list_meetings() {
                 }
             }
             else{
+                if( !isset($response['messageKey']) || $response['messageKey'] == '' ){
+                    // The meeting was just created, insert the create event to the log
+                    $rows_affected = $wpdb->insert( $table_logs_name, array( 'meetingID' => $meetingID, 'recorded' => $found->recorded, 'timestamp' => time(), 'event' => 'Create' ) );
+                }
+                
                 $bigbluebutton_joinURL = BigBlueButton::getJoinURL($meetingID, $current_user->display_name,$moderatorPW, $salt_val, $url_val );
-                echo '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
+                echo '<script type="text/javascript">console.debug("'.$bigbluebutton_joinURL.'"); //window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
                 return;
             }
             	

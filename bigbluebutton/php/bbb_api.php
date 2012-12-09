@@ -294,10 +294,12 @@ class BigBlueButton {
 	public function createMeetingArray( $username, $meetingID, $meetingName, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
 	
 		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getCreateMeetingURL($meetingName, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata ) );
-	
+		
 		if( $xml ) {
-			if($xml->meetingID) return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded );
-			else return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
+			if($xml->meetingID) 
+			    return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey, 'meetingID' => (string)$xml->meetingID, 'attendeePW' => (string)$xml->attendeePW, 'moderatorPW' => (string)$xml->moderatorPW, 'hasBeenForciblyEnded' => (string)$xml->hasBeenForciblyEnded );
+			else 
+			    return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey );
 		}
 		else {
 			return null;
