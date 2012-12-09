@@ -253,8 +253,10 @@ if (isset($bigbluebutton_plugin)) {
 
     register_activation_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_install') ); //Runs the install script (including the databse and options set up)
 
-    register_deactivation_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_uninstall') );//Runs the uninstall function (it includes the database and options delete)
+    register_deactivation_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_uninstall') ); //Runs the uninstall function (it includes the database and options delete)
 
+    //register_uninstall_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_uninstall') ); //Runs the uninstall function (it includes the database and options delete)
+    
     set_error_handler("bigbluebutton_warning_handler", E_WARNING);
 
 }
@@ -280,7 +282,7 @@ function bigbluebutton_warning_handler($errno, $errstr) {
 //================================================================================
 //Inserts a bigbluebutton form on a post or page of the blog
 function bigbluebutton_shortcode($args) {
-    session_start();
+    //if (!session_id()) session_start();
     extract($args);
 
     bigbluebutton_form($args);
@@ -288,7 +290,7 @@ function bigbluebutton_shortcode($args) {
 }
 
 function bigbluebutton_test_shortcode($args) {
-    session_start();
+    //if (!session_id()) session_start();
     extract($args);
     
     echo 'Version '.get_option('bigbluebutton_plugin_version').' is installed!!!<br>';
@@ -310,7 +312,7 @@ function bigbluebutton_test_shortcode($args) {
 //================================================================================
 //Inserts a bigbluebutton widget on the siderbar of the blog
 function bigbluebutton_sidebar($args) {
-    session_start();
+    //if (!session_id()) session_start();
     extract($args);
 
     echo $before_widget;
@@ -328,7 +330,7 @@ function bigbluebutton_sidebar($args) {
 
 function bigbluebutton_form($args) {
 
-    global $wpdb;
+    global $wpdb, $after_widget;
 
     //Read in existing option value from database
     $url_val = get_option('bigbluebutton_url');
@@ -341,7 +343,7 @@ function bigbluebutton_form($args) {
     $dataSubmitted = false;
     $validMeeting = false;
     $meetingExist = false;
-    if( isset($_POST['Submit']) && $_POST['Submit'] == 'Join' ) { //The user has submitted his login information
+    if( isset($_POST['SubmitForm']) && $_POST['Submit'] == 'Join' ) { //The user has submitted his login information
         $dataSubmitted = true;
         $meetingExist = true;
 
@@ -349,13 +351,12 @@ function bigbluebutton_form($args) {
         $name = $_POST['display_name'];
         $password = $_POST['pwd'];
         $meetingID = $_POST['meetingID'];
-        $meetingName = $_POST['meetingName'];
 
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
         if($found->meetingID == $meetingID && ($found->moderatorPW == $password || $found->attendeePW == $password) ){
             	
             //Calls create meeting on the bigbluebutton server
-            $response = BigBlueButton::createMeetingArray($name, $found->meetingID."[".$found->meetingVersion."]", $found->meetingName, "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl') );
+            $response = BigBlueButton::createMeetingArray($name, $found->meetingID, $found->meetingName, "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl') );
 
             //Analyzes the bigbluebutton server's response
             if(!$response || $response['returncode'] == 'FAILED' ){//If the server is unreachable, or an error occured
@@ -364,10 +365,10 @@ function bigbluebutton_form($args) {
                 return;
                 	
             } else{ //The user can join the meeting, as it is valid
-                $bigbluebutton_joinURL = BigBlueButton::getJoinURL($found->meetingID."[".$found->meetingVersion."]", $name, $password, $salt_val, $url_val );
+                $bigbluebutton_joinURL = BigBlueButton::getJoinURL($found->meetingID, $name, $password, $salt_val, $url_val );
                 //If the meeting is already running or the moderator is trying to join or a viewer is trying to join and the
                 //do not wait for moderator option is set to false then the user is immediately redirected to the meeting
-                if ( (BigBlueButton::isMeetingRunning( $found->meetingID."[".$found->meetingVersion."]", $url_val, $salt_val ) && ($found->moderatorPW == $password || $found->attendeePW == $password ) )
+                if ( (BigBlueButton::isMeetingRunning( $found->meetingID, $url_val, $salt_val ) && ($found->moderatorPW == $password || $found->attendeePW == $password ) )
                         || $response['moderatorPW'] == $password
                         || ($response['attendeePW'] == $password && !$found->waitForModerator)  ){
                     //If the password submitted is correct then the user gets redirected
@@ -381,7 +382,7 @@ function bigbluebutton_form($args) {
                     $_SESSION['bigbluebutton_url'] = $url_val;
                     $_SESSION['bigbluebutton_salt'] = $salt_val;
                     //Displays the javascript to automatically redirect the user when the meeting begins
-                    bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $found->meetingID, $found->meetingID."[".$found->meetingVersion."]", $name);
+                    bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $found->meetingID."[".$found->meetingVersion."]", $found->meetingName, $name);
                     echo $after_widget;
                     return;
                 }
@@ -413,7 +414,7 @@ function bigbluebutton_form($args) {
                   <td><select name="meetingID">';
 
         foreach ($listOfMeetings as $meeting) {
-            echo "                    <option>".$meeting->meetingID."</option>";
+            echo '                    <option value="'.$meeting->meetingID.'">'.$meeting->meetingName.'</option>';
 		}
 		
 		echo '
@@ -428,7 +429,7 @@ function bigbluebutton_form($args) {
                   <td><INPUT type="password" name="pwd" size="10"></td>
                 </tr>
               </table>
-              <INPUT type="submit" name="Submit" value="Join">
+              <INPUT type="submit" name="SubmitForm" value="Join">
             </form>';
     
     } else if($dataSubmitted){
@@ -447,7 +448,7 @@ function bigbluebutton_form($args) {
 
 
 //Displays the javascript that handles redirecting a user, when the meeting has started
-//the meetingName is the meetingID[$meetingVersion]
+//the meetingName is the meetingID
 function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingID, $meetingName, $name){
 
     echo '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>'."\n";
@@ -480,8 +481,8 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
               <tr>
                 <td>
                   Hi '.$name.',<br /><br />
-                  Now waiting for the moderator to start '.$meetingID.'.<br />
-                  <img align="center" src="./wp-content/plugins/bigbluebutton/images/polling.gif" /><br />
+                  Now waiting for the moderator to start '.$meetingName.'.<br />
+                  <div align="center"><img src="./wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />
                   (Your browser will automatically refresh and join the meeting when it starts.)
                 </td>
               </tr>
@@ -534,7 +535,7 @@ function bigbluebutton_general_settings() {
     $salt_val = get_option('bigbluebutton_salt');
     
     //Obtains the meeting information of the meeting that is going to be terminated
-    if( isset($_POST['Submit']) && $_POST['Submit'] == 'Save Changes') {
+    if( isset($_POST['SubmitSettings']) && $_POST['SubmitSettings'] == 'Save Changes') {
          
         //Reads their posted value
         $url_val = $_POST[ 'bigbluebutton_url' ];
@@ -572,7 +573,7 @@ function bigbluebutton_general_settings() {
           </p>
 
           <p class="submit">
-            <input type="submit" name="Submit" class="button-primary" value="Save Changes" />
+            <input type="submit" name="SubmitSettings" class="button-primary" value="Save Changes" />
           </p>
 
         </form>
@@ -605,21 +606,21 @@ function bigbluebutton_list_meetings() {
     $salt_val = get_option('bigbluebutton_salt');
 
     //---------------------------------------------------JOIN-----------------------------------------------
-    if( isset($_POST['Submit']) ) { //Creates then joins the meeting. If any problems occur the error is displayed
+    if( isset($_POST['SubmitList']) ) { //Creates then joins the meeting. If any problems occur the error is displayed
+        print_r($_POST);
         // Read the posted value and delete
-        //echo 'meetingID';
-        //$meetingID = $_POST['meetingID'];
-        //$found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
-        //$moderatorPW = $found->moderatorPW;
-        //$moderatorPW = $found->moderatorPW;
-        //$attendeePW = $found->attendeePW;
-        //$meetingVersion = $found->meetingVersion;
-        //$recorded = $found->recorded;
-
-        if($_POST['Submit'] == 'Join'){
+        // Read the posted value and delete
+        $meetingID = $_POST['meetingID'];
+        $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
+        $moderatorPW = $found->moderatorPW;
+        $moderatorPW = $found->moderatorPW;
+        $attendeePW = $found->attendeePW;
+        $meetingVersion = $found->meetingVersion;
+        $recorded = $found->recorded;
+        
+        if($_POST['SubmitList'] == 'Join'){
             //Calls create meeting on the bigbluebutton server
-            $response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID."[".$meetingVersion."]", "", $moderatorPW, $attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false' );
-            //( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
+            $response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID, "", $moderatorPW, $attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false' );
 
             $createNew = false;
             //Analyzes the bigbluebutton server's response
@@ -638,17 +639,17 @@ function bigbluebutton_list_meetings() {
                 }
             }
             else{
-                $bigbluebutton_joinURL = BigBlueButton::getJoinURL($meetingID."[".$meetingVersion."]", $current_user->display_name,$moderatorPW, $salt_val, $url_val );
+                $bigbluebutton_joinURL = BigBlueButton::getJoinURL($meetingID, $current_user->display_name,$moderatorPW, $salt_val, $url_val );
                 echo '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
                 return;
             }
             	
         }
         //---------------------------------------------------END-------------------------------------------------
-        else if($_POST['Submit'] == 'End' ) { //Obtains the meeting information of the meeting that is going to be terminated
+        else if($_POST['SubmitList'] == 'End' ) { //Obtains the meeting information of the meeting that is going to be terminated
             	
             //Calls endMeeting on the bigbluebutton server
-            $response = BigBlueButton::endMeeting($meetingID."[".$meetingVersion."]", $moderatorPW, $url_val, $salt_val );
+            $response = BigBlueButton::endMeeting($meetingID, $moderatorPW, $url_val, $salt_val );
 
             //Analyzes the bigbluebutton server's response
             if(!$response){//If the server is unreachable, then prompts the user of the necessary action
@@ -675,10 +676,10 @@ function bigbluebutton_list_meetings() {
             	
         }
         //---------------------------------------------------DELETE-------------------------------------------------
-        else if($_POST['Submit'] == 'Delete' ) { //Obtains the meeting information of the meeting that is going to be delete
+        else if($_POST['SubmitList'] == 'Delete' ) { //Obtains the meeting information of the meeting that is going to be delete
 
             //Calls endMeeting on the bigbluebutton server
-            $response = BigBlueButton::endMeeting($meetingID."[".$meetingVersion."]", $moderatorPW, $url_val, $salt_val );
+            $response = BigBlueButton::endMeeting($meetingID, $moderatorPW, $url_val, $salt_val );
 
             //Analyzes the bigbluebutton server's response
             if(!$response){//If the server is unreachable, then prompts the user of the necessary action
@@ -717,7 +718,7 @@ function bigbluebutton_list_meetings() {
     //not displayed again in this for loop
     foreach ($listOfMeetings as $meeting) {
 
-        $info = BigBlueButton::getMeetingInfoArray( $meeting->meetingID."[".$meeting->meetingVersion."]", $meeting->moderatorPW, $url_val, $salt_val);
+        $info = BigBlueButton::getMeetingInfoArray( $meeting->meetingID, $meeting->moderatorPW, $url_val, $salt_val);
         //Analyzes the bigbluebutton server's response
         if(!$info){//If the server is unreachable, then prompts the user of the necessary action
             echo '<div class="updated"><p><strong>Unable to display the meetings. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running.</strong></p></div>';
@@ -744,8 +745,8 @@ function bigbluebutton_list_meetings() {
                       <td>'.$meeting->moderatorPW.'</td>
                       <td>'.($meeting->waitForModerator? 'Yes': 'No').'</td>
                       <td>'.($meeting->recorded? 'Yes': 'No').'</td>
-                      <td><input type="submit" name="Submit" class="button-primary" value="Join" />&nbsp; 
-                          <input type="submit" name="Submit" class="button-primary" value="Delete" onClick="return confirm(\'Are you sure you want to delete the meeting?\')" />
+                      <td><input type="submit" name="SubmitList" class="button-primary" value="Join" />&nbsp; 
+                          <input type="submit" name="SubmitList" class="button-primary" value="Delete" onClick="return confirm(\'Are you sure you want to delete the meeting?\')" />
                       </td>
                     </tr>
                   </form>';
@@ -766,15 +767,15 @@ function bigbluebutton_list_meetings() {
                       <td>'.($meeting->recorded? 'Yes': 'No').'</td>
                       </td>';
 		    if($info['hasBeenForciblyEnded']=='false'){
-		        echo '    <td><input type="submit" name="Submit" class="button-primary" value="Join" />&nbsp;
-		                      <input type="submit" name="Submit" class="button-primary" value="End" onClick="return confirm(\'Are you sure you want to end the meeting?\')" />&nbsp;
-		                      <input type="submit" name="Submit" class="button-primary" value="Delete" onClick="return confirm(\'Are you sure you want to delete the meeting?\')" />
+		        echo '    <td><input type="submit" name="SubmitList" class="button-primary" value="Join" />&nbsp;
+		                      <input type="submit" name="SubmitList" class="button-primary" value="End" onClick="return confirm(\'Are you sure you want to end the meeting?\')" />&nbsp;
+		                      <input type="submit" name="SubmitList" class="button-primary" value="Delete" onClick="return confirm(\'Are you sure you want to delete the meeting?\')" />
 		                  </td>';
 		    } else {
 		        echo '    <td>
 			                <!-- Meeting has ended and is temporarily unavailable. -->
-			                <input type="submit" name="Submit" class="button-primary" value="Join" />&nbsp;
-			                <input type="submit" name="Submit" class="button-primary" value="Delete" onClick="return confirm(\'Are you sure you want to delete the meeting?\')" />&nbsp;
+			                <input type="submit" name="SubmitList" class="button-primary" value="Join" />&nbsp;
+			                <input type="submit" name="SubmitList" class="button-primary" value="Delete" onClick="return confirm(\'Are you sure you want to delete the meeting?\')" />&nbsp;
                           </td>';
 		    }
 		    echo '	</tr>
@@ -830,7 +831,7 @@ function bigbluebutton_create_meetings() {
     $salt_val = get_option('bigbluebutton_salt');
 
     //Obtains the meeting information of the meeting that is going to be created
-    if( isset($_POST['Submit']) && $_POST['Submit'] == 'Create' ) {
+    if( isset($_POST['SubmitCreate']) && $_POST['SubmitCreate'] == 'Create' ) {
          
         /// Reads the posted values
         $meetingName = $_POST[ 'meetingName' ];
@@ -903,7 +904,7 @@ function bigbluebutton_create_meetings() {
             <p>Moderator Password: <input type="text" name="moderatorPW" value="" size="20"></p>
             <p>Wait for moderator to start meeting: <input type="checkbox" name="waitForModerator" value="True" /></p>
             <p>Recorded meeting: <input type="checkbox" name="recorded" value="True" /></p>
-            <p class="submit"><input type="submit" name="Submit" class="button-primary" value="Create" /></p>
+            <p class="submit"><input type="submit" name="SubmitCreate" class="button-primary" value="Create" /></p>
           </form>
           <hr />';
 
