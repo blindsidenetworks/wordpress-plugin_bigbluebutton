@@ -53,14 +53,6 @@ require('php/bbb_api.php');
 
 global $bigbluebutton_plugin_version;
 
-$meetingID_name = 'meetingID';
-$meetingName_name = 'meetingName';
-$meetingVersion_name = 'meetingVersion';
-$attendeePW_name = 'attendeePW';
-$moderatorPW_name = 'moderatorPW';
-$waitForModerator_name = 'waitForModerator';
-$recorded_name = 'recorded';
-
 //================================================================================
 //-------------------------BigBlueButtonPlugin Class------------------------------
 //================================================================================
@@ -300,10 +292,10 @@ function bigbluebutton_test_shortcode($args) {
     extract($args);
     
     echo 'Version '.get_option('bigbluebutton_plugin_version').' is installed!!!<br>';
-    echo 'No '.'bigbluebutton_url'.'<br>';
+    echo 'Variable meetingID<br>';
     
     if( !get_option('bigbluebutton_url')){
-        echo 'No URL for '.'bigbluebutton_url'.'<br>';
+        echo 'No URL for bigbluebutton_url<br>';
     } else {
         echo 'BigBlueButton URL: '.get_option('bigbluebutton_url').'<br>';
     }
@@ -336,7 +328,7 @@ function bigbluebutton_sidebar($args) {
 
 function bigbluebutton_form($args) {
 
-    global $wpdb, $meetingID_name, $meetingName_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name;
+    global $wpdb;
 
     //Read in existing option value from database
     $url_val = get_option('bigbluebutton_url');
@@ -356,8 +348,8 @@ function bigbluebutton_form($args) {
         //Read posted values
         $name = $_POST['display_name'];
         $password = $_POST['pwd'];
-        $meetingID = $_POST[$meetingID_name];
-        $meetingName = $_POST[$meetingName_name];
+        $meetingID = $_POST['meetingID'];
+        $meetingName = $_POST['meetingName'];
 
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
         if($found->meetingID == $meetingID && ($found->moderatorPW == $password || $found->attendeePW == $password) ){
@@ -418,7 +410,7 @@ function bigbluebutton_form($args) {
               <table>
                 <tr>
                   <td>Meeting</td>
-                  <td><select name="'.$meetingID_name.'">';
+                  <td><select name="meetingID">';
 
         foreach ($listOfMeetings as $meeting) {
             echo "                    <option>".$meeting->meetingID."</option>";
@@ -604,7 +596,7 @@ function bigbluebutton_general_settings() {
 function bigbluebutton_list_meetings() {
     global $wpdb;
     $table_name = $wpdb->prefix . "bigbluebutton";
-    global $meetingID_name, $meetingName_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name, $current_user;
+    global $current_user;
 
     //Displays the title of the page
     echo "<h2>List of Meeting Rooms</h2>";
@@ -615,15 +607,14 @@ function bigbluebutton_list_meetings() {
     //---------------------------------------------------JOIN-----------------------------------------------
     if( isset($_POST['Submit']) ) { //Creates then joins the meeting. If any problems occur the error is displayed
         // Read the posted value and delete
-        echo $meetingID_name;
-        $meetingID = $_POST[$meetingID_name];
-
-        $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
-        $moderatorPW = $found->moderatorPW;
-        $moderatorPW = $found->moderatorPW;
-        $attendeePW = $found->attendeePW;
-        $meetingVersion = $found->meetingVersion;
-        $recorded = $found->recorded;
+        //echo 'meetingID';
+        //$meetingID = $_POST['meetingID'];
+        //$found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
+        //$moderatorPW = $found->moderatorPW;
+        //$moderatorPW = $found->moderatorPW;
+        //$attendeePW = $found->attendeePW;
+        //$meetingVersion = $found->meetingVersion;
+        //$recorded = $found->recorded;
 
         if($_POST['Submit'] == 'Join'){
             //Calls create meeting on the bigbluebutton server
@@ -668,7 +659,7 @@ function bigbluebutton_list_meetings() {
 
                 //In case the meeting is created again it sets the meeting version to the time stamp. Therefore the meeting can be recreated before the 1 hour rule without any problems.
                 $meetingVersion = time();
-                $wpdb->update( $table_name, array( $meetingVersion_name => $meetingVersion), array( $meetingID_name => $meetingID ));
+                $wpdb->update( $table_name, array( 'meetingVersion' => $meetingVersion), array( 'meetingID' => $meetingID ));
                 	
             }
             else{ //If the meeting was unable to be termindated
@@ -746,7 +737,7 @@ function bigbluebutton_list_meetings() {
                 $printed = true;
             }
             echo '<form name="form1" method="post" action="">
-                    <input type="hidden" name="'.$meetingID_name.'" value="'.$meeting->meetingID.'">
+                    <input type="hidden" name="meetingID" value="'.$meeting->meetingID.'">
                     <tr>
                       <td>'.$meeting->meetingName.'</td>
                       <td>'.$meeting->attendeePW.'</td>
@@ -766,7 +757,7 @@ function bigbluebutton_list_meetings() {
             }
 
             echo '<form name="form1" method="post" action="">
-                    <input type="hidden" name="'.$meetingID_name.'" value="'.$meeting->meetingID.'">
+                    <input type="hidden" name="meetingID" value="'.$meeting->meetingID.'">
                     <tr>
                       <td>'.$meeting->meetingName.'</td>
                       <td>'.$meeting->attendeePW.'</td>
@@ -832,8 +823,6 @@ function bigbluebutton_print_table_header(){
 //This page allows the user to create a meeting
 function bigbluebutton_create_meetings() {
 
-    global $meetingID_name, $meetingName_name, $meetingVersion_name, $attendeePW_name, $moderatorPW_name, $waitForModerator_name, $recorded_name;
-
     //Displays the title of the page
     echo "<h2>Create a Meeting Room</h2>";
 
@@ -844,11 +833,11 @@ function bigbluebutton_create_meetings() {
     if( isset($_POST['Submit']) && $_POST['Submit'] == 'Create' ) {
          
         /// Reads the posted values
-        $meetingName = $_POST[ $meetingName_name ];
-        $attendeePW = $_POST[ $attendeePW_name ];
-        $moderatorPW = $_POST[ $moderatorPW_name ];
-        $waitForModerator = (isset($_POST[ $waitForModerator_name ]) && $_POST[ $waitForModerator_name ] == 'True')? true: false;
-        $recorded = (isset($_POST[ $recorded_name ]) && $_POST[ $recorded_name ] == 'True')? true: false;
+        $meetingName = $_POST[ 'meetingName' ];
+        $attendeePW = $_POST[ 'attendeePW' ];
+        $moderatorPW = $_POST[ 'moderatorPW' ];
+        $waitForModerator = (isset($_POST[ 'waitForModerator' ]) && $_POST[ 'waitForModerator' ] == 'True')? true: false;
+        $recorded = (isset($_POST[ 'recorded' ]) && $_POST[ 'recorded' ] == 'True')? true: false;
         $meetingVersion = time();
         /// Assign a random unique ID based on the name and timestamp
         $meetingID = sha1($meetingName.strval($meetingVersion));
@@ -869,7 +858,7 @@ function bigbluebutton_create_meetings() {
 			//Checks the meeting to be created to see if it already exists in wordpress database
 			global $wpdb;
 			$table_name = $wpdb->prefix . "bigbluebutton";
-			$listOfMeetings = $wpdb->get_results("SELECT meetingID FROM ".$table_name);
+			$listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName FROM ".$table_name);
 			
 			foreach ($listOfMeetings as $meeting) {
 				if($meeting->meetingName == $meetingName){
@@ -909,11 +898,11 @@ function bigbluebutton_create_meetings() {
 	
     //Form to create a meeting, the fields are the meeting name, and the optional fields are the attendee password and moderator password
     echo '<form name="form1" method="post" action="">
-            <p>Meeting Room Name: <input type="text" name="'.$meetingName_name.'" value=""	size="20"></p>
-            <p>Attendee Password: <input type="text" name="'.$attendeePW_name.'" value="" size="20"></p>
-            <p>Moderator Password: <input type="text" name="'.$moderatorPW_name.'" value="" size="20"></p>
-            <p>Wait for moderator to start meeting: <input type="checkbox" name="'.$waitForModerator_name.'" value="True" /></p>
-            <p>Recorded meeting: <input type="checkbox" name="'.$recorded_name.'" value="True" /></p>
+            <p>Meeting Room Name: <input type="text" name="meetingName" value=""	size="20"></p>
+            <p>Attendee Password: <input type="text" name="attendeePW" value="" size="20"></p>
+            <p>Moderator Password: <input type="text" name="moderatorPW" value="" size="20"></p>
+            <p>Wait for moderator to start meeting: <input type="checkbox" name="waitForModerator" value="True" /></p>
+            <p>Recorded meeting: <input type="checkbox" name="recorded" value="True" /></p>
             <p class="submit"><input type="submit" name="Submit" class="button-primary" value="Create" /></p>
           </form>
           <hr />';
