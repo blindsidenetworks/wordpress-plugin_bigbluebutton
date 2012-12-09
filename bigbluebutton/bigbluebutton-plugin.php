@@ -452,9 +452,9 @@ function bigbluebutton_form($args) {
 function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingID, $meetingName, $name){
 
     echo '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>'."\n";
-    echo '<script type="text/javascript" src="/wp-content/plugins/bigbluebutton/js/heartbeat.js"></script>'."\n";
-    echo '<script type="text/javascript" src="/wp-content/plugins/bigbluebutton/js/md5.js"></script>'."\n";
-    echo '<script type="text/javascript" src="/wp-content/plugins/bigbluebutton/js/jquery.xml2json.js"></script>'."\n";
+    echo '<script type="text/javascript" src="wp-content/plugins/bigbluebutton/js/heartbeat.js"></script>'."\n";
+    echo '<script type="text/javascript" src="wp-content/plugins/bigbluebutton/js/md5.js"></script>'."\n";
+    echo '<script type="text/javascript" src="wp-content/plugins/bigbluebutton/js/jquery.xml2json.js"></script>'."\n";
 
     echo '<script type="text/javascript">
             $(document).ready(function(){
@@ -467,6 +467,7 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
                 });
             
             function mycallback() {
+                console.debug(\'Hello\');
                 // Not elegant, but works around a bug in IE8
                 var isMeetingRunning = ($("#HeartBeatDIV").text().search("true") > 0 );
 
@@ -652,7 +653,7 @@ function bigbluebutton_list_meetings() {
                 echo '<div class="updated"><p><strong>Unable to terminate the meeting. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running.</strong></p></div>';
             }
             else if( $response['returncode'] == 'SUCCESS' ) { //The meeting was terminated
-                echo '<div class="updated"><p><strong>'.$meetingID.' meeting has been terminated.</strong></p></div>';
+                echo '<div class="updated"><p><strong>'.$meetingName.' meeting has been terminated.</strong></p></div>';
 
                 //In case the meeting is created again it sets the meeting version to the time stamp. Therefore the meeting can be recreated before the 1 hour rule without any problems.
                 $meetingVersion = time();
