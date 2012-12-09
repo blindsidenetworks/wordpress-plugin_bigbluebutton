@@ -343,7 +343,7 @@ function bigbluebutton_form($args) {
     $dataSubmitted = false;
     $validMeeting = false;
     $meetingExist = false;
-    if( isset($_POST['SubmitForm']) && $_POST['Submit'] == 'Join' ) { //The user has submitted his login information
+    if( isset($_POST['SubmitForm']) && $_POST['SubmitForm'] == 'Join' ) { //The user has submitted his login information
         $dataSubmitted = true;
         $meetingExist = true;
 
@@ -528,9 +528,6 @@ function bigbluebutton_general_settings() {
     echo '<div class="wrap">';
     echo "<h2>BigBlueButton Settings</h2>";
 
-    //if( !get_option('bigbluebutton_url') ) update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
-    //if( !get_option('bigbluebutton_salt') ) update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
-    
     $url_val = get_option('bigbluebutton_url');
     $salt_val = get_option('bigbluebutton_salt');
     
@@ -609,10 +606,9 @@ function bigbluebutton_list_meetings() {
     if( isset($_POST['SubmitList']) ) { //Creates then joins the meeting. If any problems occur the error is displayed
         print_r($_POST);
         // Read the posted value and delete
-        // Read the posted value and delete
         $meetingID = $_POST['meetingID'];
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
-        $moderatorPW = $found->moderatorPW;
+        $meetingName = $found->meetingName;
         $moderatorPW = $found->moderatorPW;
         $attendeePW = $found->attendeePW;
         $meetingVersion = $found->meetingVersion;
@@ -620,7 +616,7 @@ function bigbluebutton_list_meetings() {
         
         if($_POST['SubmitList'] == 'Join'){
             //Calls create meeting on the bigbluebutton server
-            $response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID, "", $moderatorPW, $attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false' );
+            $response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID, $meetingName, "", $moderatorPW, $attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false' );
 
             $createNew = false;
             //Analyzes the bigbluebutton server's response
@@ -723,8 +719,7 @@ function bigbluebutton_list_meetings() {
         if(!$info){//If the server is unreachable, then prompts the user of the necessary action
             echo '<div class="updated"><p><strong>Unable to display the meetings. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running.</strong></p></div>';
             return;
-        }
-        else if( $info['returncode'] && $info['messageKey'] != 'notFound' && $info['messageKey'] != 'invalidPassword') { /// If the meeting was unable to be deleted due to an error
+        } else if( $info['returncode'] == 'FAILED' && $info['messageKey'] != 'notFound' && $info['messageKey'] != 'invalidPassword') { /// If the meeting was unable to be deleted due to an error
             if($info['messageKey'] == 'checksumError'){
                 echo '<div class="updated"><p><strong>A checksum error occured. Make sure you entered the correct salt.</strong></p></div>';
             }
@@ -732,7 +727,7 @@ function bigbluebutton_list_meetings() {
                 echo '<div class="updated"><p><strong>'.$info['message'].'</strong></p></div>';
             }
             return;
-        } else if( $info['returncode'] && ($info['messageKey'] == 'notFound' || $info['messageKey'] != 'invalidPassword') ){ /// The meeting exists only in the wordpress db
+        } else if( $info['returncode'] == 'FAILED' && ($info['messageKey'] == 'notFound' || $info['messageKey'] != 'invalidPassword') ){ /// The meeting exists only in the wordpress db
             if(!$printed){
                 bigbluebutton_print_table_header();
                 $printed = true;
@@ -766,7 +761,7 @@ function bigbluebutton_list_meetings() {
                       <td>'.($meeting->waitForModerator? 'Yes': 'No').'</td>
                       <td>'.($meeting->recorded? 'Yes': 'No').'</td>
                       </td>';
-		    if($info['hasBeenForciblyEnded']=='false'){
+		    if( isset($info['hasBeenForciblyEnded']) && $info['hasBeenForciblyEnded']=='false'){
 		        echo '    <td><input type="submit" name="SubmitList" class="button-primary" value="Join" />&nbsp;
 		                      <input type="submit" name="SubmitList" class="button-primary" value="End" onClick="return confirm(\'Are you sure you want to end the meeting?\')" />&nbsp;
 		                      <input type="submit" name="SubmitList" class="button-primary" value="Delete" onClick="return confirm(\'Are you sure you want to delete the meeting?\')" />
