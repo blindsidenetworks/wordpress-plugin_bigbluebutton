@@ -267,7 +267,7 @@ class BigBlueButton {
 			return ( BigBlueButton::getJoinURL( $meetingID, $username, $mPW, $SALT, $URL ) );
 		}	
 		else if( $xml ) {
-			return ( $xml->messageKey.' : '.$xml->message );
+			return ( (string)$xml->messageKey.' : '.(string)$xml->message );
 		}
 		else {
 			return ('Unable to fetch URL '.$url_create.$params.'&checksum='.sha1("create".$params.$SALT) );
@@ -345,10 +345,10 @@ class BigBlueButton {
 		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
 				
         if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
-			return array( 'returncode' => $xml->returncode, 'meetingID' => $xml->meetingID, 'moderatorPW' => $xml->moderatorPW, 'attendeePW' => $xml->attendeePW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded, 'running' => $xml->running, 'startTime' => $xml->startTime, 'endTime' => $xml->endTime, 'participantCount' => $xml->participantCount, 'moderatorCount' => $xml->moderatorCount, 'attendees' => $xml->attendees );
+			return array( 'returncode' => (string)$xml->returncode, 'meetingID' => (string)$xml->meetingID, 'moderatorPW' => (string)$xml->moderatorPW, 'attendeePW' => (string)$xml->attendeePW, 'hasBeenForciblyEnded' => (string)$xml->hasBeenForciblyEnded, 'running' => (string)$xml->running, 'startTime' => (string)$xml->startTime, 'endTime' => (string)$xml->endTime, 'participantCount' => (string)$xml->participantCount, 'moderatorCount' => (string)$xml->moderatorCount, 'attendees' => (string)$xml->attendees );
 		}
 		else if( ($xml && $xml->returncode == 'FAILED') || $xml) { //If the xml packet returned failure it displays the message to the user
-			return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+			return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
 		}
 		else { //If the server is unreachable, then prompts the user of the necessary action
 			return null;
@@ -370,7 +370,7 @@ class BigBlueButton {
 	public function getMeetings( $URL, $SALT ) {
 		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getMeetingsURL( $URL, $SALT ) );
 		if( $xml && $xml->returncode == 'SUCCESS' ) {
-			if( $xml->messageKey )
+			if( (string)$xml->messageKey )
 				return ( $xml->message->asXML() );	
 			ob_start();
 			echo '<meetings>';
@@ -406,7 +406,7 @@ class BigBlueButton {
 		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getMeetingsURL( $URL, $SALT ) );
 
 		if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
-			return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+			return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
 		}
 		else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
 		
@@ -420,7 +420,7 @@ class BigBlueButton {
 
 		}
 		else if( $xml ) { //If the xml packet returned failure it displays the message to the user
-			return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+			return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
 		}
 		else { //If the server is unreachable, then prompts the user of the necessary action
 			return null;
@@ -430,7 +430,7 @@ class BigBlueButton {
 	public function getRecordingsArray($meetingID, $URL, $SALT ) {
 	    $xml = bigbluebuttonbn_wrap_simplexml_load_file( BigBlueButton::getRecordingsURL( $meetingID, $URL, $SALT ) );
 	    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
-	        return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
+	        return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
 	    } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
 	        $recordings = array();
 	
@@ -457,7 +457,7 @@ class BigBlueButton {
 	        return $recordings;
 	
 	    } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
-	        return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
+	        return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
 	    } else { //If the server is unreachable, then prompts the user of the necessary action
 	        return NULL;
 	    }
@@ -522,7 +522,7 @@ class BigBlueButton {
 		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getMeetingInfoURL( $meetingID, $modPW, $URL, $SALT ) );
 
 		if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey == null ) {//The meetings were returned
-			return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+			return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
 		}
 		else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
 			foreach ($xml->attendees->attendee as $attendee){
@@ -531,7 +531,7 @@ class BigBlueButton {
 			return $users;
 		}
 		else if( $xml ) { //If the xml packet returned failure it displays the message to the user
-			return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+			return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
 		}
 		else { //If the server is unreachable, then prompts the user of the necessary action
 			return null;
@@ -556,7 +556,7 @@ class BigBlueButton {
 		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getEndMeetingURL( $meetingID, $modPW, $URL, $SALT ) );
 
 		if( $xml ) { //If the xml packet returned failure it displays the message to the user
-			return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey);
+			return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
 		}
 		else { //If the server is unreachable, then prompts the user of the necessary action
 			return null;
@@ -576,7 +576,7 @@ class BigBlueButton {
 	public function isMeetingRunning( $meetingID, $URL, $SALT ) {
 		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getIsMeetingRunningURL( $meetingID, $URL, $SALT ) );
 		if( $xml && $xml->returncode == 'SUCCESS' ) 
-			return ( ( $xml->running == 'true' ) ? true : false);
+			return ( ( (string)$xml->running == 'true' ) ? true : false);
 		else
 			return ( false );
 	}

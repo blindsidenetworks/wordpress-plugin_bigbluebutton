@@ -380,6 +380,7 @@ function bigbluebutton_form($args) {
                 return;
                 	
             } else{ //The user can join the meeting, as it is valid
+                //print_r($response);
                 if( !isset($response['messageKey']) || $response['messageKey'] == '' ){
                     // The meeting was just created, insert the create event to the log
                     $rows_affected = $wpdb->insert( $table_logs_name, array( 'meetingID' => $meetingID, 'recorded' => $found->recorded, 'timestamp' => time(), 'event' => 'Create' ) );
@@ -392,7 +393,7 @@ function bigbluebutton_form($args) {
                         || $response['moderatorPW'] == $password
                         || ($response['attendeePW'] == $password && !$found->waitForModerator)  ){
                     //If the password submitted is correct then the user gets redirected
-                    echo '<script type="text/javascript">console.debug("'.$bigbluebutton_joinURL.'"); //window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
+                    echo '<script type="text/javascript">console.debug("'.$bigbluebutton_joinURL.'"); window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
                     return;
                 }
                 //If the viewer has the correct password, but the meeting has not yet started they have to wait
@@ -492,7 +493,7 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
 
                 if (isMeetingRunning) {
                     console.debug("'.$bigbluebutton_joinURL.'");
-                    //window.location = "'.$bigbluebutton_joinURL.'";
+                    window.location = "'.$bigbluebutton_joinURL.'";
                 }
             }
           </script>';
@@ -656,13 +657,14 @@ function bigbluebutton_list_meetings() {
                 }
             }
             else{
+                //print_r($response);
                 if( !isset($response['messageKey']) || $response['messageKey'] == '' ){
                     // The meeting was just created, insert the create event to the log
                     $rows_affected = $wpdb->insert( $table_logs_name, array( 'meetingID' => $meetingID, 'recorded' => $found->recorded, 'timestamp' => time(), 'event' => 'Create' ) );
                 }
                 
                 $bigbluebutton_joinURL = BigBlueButton::getJoinURL($meetingID, $current_user->display_name,$moderatorPW, $salt_val, $url_val );
-                echo '<script type="text/javascript">console.debug("'.$bigbluebutton_joinURL.'"); //window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
+                echo '<script type="text/javascript">console.debug("'.$bigbluebutton_joinURL.'"); window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
                 return;
             }
             	
