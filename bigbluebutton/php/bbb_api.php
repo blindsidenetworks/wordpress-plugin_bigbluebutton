@@ -140,22 +140,22 @@ class BigBlueButton {
 	*@param logoutURL -- the URL that the bbb client will go to after users logouut
 	*@param SALT -- the security salt of the bigbluebutton server
 	*@param URL -- the url of the bigbluebutton server
-	*@param record -- record meeting - default to false
+	*@param record -- record meeting - default to "false" <-- This is a string, not a boolean
 	*
 	*@return The url to join the meeting
 	*/
-	public function getCreateMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcomeString, $logoutURL, $SALT, $URL, $record = 'false', $duration=0, $voiceBridge=0, $metadata = array() ) {
+	public function getCreateMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcomeString, $logoutURL, $SALT, $URL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
 		$url_create = $URL."api/create?";
 		if ( $voiceBridge == 0)
 			//  Below has a risk of rooms having a voice bridge conflict..
 			//  @47 rooms, there is a 10% chance of conflict, at 76 rooms, 25% chance.
 			$voiceBridge = 70000 + rand(0, 9999);
-	
+
 		$meta = '';
 		foreach ($metadata as $key => $value) {
 			$meta = $meta.'&'.$key.'='.urlencode($value);
 		}
-	
+
 		$params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&voiceBridge='.$voiceBridge.'&logoutURL='.urlencode($logoutURL).'&record='.$record.$meta;
 	
 		$duration = intval($duration);
@@ -268,7 +268,6 @@ class BigBlueButton {
 	*/
 	public function createMeetingAndGetJoinURL( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
 
-
 		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata ) );
 		
 		if( $xml && $xml->returncode == 'SUCCESS' ) {
@@ -304,7 +303,7 @@ class BigBlueButton {
 	public function createMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
 	
 		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata ) );
-	
+
 		if( $xml ) {
 			if($xml->meetingID) return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded );
 			else return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
