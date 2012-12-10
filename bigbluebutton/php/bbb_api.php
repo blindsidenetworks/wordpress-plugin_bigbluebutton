@@ -425,41 +425,40 @@ class BigBlueButton {
 		}
 	}
 	
-	public function getRecordingsArray($meetingID, $URL, $SALT ) {
-	    $xml = bbb_wrap_simplexml_load_file( BigBlueButton::getRecordingsURL( $meetingID, $URL, $SALT ) );
-	    if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
-	        return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
-	    } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
-	        $recordings = array();
+    public function getRecordingsArray($meetingID, $URL, $SALT ) {
+        $xml = bbb_wrap_simplexml_load_file( BigBlueButton::getRecordingsURL( $meetingID, $URL, $SALT ) );
+        if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
+            return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
+        } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
+            $recordings = array();
+
+            foreach ($xml->recordings->recording as $recording) {
+                $playbackArray = array();
+                foreach ( $recording->playback->format as $format ){
+                    $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url );
+                }
+
+                //Add the metadata to the recordings array
+               $metadataArray = array();
+                $metadata = get_object_vars($recording->metadata);
+                foreach ($metadata as $key => $value) {
+                    if(is_object($value)) $value = '';
+                    $metadataArray['meta_'.$key] = $value;
+                }
+    
+                $recordings[] = array( 'recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime, 'playbacks' => $playbackArray ) + $metadataArray;
+
+            }
 	
-	        foreach ($xml->recordings->recording as $recording) {
-	            $playbackArray = array();
-	            foreach ( $recording->playback->format as $format ){
-	                $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url );
-	            }
+            usort($recordings, BigBlueButton::recordingBuildSorter('startTime'));
+            return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey, 'recordings' => $recordings);
 	
-	            //Add the metadata to the recordings array
-	            $metadataArray = array();
-	            $metadata = get_object_vars($recording->metadata);
-	            foreach ($metadata as $key => $value) {
-	                if(is_object($value)) $value = '';
-	                $metadataArray['meta_'.$key] = $value;
-	            }
-	
-	            $recordings[] = array( 'recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime, 'playbacks' => $playbackArray ) + $metadataArray;
-	
-	        }
-	
-	        usort($recordings, BigBlueButton::recordingBuildSorter('startTime'));
-	
-	        return $recordings;
-	
-	    } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
-	        return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
-	    } else { //If the server is unreachable, then prompts the user of the necessary action
-	        return NULL;
-	    }
-	}
+        } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
+            return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
+        } else { //If the server is unreachable, then prompts the user of the necessary action
+            return NULL;
+        }
+    }
 	
 	private function recordingBuildSorter($key){
 	    return function ($a, $b) use ($key){

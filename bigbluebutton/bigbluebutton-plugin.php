@@ -20,14 +20,27 @@ if(version_compare($wp_version, "2.5", "<")) {
     exit($exit_msg);
 }
 
-//constants
+//constant definitions
 define("BIGBLUEBUTTON_DIR", WP_PLUGIN_URL . '/bigbluebutton/' );
 
+//shortcode definitions
 add_shortcode('bigbluebutton', 'bigbluebutton_shortcode');
 add_shortcode('Bigbluebutton', 'bigbluebutton_shortcode');
 add_shortcode('BigBlueButton', 'bigbluebutton_shortcode');
 
 add_shortcode('bigbluebutton_test', 'bigbluebutton_test_shortcode');
+add_shortcode('bigbluebutton_recordings', 'bigbluebutton_recordings_shortcode');
+
+//action definitions
+add_action('init', 'init_sessions');
+
+//================================================================================
+//------------------Required Libraries and Global Variables-----------------------
+//================================================================================
+require('php/bbb_api.php');
+
+global $bigbluebutton_plugin_version;
+
 
 //================================================================================
 //------------------Code for development------------------------------------------
@@ -45,13 +58,6 @@ if(!function_exists('_log')){
 }
 _log('Loading the plugin');
 
-
-//================================================================================
-//------------------Required Libraries and Global Variables-----------------------
-//================================================================================
-require('php/bbb_api.php');
-
-global $bigbluebutton_plugin_version;
 
 //================================================================================
 //-------------------------BigBlueButtonPlugin Class------------------------------
@@ -282,6 +288,14 @@ function bigbluebutton_admin_styles(){
 }
 
 
+// Sessions are required by the plugin to work.
+function init_sessions() {
+    if (!session_id()) {
+        session_start();
+    }
+}
+
+
 //================================================================================
 //------------------------------Error Handler-------------------------------------
 //================================================================================
@@ -291,8 +305,7 @@ function bigbluebutton_warning_handler($errno, $errstr) {
 
 
 //================================================================================
-//---------------------------------ShortCode--------------------------------------
-// Added: Jun 22, 2011 by JFederic
+//---------------------------------ShortCode functions----------------------------
 //================================================================================
 //Inserts a bigbluebutton form on a post or page of the blog
 function bigbluebutton_shortcode($args) {
@@ -320,9 +333,15 @@ function bigbluebutton_test_shortcode($args) {
     
 }
 
+function bigbluebutton_recordings_shortcode($args) {
+    if (!session_id()) session_start();
+    extract($args);
+
+
+}
+
 //================================================================================
 //---------------------------------Widget-----------------------------------------
-// Modified: Jun 22, 2011 by JFederic
 //================================================================================
 //Inserts a bigbluebutton widget on the siderbar of the blog
 function bigbluebutton_sidebar($args) {
@@ -338,7 +357,6 @@ function bigbluebutton_sidebar($args) {
 
 //================================================================================
 //---------------------------------Widget-----------------------------------------
-// Added: Jun 22, 2011 by JFederic
 //================================================================================
 //Create the form called by the Shortcode and Widget functions
 
@@ -834,16 +852,21 @@ function bigbluebutton_list_recordings() {
             if( $meetingIDs != '' ) $meetingIDs .= ', ';
             $meetingIDs .= $meeting->meetingID;
         }
-        
-        if( $meetingIDs != '' ){
-            $listOfRecordings = BigBlueButton::getRecordingsArray($meetingIDs, $url_val, $salt_val);
-        }
-            
     }
+    
+    $listOfRecordings = Array();
+    if( $meetingIDs != '' ){
+        $recordingsArray = BigBlueButton::getRecordingsArray($meetingIDs, $url_val, $salt_val);
+        if( $recordingsArray['returncode'] == 'SUCCESS' && !$recordingsArray['messageKey'] ){
+            $listOfRecordings = $recordingsArray['recordings'];
+        }
+    }
+    
     
     //Displays the title of the page
     echo "<h2>List of Recordings </h2>";
-    
+
+    //Print begining of the table
     echo '
           <div>
             <table class="stats" cellspacing="5">
@@ -856,6 +879,9 @@ function bigbluebutton_list_recordings() {
               </tr>';
     $moderator = true;
     foreach( $listOfRecordings as $recording){
+        echo '<!-- ';
+        print_r($recording);
+        echo ' -->';
         
         /// Prepare playback recording links
         $type = '';
@@ -866,15 +892,15 @@ function bigbluebutton_list_recordings() {
         /// Prepare actionbar
         $actionbar = '';
         if ( $moderator ) {
-            $deleteURL = BigBluebutton::getDeleteRecordingsURL($recording['recordID'], $url, $salt);
+            $deleteURL = BigBluebutton::getDeleteRecordingsURL($recording['recordID'], $url_val, $salt_val);
             if ( $recording['published'] == 'true' ){
-                $publishURL = BigBluebutton::getPublishRecordingsURL($recording['recordID'], 'false', $url, $salt);
-                $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_hide."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/hide.gif' class='iconsmall' onClick='actionCall(\\\"unpublish\\\", \\\"".$recording['recordID']."\\\", \\\"".$cid."\\\")'   /></a>";
+                $publishURL = BigBluebutton::getPublishRecordingsURL($recording['recordID'], 'false', $url_val, $salt_val);
+                $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='Hide' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/hide.gif' class='iconsmall' onClick='actionCall(\\\"unpublish\\\", \\\"".$recording['recordID']."\\\")' /></a>";
             } else {
-                $publishURL = BigBluebutton::getPublishRecordingsURL($recording['recordID'], 'true', $url, $salt);
-                $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_show."' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='pix/show.gif' class='iconsmall' onClick='actionCall(\\\"publish\\\", \\\"".$recording['recordID']."\\\", \\\"".$cid."\\\")'   /></a>";
+                $publishURL = BigBluebutton::getPublishRecordingsURL($recording['recordID'], 'true', $url_val, $salt_val);
+                $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='Show' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/show.gif' class='iconsmall' onClick='actionCall(\\\"publish\\\", \\\"".$recording['recordID']."\\\")' /></a>";
             }
-            $actionbar .= "<a id='actionbar-delete-a-".$recording['recordID']."' title='".$view_recording_list_actionbar_delete."' href='#'><img id='actionbar-delete-img-".$recording['recordID']."' src='pix/delete.gif' class='iconsmall' onClick='actionCall(\\\"delete\\\", \\\"".$recording['recordID']."\\\", \\\"".$cid."\\\")'   /></a>";
+            $actionbar .= "<a id='actionbar-delete-a-".$recording['recordID']."' title='Delete' href='#'><img id='actionbar-delete-img-".$recording['recordID']."' src='".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/delete.gif' class='iconsmall' onClick='actionCall(\\\"delete\\\", \\\"".$recording['recordID']."\\\")' /></a>";
         }
         
         
@@ -895,19 +921,21 @@ function bigbluebutton_list_recordings() {
         }
         
         //Format the date
-        //$date = new DateTime($recording['startTime'] * 1000);
-        $formatedStartDate = $recording['startTime']; //$date->format('%a %h %d %H:%M:%S %Z %Y'); //userdate($recording['startTime'], $format, usertimezone(get_option('timezone_string')) );
+        //$formatedStartDate = gmdate("M d Y H:i:s", $recording['startTime']);
+        $formatedStartDate = date_i18n( "M d Y H:i:s", $recording['startTime'], false );
         
+        //Print detail
         echo '
               <tr>
                 <td class="hed" colspan="1">'.$type.'</td>
                 <td class="hed" colspan="1">'.$recording['meetingName'].'</td>
                 <td class="hed" colspan="1">'.$formatedStartDate.'</td>
-                <td class="hed" colspan="1">'.$duration.'</td>
+                <td class="hed" colspan="1">'.$duration.' min</td>
                 <td class="hedextra" colspan="1">'.$actionbar.'</td>
               </tr>';
     }
 
+    //Print end of the table
     echo '  </table>
           </div><hr />';
     
