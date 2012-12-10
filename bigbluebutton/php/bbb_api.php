@@ -560,6 +560,39 @@ class BigBlueButton {
 		}
 
 	}
+
+	public function doDeleteRecordings( $recordIDs, $URL, $SALT ) {
+	
+	    $ids = 	explode(",", $recordIDs);
+	    foreach( $ids as $id){
+	        $xml = bbb_wrap_simplexml_load_file( BigBlueButton::getDeleteRecordingsURL($id, $URL, $SALT) );
+	        if( $xml && $xml->returncode != 'SUCCESS' )
+	            return false;
+	    }
+	    return true;
+	}
+	
+	public function doPublishRecordings( $recordIDs, $set, $URL, $SALT ) {
+	    $ids = 	explode(",", $recordIDs);
+	    foreach( $ids as $id){
+	        $xml = bbb_wrap_simplexml_load_file( BigBlueButton::getPublishRecordingsURL($id, $set, $URL, $SALT) );
+	        if( $xml && $xml->returncode != 'SUCCESS' )
+	            return false;
+	    }
+	    return true;
+	}
+	
+	public function getServerVersion( $URL ){
+	    $base_url_record = $URL."api";
+	
+	    $xml = bbb_wrap_simplexml_load_file( $base_url_record );
+	    if( $xml && $xml->returncode == 'SUCCESS' )
+	        return $xml->version;
+	    else
+	        return NULL;
+	
+	}
+	
 	
 	/**
 	*This method check the BigBlueButton server to see if the meeting is running (i.e. there is someone in the meeting)

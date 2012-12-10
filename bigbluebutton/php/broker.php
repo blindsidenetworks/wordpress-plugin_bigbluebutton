@@ -22,7 +22,7 @@ Versions:
 
 */
 
-//================================================================================
+///================================================================================
 //------------------Required Libraries and Global Variables-----------------------
 //================================================================================
 require('bbb_api.php');
@@ -30,23 +30,66 @@ session_start();
 
 $url_name = 'mt_bbb_url';
 $salt_name = 'mt_salt';
+$action_name = 'action';
 $recordingID_name = 'recordingID';
+$meetingID_name = 'meetingID';
 
 //================================================================================
 //------------------------------------Main----------------------------------------
 //================================================================================
-header('Content-Type: text/plain; charset=utf-8');
 //Retrieves the bigbluebutton url, and salt from the seesion
-if ( isset($_SESSION[$salt_name]) && isset($_SESSION[$url_name]) && isset($_GET[$meetingID_name]) ){
+if ( !isset($_SESSION[$salt_name]) || !isset($_SESSION[$url_name]) ) {
+    header("HTTP/1.0 400 Bad Request. BigBlueButton Url or Salt are not accessible.");
+    
+} else if ( !isset($_GET[$action_name]) ) {
+    header("HTTP/1.0 400 Bad Request. [action] parameter was not included in this query.");
+
+} else {
     $salt_val = $_SESSION[$salt_name];
     $url_val = $_SESSION[$url_name];
-    $meetingID = $_GET[$meetingID_name];
-    
-    //Calls getMeetingXML and returns returns the result
-    echo BigBlueButton::getMeetingXML( $meetingID, $url_val, $salt_val );
-    
-} else {
-    echo 'false';
+    $action = $_GET[$action_name];
+    switch ($action) {
+        case "publish":
+            header('Content-Type: text/plain; charset=utf-8');
+            if( !isset($_GET[$recordingID_name])) {
+                header("HTTP/1.0 400 Bad Request. [recordingID] parameter was not included in this query.");
+            } else {    
+                $recordingID = $_GET[$recordingID_name];
+                echo BigBlueButton::doPublishRecordings($recordingID, 'true', $url_val, $salt_val);
+            }
+            break;
+        case "unpublish":
+            header('Content-Type: text/plain; charset=utf-8');
+            if( !isset($_GET[$recordingID_name])) {
+                header("HTTP/1.0 400 Bad Request. [recordingID] parameter was not included in this query.");
+            } else {    
+                $recordingID = $_GET[$recordingID_name];
+                echo BigBlueButton::doPublishRecordings($recordingID, 'false', $url_val, $salt_val);
+            }
+            break;
+        case "delete":
+            header('Content-Type: text/plain; charset=utf-8');
+            if( !isset($_GET[$recordingID_name])) {
+                header("HTTP/1.0 400 Bad Request. [recordingID] parameter was not included in this query.");
+            } else {    
+                $recordingID = $_GET[$recordingID_name];
+                echo BigBlueButton::doDeleteRecordings($recordingID, $url_val, $salt_val);
+            }
+            break;
+        case "ping":
+            header('Content-Type: text/xml; charset=utf-8');
+            echo '<?xml version="1.0"?>'."\r\n";
+            if( !isset($_GET[$meetingID_name])) {
+                header("HTTP/1.0 400 Bad Request. [meetingID] parameter was not included in this query.");
+            } else {
+                $meetingID = $_GET[$meetingID_name];
+                echo BigBlueButton::getMeetingXML( $meetingID, $url_val, $salt_val );
+            }
+            break;
+        default:
+            header('Content-Type: text/plain; charset=utf-8');
+            echo BigBlueButton::getServerVersion($url_val);
+    }
 }
 
 ?>

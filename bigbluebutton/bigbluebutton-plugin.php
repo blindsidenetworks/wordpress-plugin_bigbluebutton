@@ -396,7 +396,6 @@ function bigbluebutton_form($args) {
                 return;
                 	
             } else{ //The user can join the meeting, as it is valid
-                //print_r($response);
                 if( !isset($response['messageKey']) || $response['messageKey'] == '' ){
                     // The meeting was just created, insert the create event to the log
                     $rows_affected = $wpdb->insert( $table_logs_name, array( 'meetingID' => $meetingID, 'recorded' => $found->recorded, 'timestamp' => time(), 'event' => 'Create' ) );
@@ -409,7 +408,7 @@ function bigbluebutton_form($args) {
                         || $response['moderatorPW'] == $password
                         || ($response['attendeePW'] == $password && !$found->waitForModerator)  ){
                     //If the password submitted is correct then the user gets redirected
-                    echo '<script type="text/javascript">console.debug("'.$bigbluebutton_joinURL.'"); window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
+                    echo '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
                     return;
                 }
                 //If the viewer has the correct password, but the meeting has not yet started they have to wait
@@ -496,7 +495,7 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
     echo '<script type="text/javascript">
             $(document).ready(function(){
                 $.jheartbeat.set({
-                    url: "./wp-content/plugins/bigbluebutton/php/check.php?meetingID='.urlencode($meetingID).'",
+                    url: "./wp-content/plugins/bigbluebutton/php/broker.php?action=ping&meetingID='.urlencode($meetingID).'",
                     delay: 5000
                     }, function () {
                         mycallback();
@@ -506,9 +505,8 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
             function mycallback() {
                 // Not elegant, but works around a bug in IE8
                 var isMeetingRunning = ($("#HeartBeatDIV").text().search("true") > 0 );
-
+                
                 if (isMeetingRunning) {
-                    console.debug("'.$bigbluebutton_joinURL.'");
                     window.location = "'.$bigbluebutton_joinURL.'";
                 }
             }
@@ -673,14 +671,13 @@ function bigbluebutton_list_meetings() {
                 }
             }
             else{
-                //print_r($response);
                 if( !isset($response['messageKey']) || $response['messageKey'] == '' ){
                     // The meeting was just created, insert the create event to the log
                     $rows_affected = $wpdb->insert( $table_logs_name, array( 'meetingID' => $meetingID, 'recorded' => $found->recorded, 'timestamp' => time(), 'event' => 'Create' ) );
                 }
                 
                 $bigbluebutton_joinURL = BigBlueButton::getJoinURL($meetingID, $current_user->display_name,$moderatorPW, $salt_val, $url_val );
-                echo '<script type="text/javascript">console.debug("'.$bigbluebutton_joinURL.'"); window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
+                echo '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'";</script>'."\n";
                 return;
             }
             	
@@ -844,7 +841,6 @@ function bigbluebutton_list_recordings($title='List of Recordings') {
     
     //Gets all the meetings from wordpress database
     $listOfMeetings = $wpdb->get_results("SELECT DISTINCT meetingID FROM ".$table_logs_name." WHERE recorded = 1 ORDER BY timestamp;");
-    //print_r($listOfMeetings);
     
     $meetingIDs = '';
     $listOfRecordings = Array();
@@ -874,7 +870,7 @@ function bigbluebutton_list_recordings($title='List of Recordings') {
               wwwroot = \''.get_bloginfo('url').'\'
               function actionCall(action, recordingid) {
                   
-                  actionurl = wwwroot + "/wp-content/plugins/bigbluebutton/php/check.php?meetingID=xxxx"
+                  actionurl = wwwroot + "/wp-content/plugins/bigbluebutton/php/broker.php?action=" + action + "&recordingID=" + recordingid;
 	              action = (typeof action == \'undefined\') ? \'publish\' : action;
 	              
 	              if (action == \'publish\' || action == \'unpublish\' || (action == \'delete\' && confirm("Are you sure to delete this recording?"))) {
@@ -891,16 +887,13 @@ function bigbluebutton_list_recordings($title='List of Recordings') {
                               }
                           }
                       } else {
-                          // Deletes the line in the dataTable
-                          var row = $(document.getElementById(\'actionbar-publish-img-\'+ recordingid)).closest("tr").get(0);
-                          //oTable.fnDeleteRow(oTable.fnGetPosition(row));
+                          // Removes the line from the table
+                          $(document.getElementById(\'actionbar-tr-\'+ recordingid)).remove();
                       }
                       $.ajax({
                           url : actionurl,
 	   		              async : false,
                           success : function(response){
-                              console.debug(\'Hello\');
-                              console.debug(response);
                           },
 	   		              error : function(xmlHttpRequest, status, error) {
 	   		                  console.debug(xmlHttpRequest);
@@ -928,6 +921,7 @@ function bigbluebutton_list_recordings($title='List of Recordings') {
     echo '
               </tr>';
     foreach( $listOfRecordings as $recording){
+      if ( current_user_can('activate_plugins') || $recording['published'] == 'true') {
         /// Prepare playback recording links
         $type = '';
         foreach ( $recording['playbacks'] as $playback ){
@@ -972,7 +966,7 @@ function bigbluebutton_list_recordings($title='List of Recordings') {
         
         //Print detail
         echo '
-              <tr>
+              <tr id="actionbar-tr-'.$recording['recordID'].'">
                 <td class="hed" colspan="1">'.$type.'</td>
                 <td class="hed" colspan="1">'.$recording['meetingName'].'</td>
                 <td class="hed" colspan="1">'.$formatedStartDate.'</td>
@@ -985,11 +979,12 @@ function bigbluebutton_list_recordings($title='List of Recordings') {
         
         echo '    
               </tr>';
+      }
     }
 
     //Print end of the table
     echo '  </table>
-          </div><hr />';
+          </div>';
     
     
     
