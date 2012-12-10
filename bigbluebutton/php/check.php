@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2010 Blindside Networks
+Copyright 2010-2012 Blindside Networks
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ Versions:
                    (email : seb DOT sschneider [ a t ] g m ail DOT com)
    1.1  --  Updated by Omar Shammas 
                     (email : omar DOT shammas [a t ] g m ail DOT com)
+   1.2  --  Updated by Jesus Federico 
+                    (email : federico DOT jesus [a t ] g m ail DOT com)
 
 */
 
@@ -37,13 +39,19 @@ $meetingID_name = 'meetingID';
 //================================================================================
 //------------------------------------Main----------------------------------------
 //================================================================================
+header('Content-Type: text/xml; charset=utf-8');
 echo '<?xml version="1.0"?>'."\r\n";
-
 //Retrieves the bigbluebutton url, and salt from the seesion
-$salt_val = $_SESSION[$salt_name];
-$url_val = $_SESSION[$url_name];
-$meetingID = $_GET[$meetingID_name];
+if ( isset($_SESSION[$salt_name]) && isset($_SESSION[$url_name]) && isset($_GET[$meetingID_name]) ){
+    $salt_val = $_SESSION[$salt_name];
+    $url_val = $_SESSION[$url_name];
+    $meetingID = $_GET[$meetingID_name];
+    
+    //Calls getMeetingXML and returns returns the result
+    echo BigBlueButton::getMeetingXML( $meetingID, $url_val, $salt_val );
+    
+} else {
+    echo '<returncode>SUCCESS</returncode><running>false</running>';
+}
 
-//Calls getMeetingXML and returns returns the result
-echo BigBlueButton::getMeetingXML( $meetingID, $url_val, $salt_val );
 ?>
