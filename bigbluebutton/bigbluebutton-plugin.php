@@ -25,9 +25,6 @@ define("BIGBLUEBUTTON_DIR", WP_PLUGIN_URL . '/bigbluebutton/' );
 
 //shortcode definitions
 add_shortcode('bigbluebutton', 'bigbluebutton_shortcode');
-add_shortcode('Bigbluebutton', 'bigbluebutton_shortcode');
-add_shortcode('BigBlueButton', 'bigbluebutton_shortcode');
-
 add_shortcode('bigbluebutton_test', 'bigbluebutton_test_shortcode');
 add_shortcode('bigbluebutton_recordings', 'bigbluebutton_recordings_shortcode');
 
@@ -309,7 +306,7 @@ function bigbluebutton_warning_handler($errno, $errstr) {
 //================================================================================
 //Inserts a bigbluebutton form on a post or page of the blog
 function bigbluebutton_shortcode($args) {
-    if (!session_id()) session_start();
+    //if (!session_id()) session_start();
     extract($args);
 
     bigbluebutton_form($args);
@@ -317,7 +314,7 @@ function bigbluebutton_shortcode($args) {
 }
 
 function bigbluebutton_test_shortcode($args) {
-    if (!session_id()) session_start();
+    //if (!session_id()) session_start();
     extract($args);
     
     echo 'Version '.get_option('bigbluebutton_plugin_version').' is installed!!!<br>';
@@ -334,9 +331,10 @@ function bigbluebutton_test_shortcode($args) {
 }
 
 function bigbluebutton_recordings_shortcode($args) {
-    if (!session_id()) session_start();
+    //if (!session_id()) session_start();
     extract($args);
 
+    bigbluebutton_list_recordings();
 
 }
 
@@ -496,14 +494,14 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
     echo '<script type="text/javascript" src="wp-content/plugins/bigbluebutton/js/jquery.xml2json.js"></script>'."\n";
 
     echo '<script type="text/javascript">
-                $(document).ready(function(){
+            $(document).ready(function(){
                 $.jheartbeat.set({
                     url: "./wp-content/plugins/bigbluebutton/php/check.php?meetingID='.urlencode($meetingID).'",
                     delay: 5000
                     }, function () {
                         mycallback();
-                    });
                 });
+            });
             
             function mycallback() {
                 // Not elegant, but works around a bug in IE8
@@ -833,13 +831,16 @@ function bigbluebutton_list_meetings() {
 //---------------------------------List Recordings----------------------------------
 //================================================================================
 // Displays all the recordings available in the bigbluebutton server
-function bigbluebutton_list_recordings() {
+function bigbluebutton_list_recordings($title='List of Recordings') {
     global $wpdb;
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
     
     $url_val = get_option('bigbluebutton_url');
     $salt_val = get_option('bigbluebutton_salt');
+    
+    $_SESSION['mt_bbb_url'] = $url_val;
+    $_SESSION['mt_salt'] = $salt_val;
     
     //Gets all the meetings from wordpress database
     $listOfMeetings = $wpdb->get_results("SELECT DISTINCT meetingID FROM ".$table_logs_name." WHERE recorded = 1 ORDER BY timestamp;");
@@ -864,8 +865,53 @@ function bigbluebutton_list_recordings() {
     
     
     //Displays the title of the page
-    echo "<h2>List of Recordings </h2>";
+    echo "<h2>".$title."</h2>";
 
+    if ( current_user_can('activate_plugins') ) {
+        echo '
+          <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>'."\n".'
+          <script type="text/javascript">
+              wwwroot = \''.get_bloginfo('url').'\'
+              function actionCall(action, recordingid) {
+                  
+                  actionurl = wwwroot + "/wp-content/plugins/bigbluebutton/php/check.php?meetingID=xxxx"
+	              action = (typeof action == \'undefined\') ? \'publish\' : action;
+	              
+	              if (action == \'publish\' || action == \'unpublish\' || (action == \'delete\' && confirm("Are you sure to delete this recording?"))) {
+		              if (action == \'publish\' || action == \'unpublish\') {
+			              var el_a = document.getElementById(\'actionbar-publish-a-\'+ recordingid);
+			              if (el_a) {
+				              var el_img = document.getElementById(\'actionbar-publish-img-\'+ recordingid);
+				              if (el_a.title == \'Hide\' ) {
+					              el_a.title = \'Show\';
+					              el_img.src = wwwroot + \'/wp-content/plugins/bigbluebutton/images/show.gif\';
+                              } else {
+                                  el_a.title = \'Hide\';
+                                  el_img.src = wwwroot + \'/wp-content/plugins/bigbluebutton/images/hide.gif\';
+                              }
+                          }
+                      } else {
+                          // Deletes the line in the dataTable
+                          var row = $(document.getElementById(\'actionbar-publish-img-\'+ recordingid)).closest("tr").get(0);
+                          //oTable.fnDeleteRow(oTable.fnGetPosition(row));
+                      }
+                      $.ajax({
+                          url : actionurl,
+	   		              async : false,
+                          success : function(response){
+                              console.debug(\'Hello\');
+                              console.debug(response);
+                          },
+	   		              error : function(xmlHttpRequest, status, error) {
+	   		                  console.debug(xmlHttpRequest);
+			              }
+                      });
+                  }    
+              }   
+          </script>';
+    }
+    
+    
     //Print begining of the table
     echo '
           <div>
@@ -874,15 +920,14 @@ function bigbluebutton_list_recordings() {
                 <th class="hed" colspan="1">Recording</td>
                 <th class="hed" colspan="1">Meeting Room Name</td>
                 <th class="hed" colspan="1">Date</td>
-                <th class="hed" colspan="1">Duration</td>
-                <th class="hedextra" colspan="1">Toolbar</td>
+                <th class="hed" colspan="1">Duration</td>';
+    if ( current_user_can('activate_plugins') ) {
+        echo '
+                <th class="hedextra" colspan="1">Toolbar</td>';
+    }
+    echo '
               </tr>';
-    $moderator = true;
     foreach( $listOfRecordings as $recording){
-        echo '<!-- ';
-        print_r($recording);
-        echo ' -->';
-        
         /// Prepare playback recording links
         $type = '';
         foreach ( $recording['playbacks'] as $playback ){
@@ -891,16 +936,17 @@ function bigbluebutton_list_recordings() {
         
         /// Prepare actionbar
         $actionbar = '';
-        if ( $moderator ) {
+        if ( current_user_can('activate_plugins') ) {
+            
             $deleteURL = BigBluebutton::getDeleteRecordingsURL($recording['recordID'], $url_val, $salt_val);
             if ( $recording['published'] == 'true' ){
                 $publishURL = BigBluebutton::getPublishRecordingsURL($recording['recordID'], 'false', $url_val, $salt_val);
-                $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='Hide' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/hide.gif' class='iconsmall' onClick='actionCall(\\\"unpublish\\\", \\\"".$recording['recordID']."\\\")' /></a>";
+                $actionbar = "<a id=\"actionbar-publish-a-".$recording['recordID']."\" title=\"Hide\" href=\"#\"><img id=\"actionbar-publish-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/hide.gif\" class=\"iconsmall\" onClick=\"actionCall('unpublish', '".$recording['recordID']."'); return false;\" /></a>";
             } else {
                 $publishURL = BigBluebutton::getPublishRecordingsURL($recording['recordID'], 'true', $url_val, $salt_val);
-                $actionbar = "<a id='actionbar-publish-a-".$recording['recordID']."' title='Show' href='#'><img id='actionbar-publish-img-".$recording['recordID']."' src='".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/show.gif' class='iconsmall' onClick='actionCall(\\\"publish\\\", \\\"".$recording['recordID']."\\\")' /></a>";
+                $actionbar = "<a id=\"actionbar-publish-a-".$recording['recordID']."\" title=\"Show\" href=\"#\"><img id=\"actionbar-publish-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/show.gif\" class=\"iconsmall\" onClick=\"actionCall('publish', '".$recording['recordID']."'); return false;\" /></a>";
             }
-            $actionbar .= "<a id='actionbar-delete-a-".$recording['recordID']."' title='Delete' href='#'><img id='actionbar-delete-img-".$recording['recordID']."' src='".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/delete.gif' class='iconsmall' onClick='actionCall(\\\"delete\\\", \\\"".$recording['recordID']."\\\")' /></a>";
+            $actionbar .= "<a id=\"actionbar-delete-a-".$recording['recordID']."\" title=\"Delete\" href=\"#\"><img id=\"actionbar-delete-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/delete.gif\" class=\"iconsmall\" onClick=\"actionCall('delete', '".$recording['recordID']."'); return false;\" /></a>";
         }
         
         
@@ -930,8 +976,14 @@ function bigbluebutton_list_recordings() {
                 <td class="hed" colspan="1">'.$type.'</td>
                 <td class="hed" colspan="1">'.$recording['meetingName'].'</td>
                 <td class="hed" colspan="1">'.$formatedStartDate.'</td>
-                <td class="hed" colspan="1">'.$duration.' min</td>
-                <td class="hedextra" colspan="1">'.$actionbar.'</td>
+                <td class="hed" colspan="1">'.$duration.' min</td>';
+        
+        if ( current_user_can('activate_plugins') ) {
+            echo '
+                <td class="hedextra" colspan="1">'.$actionbar.'</td>';
+        }
+        
+        echo '    
               </tr>';
     }
 
