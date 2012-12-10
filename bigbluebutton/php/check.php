@@ -30,8 +30,10 @@ Versions:
 require('bbb_api.php');
 session_start();
 
-$url_name = 'mt_bbb_url';
-$salt_name = 'mt_salt';
+//$url_name = 'mt_bbb_url';
+$url_name = 'bigbluebutton_url';
+$salt_name = 'bigbluebutton_salt';
+//$salt_name = 'mt_salt';
 $meetingID_name = 'meetingID';
 
 //================================================================================

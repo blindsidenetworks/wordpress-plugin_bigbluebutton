@@ -24,8 +24,9 @@ Versions:
                     (email : seb DOT sschneider [ a t ] g m ail DOT com)
    1.2  --  Updated by Omar Shammas
                     (email : omar DOT shammas [a t ] g m ail DOT com)
-   1.3  --  Updated by Jesus Federico
-                    (email : jesus [a t ] blind side n e t w o rks DOT com)
+   1.3  --  Updated by Jesus Federico (email : jesus [a t ] blind side n e t w o rks DOT com)
+		with assistance from Jay Donovan (email : jay [a t ] tech surgeons DOT com)
+
 
 */
 
@@ -54,13 +55,13 @@ function bbb_wrap_simplexml_load_file($url){
 
 /*
 @param
-$userName = userName AND meetingID (string) 
-$welcomeString = welcome message (string)
+  $userName = userName AND meetingID (string) 
+  $welcomeString = welcome message (string)
 
-$modPW = moderator password (string)
-$vPW = viewer password (string)
-$voiceBridge = voice bridge (integer)
-$logout = logout url (url)
+  $modPW = moderator password (string)
+  $vPW = viewer password (string)
+  $voiceBridge = voice bridge (integer)
+  $logout = logout url (url)
 */
 // create a meeting and return the url to join as moderator
 
@@ -72,7 +73,7 @@ class BigBlueButton {
 	var $userName = array();
 	var $meetingID; // the meeting id
 	
-	var $welcomeString;
+	var $welcomeString; 
 	// the next 2 fields are maybe not needed?!?
 	var $modPW; // the moderator password 
 	var $attPW; // the attendee pw
@@ -110,6 +111,7 @@ class BigBlueButton {
 	//------------------------------------------------GET URLs-------------------------------------------------
 	/**
 	*This method returns the url to join the specified meeting.
+	* IS THIS TRUE?  getCreateMeetingURL claims the same thing - DOCUMENTATION CONFUSION 
 	*
 	*@param meetingID -- the unique meeting identifier used to store the meeting in the bigbluebutton server
 	*@param username -- the display name to be used when the user joins the meeting
@@ -128,36 +130,40 @@ class BigBlueButton {
 	
 	/**
 	*This method returns the url to join the specified meeting.
+	* IS THIS TRUE?  getJoinURL claims the same thing - DOCUMENTATION CONFUSION 
 	*
-	*@param name -- a name fot the meeting
+	*@param name -- a name for the meeting
 	*@param meetingID -- the unique meeting identifier used to store the meeting in the bigbluebutton server
 	*@param attendeePW -- the attendee of the meeting
 	*@param moderatorPW -- the moderator of the meeting
-	*@param welcome -- the welcome message that gets displayed on the chat window
+	*@param welcomeString -- the welcome message that gets displayed on the chat window
 	*@param logoutURL -- the URL that the bbb client will go to after users logouut
 	*@param SALT -- the security salt of the bigbluebutton server
 	*@param URL -- the url of the bigbluebutton server
+	*@param record -- record meeting - default to "false" <-- This is a string, not a boolean
 	*
 	*@return The url to join the meeting
 	*/
-	public function getCreateMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcome, $logoutURL, $SALT, $URL, $record = 'false', $duration=0, $voiceBridge=0, $metadata = array() ) {
+	public function getCreateMeetingURL($name, $meetingID, $attendeePW, $moderatorPW, $welcomeString, $logoutURL, $SALT, $URL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
 		$url_create = $URL."api/create?";
 		if ( $voiceBridge == 0)
+			//  Below has a risk of rooms having a voice bridge conflict..
+			//  @47 rooms, there is a 10% chance of conflict, at 76 rooms, 25% chance.
 			$voiceBridge = 70000 + rand(0, 9999);
-	
+
 		$meta = '';
 		foreach ($metadata as $key => $value) {
 			$meta = $meta.'&'.$key.'='.urlencode($value);
 		}
-	
+
 		$params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingID).'&attendeePW='.urlencode($attendeePW).'&moderatorPW='.urlencode($moderatorPW).'&voiceBridge='.$voiceBridge.'&logoutURL='.urlencode($logoutURL).'&record='.$record.$meta;
 	
 		$duration = intval($duration);
 		if( $duration > 0 )
 			$params .= '&duration='.$duration;
 	
-		if( trim( $welcome ) )
-			$params .= '&welcome='.urlencode($welcome);
+		if( trim( $welcomeString ) )
+			$params .= '&welcome='.urlencode($welcomeString);
 	
 		return ( $url_create.$params.'&checksum='.sha1("create".$params.$SALT) );
 	}
@@ -246,7 +252,7 @@ class BigBlueButton {
 	
 	//-----------------------------------------------CREATE----------------------------------------------------
 	/**
-	*This method creates a meeting and returnS the join url for moderators.
+	*This method creates a meeting and returns the join url for moderators.
 	*
 	*@param username 
 	*@param meetingID -- the unique meeting identifier used to store the meeting in the bigbluebutton server
@@ -256,6 +262,7 @@ class BigBlueButton {
 	*@param SALT -- the security salt of the bigbluebutton server
 	*@param URL -- the url of the bigbluebutton server
 	*@param logoutURL -- the url the user should be redirected to when they logout of bigbluebutton
+	*@param record -- record meeting - default to false
 	*
 	*@return The getJoinURL if successful or an error message if unsuccessful
 	*/
@@ -276,6 +283,7 @@ class BigBlueButton {
 
 	/**
 	*This method creates a meeting and return an array of the xml packet
+	* IS THIS FOR JOIN ATTEMPTS FROM WITHIN THE WP SETTINGS AREA???
 	*
 	*@param username 
 	*@param meetingID -- the unique meeting identifier used to store the meeting in the bigbluebutton server
@@ -285,6 +293,7 @@ class BigBlueButton {
 	*@param SALT -- the security salt of the bigbluebutton server
 	*@param URL -- the url of the bigbluebutton server
 	*@param logoutURL -- the url the user should be redirected to when they logout of bigbluebutton
+	*@param record -- record meeting - default to false
 	*
 	*@return
 	*	- Null if unable to reach the bigbluebutton server
@@ -294,7 +303,7 @@ class BigBlueButton {
 	public function createMeetingArray( $username, $meetingID, $welcomeString, $mPW, $aPW, $SALT, $URL, $logoutURL, $record='false', $duration=0, $voiceBridge=0, $metadata = array() ) {
 	
 		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getCreateMeetingURL($username, $meetingID, $aPW, $mPW, $welcomeString, $logoutURL, $SALT, $URL, $record, $duration, $voiceBridge, $metadata ) );
-	
+
 		if( $xml ) {
 			if($xml->meetingID) return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey, 'meetingID' => $xml->meetingID, 'attendeePW' => $xml->attendeePW, 'moderatorPW' => $xml->moderatorPW, 'hasBeenForciblyEnded' => $xml->hasBeenForciblyEnded );
 			else return array('returncode' => $xml->returncode, 'message' => $xml->message, 'messageKey' => $xml->messageKey );
