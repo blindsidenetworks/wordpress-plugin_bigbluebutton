@@ -92,6 +92,7 @@ if (!class_exists("bigbluebuttonPlugin")) {
         function plugin_install () {
             	
             global $wpdb, $bigbluebutton_plugin_version;
+            
             require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
             //Sets the name of the table
@@ -129,18 +130,9 @@ if (!class_exists("bigbluebuttonPlugin")) {
             }
             	
             ////////////////// Initialize Settings //////////////////
-            if( !get_option('bigbluebutton_url')){
-                echo 'No URL<br>';
-            } else {
-                echo 'BigBlueButton URL: '.get_option('bigbluebutton_url').'<br>';
-            }
-            
             if( !get_option('bigbluebutton_url') ) update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
             if( !get_option('bigbluebutton_salt') ) update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
              
-            ////////////////// Set new bigbluebutton_plugin_version value //////////////////
-            update_option( "bigbluebutton_plugin_version", $bigbluebutton_plugin_version );
-            	
         }
 
         function plugin_update_check() {
@@ -271,9 +263,9 @@ if (isset($bigbluebutton_plugin)) {
 
     register_activation_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_install') ); //Runs the install script (including the databse and options set up)
 
-    register_deactivation_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_uninstall') ); //Runs the uninstall function (it includes the database and options delete)
+    //register_deactivation_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_uninstall') ); //Runs the uninstall function (it includes the database and options delete)
 
-    //register_uninstall_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_uninstall') ); //Runs the uninstall function (it includes the database and options delete)
+    register_uninstall_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_uninstall') ); //Runs the uninstall function (it includes the database and options delete)
     
     set_error_handler("bigbluebutton_warning_handler", E_WARNING);
 
