@@ -1,10 +1,5 @@
-=== BigBlueButton ===
-Contributors: blindsidenetworks
-Donate link: http://www.blindsidenetworks.com/integrations/wordpress/
-Tags: blindsidenetworks, bigbluebutton, opensource, web, conferencing,
-Requires at least: 3.0.1
-Tested up to: 3.4.1
-Stable tag: 1.0.3
+wordpress-plugin_bigbluebutton
+==============================
 
 This plugin integrates BigBlueButton functionality into Wordpress. 
 
@@ -51,10 +46,15 @@ You should enable the curl extension in php.ini.
 
 == Changelog ==
 
-= 1.0.3 =
-* Added support for playback recordings
+= 1.3.1 =
+* Changed version control. 1:major version,2:wordpress version supported,3:minor version
+* Added shortcode [bigbluebutton] to render an access form into a page or post
+* Meetings can be configured to be recorded (optional)
+* Configuration form shows the list of recordings available for the Wordpress server
+* Admin users can publish/unpublish and delete recordings from the BigBlueButton server
+* Added shortcode [bigbluebutton_recordings] to render the list of recordings into a page or post
 * Performance improvements
-* Allows shortcode at posts and pages
+      (Important: This release does not support multi sites)
 
 = 1.0.2 =
 * Wait for moderator is now meeting specific
@@ -71,7 +71,7 @@ You should enable the curl extension in php.ini.
 
 == Upgrade Notice ==
 
-= 1.0.3 =
+= 1.3.1 =
 This version provides support for playback recordings, better performance, and allows shortcode at posts and pages.
 
 = 1.0.2 =
