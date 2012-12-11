@@ -83,7 +83,8 @@ if ( !isset($_SESSION[$salt_name]) || !isset($_SESSION[$url_name]) ) {
                 header("HTTP/1.0 400 Bad Request. [meetingID] parameter was not included in this query.");
             } else {
                 $meetingID = $_GET[$meetingID_name];
-                echo BigBlueButton::getMeetingXML( $meetingID, $url_val, $salt_val );
+                $response = BigBlueButton::getMeetingXML( $meetingID, $url_val, $salt_val );
+                echo "<response>".$response."</response>";
             }
             break;
         default:

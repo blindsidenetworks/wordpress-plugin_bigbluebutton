@@ -30,6 +30,7 @@ add_shortcode('bigbluebutton_recordings', 'bigbluebutton_recordings_shortcode');
 
 //action definitions
 add_action('init', 'init_sessions');
+add_action('init', 'init_scripts');
 
 //================================================================================
 //------------------Required Libraries and Global Variables-----------------------
@@ -84,7 +85,7 @@ if (!class_exists("bigbluebuttonPlugin")) {
 
         //Registers the bigbluebutton widget
         function plugin_widget_init(){
-            wp_register_sidebar_widget(time(), __('BigBlueButton'), 'bigbluebutton_sidebar');
+            wp_register_sidebar_widget('bigbluebuttonsidebarwidget', __('BigBlueButton'), 'bigbluebutton_sidebar', array( 'description' => 'Displays a BigBlueButton login form in a sidebar.'));
         }
 
         //Sets up the bigbluebutton table to store meetings in the wordpress database
@@ -292,6 +293,14 @@ function init_sessions() {
     }
 }
 
+function init_scripts() {
+    if (!is_admin()) {
+	    //wp_deregister_script('jquery');
+        //wp_register_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js', false);
+        wp_enqueue_script('jquery');
+	}    
+}
+
 
 //================================================================================
 //------------------------------Error Handler-------------------------------------
@@ -306,7 +315,6 @@ function bigbluebutton_warning_handler($errno, $errstr) {
 //================================================================================
 //Inserts a bigbluebutton form on a post or page of the blog
 function bigbluebutton_shortcode($args) {
-    //if (!session_id()) session_start();
     extract($args);
 
     bigbluebutton_form($args);
@@ -314,7 +322,6 @@ function bigbluebutton_shortcode($args) {
 }
 
 function bigbluebutton_test_shortcode($args) {
-    //if (!session_id()) session_start();
     extract($args);
     
     echo 'Version '.get_option('bigbluebutton_plugin_version').' is installed!!!<br>';
@@ -331,7 +338,6 @@ function bigbluebutton_test_shortcode($args) {
 }
 
 function bigbluebutton_recordings_shortcode($args) {
-    //if (!session_id()) session_start();
     extract($args);
 
     bigbluebutton_list_recordings();
@@ -343,12 +349,12 @@ function bigbluebutton_recordings_shortcode($args) {
 //================================================================================
 //Inserts a bigbluebutton widget on the siderbar of the blog
 function bigbluebutton_sidebar($args) {
-    if (!session_id()) session_start();
     extract($args);
 
     echo $before_widget;
     echo $before_title.'BigBlueButton'.$after_title;
-
+    echo $after_widget;
+    
     bigbluebutton_form($args);
 
 }
@@ -487,29 +493,26 @@ function bigbluebutton_form($args) {
 //the meetingName is the meetingID
 function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingID, $meetingName, $name){
 
-    echo '<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>'."\n";
-    echo '<script type="text/javascript" src="wp-content/plugins/bigbluebutton/js/heartbeat.js"></script>'."\n";
-    echo '<script type="text/javascript" src="wp-content/plugins/bigbluebutton/js/md5.js"></script>'."\n";
-    echo '<script type="text/javascript" src="wp-content/plugins/bigbluebutton/js/jquery.xml2json.js"></script>'."\n";
-
     echo '<script type="text/javascript">
-            $(document).ready(function(){
-                $.jheartbeat.set({
-                    url: "./wp-content/plugins/bigbluebutton/php/broker.php?action=ping&meetingID='.urlencode($meetingID).'",
-                    delay: 5000
-                    }, function () {
-                        mycallback();
+            function bigbluebutton_ping() {
+                jQuery.ajax({
+                    url : "./wp-content/plugins/bigbluebutton/php/broker.php?action=ping&meetingID='.urlencode($meetingID).'",
+	   		        async : true,
+	   		        dataType : "xml",
+                    success : function(xmlDoc){
+                        $xml = jQuery( xmlDoc ), $running = $xml.find( "running" );
+                        if($running.text() == "true"){
+                            window.location = "'.$bigbluebutton_joinURL.'";
+                        }
+                    },
+	   		        error : function(xmlHttpRequest, status, error) {
+	   		            console.debug(xmlHttpRequest);
+			        }
                 });
-            });
             
-            function mycallback() {
-                // Not elegant, but works around a bug in IE8
-                var isMeetingRunning = ($("#HeartBeatDIV").text().search("true") > 0 );
-                
-                if (isMeetingRunning) {
-                    window.location = "'.$bigbluebutton_joinURL.'";
-                }
             }
+            
+            setInterval("bigbluebutton_ping()", 5000);
           </script>';
 
     echo '<table>
@@ -865,7 +868,6 @@ function bigbluebutton_list_recordings($title='List of Recordings') {
 
     if ( current_user_can('activate_plugins') ) {
         echo '
-          <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>'."\n".'
           <script type="text/javascript">
               wwwroot = \''.get_bloginfo('url').'\'
               function actionCall(action, recordingid) {
@@ -890,7 +892,7 @@ function bigbluebutton_list_recordings($title='List of Recordings') {
                           // Removes the line from the table
                           $(document.getElementById(\'actionbar-tr-\'+ recordingid)).remove();
                       }
-                      $.ajax({
+                      jQuery.ajax({
                           url : actionurl,
 	   		              async : false,
                           success : function(response){
