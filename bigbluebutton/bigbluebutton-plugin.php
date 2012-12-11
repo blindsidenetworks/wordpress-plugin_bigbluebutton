@@ -321,26 +321,10 @@ function bigbluebutton_shortcode($args) {
 
 }
 
-function bigbluebutton_test_shortcode($args) {
-    extract($args);
-    
-    echo 'Version '.get_option('bigbluebutton_plugin_version').' is installed!!!<br>';
-    echo 'Variable meetingID<br>';
-    
-    if( !get_option('bigbluebutton_url')){
-        echo 'No URL for bigbluebutton_url<br>';
-    } else {
-        echo 'BigBlueButton URL: '.get_option('bigbluebutton_url').'<br>';
-    }
-    
-    echo 'BigBlueButton Salt: '.get_option('bigbluebutton_salt').'<br>';
-    
-}
-
 function bigbluebutton_recordings_shortcode($args) {
     extract($args);
-
-    bigbluebutton_list_recordings();
+    
+    bigbluebutton_list_recordings((isset($args['title']))? $args['title']: null);
 
 }
 
@@ -831,7 +815,7 @@ function bigbluebutton_list_meetings() {
 //---------------------------------List Recordings----------------------------------
 //================================================================================
 // Displays all the recordings available in the bigbluebutton server
-function bigbluebutton_list_recordings($title='List of Recordings') {
+function bigbluebutton_list_recordings($title) {
     global $wpdb;
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
@@ -841,6 +825,8 @@ function bigbluebutton_list_recordings($title='List of Recordings') {
     
     $_SESSION['mt_bbb_url'] = $url_val;
     $_SESSION['mt_salt'] = $salt_val;
+    
+    $title = ($title != null)? $title: 'List of Recordings'; 
     
     //Gets all the meetings from wordpress database
     $listOfMeetings = $wpdb->get_results("SELECT DISTINCT meetingID FROM ".$table_logs_name." WHERE recorded = 1 ORDER BY timestamp;");
