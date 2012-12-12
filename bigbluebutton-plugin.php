@@ -22,23 +22,13 @@ if(version_compare($wp_version, "2.5", "<")) {
 
 //constant definitions
 define("BIGBLUEBUTTON_DIR", WP_PLUGIN_URL . '/bigbluebutton/' );
-
-//shortcode definitions
-add_shortcode('bigbluebutton', 'bigbluebutton_shortcode');
-add_shortcode('bigbluebutton_test', 'bigbluebutton_test_shortcode');
-add_shortcode('bigbluebutton_recordings', 'bigbluebutton_recordings_shortcode');
-
-//action definitions
-add_action('init', 'init_sessions');
-add_action('init', 'init_scripts');
+define('BIGBLUEBUTTON_PLUGIN_VERSION', bigbluebutton_get_version());
+define('BIGBLUEBUTTON_PLUGIN_URL', plugin_dir_url( __FILE__ ));
 
 //================================================================================
 //------------------Required Libraries and Global Variables-----------------------
 //================================================================================
 require('php/bbb_api.php');
-
-global $bigbluebutton_plugin_version;
-
 
 //================================================================================
 //------------------Code for development------------------------------------------
@@ -56,222 +46,32 @@ if(!function_exists('_log')){
 }
 _log('Loading the plugin');
 
-
-//================================================================================
-//-------------------------BigBlueButtonPlugin Class------------------------------
-//================================================================================
-if (!class_exists("bigbluebuttonPlugin")) {
-    class bigbluebuttonPlugin {
-        function bigbluebuttonPlugin() { //constructor
-            global $bigbluebutton_plugin_version;
-            $bigbluebutton_plugin_version = bigbluebuttonPlugin::plugin_get_version();
-        }
-
-        //Inserts the plugin pages in the admin panel
-        function plugin_add_pages() {
-
-            //Add a new submenu under Settings
-            $page = add_options_page(__('BigBlueButton','menu-test'), __('BigBlueButton','menu-test'), 'manage_options', 'bigbluebutton_general', 'bigbluebutton_general_options');
-
-            //Attaches the plugin's stylesheet to the plugin page just created
-            add_action('admin_print_styles-' . $page, 'bigbluebutton_admin_styles');
-
-        }
-
-        //Registers the plugin's stylesheet
-        function plugin_admin_init() {
-            wp_register_style('bigbluebuttonStylesheet', WP_PLUGIN_URL.'/bigbluebutton/css/bigbluebutton_stylesheet.css');
-        }
-
-        //Registers the bigbluebutton widget
-        function plugin_widget_init(){
-            wp_register_sidebar_widget('bigbluebuttonsidebarwidget', __('BigBlueButton'), 'bigbluebutton_sidebar', array( 'description' => 'Displays a BigBlueButton login form in a sidebar.'));
-        }
-
-        //Sets up the bigbluebutton table to store meetings in the wordpress database
-        function plugin_install () {
-            	
-            global $wpdb, $bigbluebutton_plugin_version;
-            
-            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-            //Sets the name of the table
-            $table_name = $wpdb->prefix . "bigbluebutton";
-            $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
-            
-            //Installation code
-            if( !get_option('bbb_db_version') && !get_option('bigbluebutton_plugin_version') ){
-                ////////////////// Create Database //////////////////
-                $sql = "CREATE TABLE " . $table_name . " (
-                    id mediumint(9) NOT NULL AUTO_INCREMENT,
-                    meetingID text NOT NULL,
-                    meetingName text NOT NULL,
-                    meetingVersion int NOT NULL,
-                    attendeePW text NOT NULL,
-                    moderatorPW text NOT NULL,
-                    waitForModerator BOOLEAN NOT NULL DEFAULT FALSE,
-                    recorded BOOLEAN NOT NULL DEFAULT FALSE,
-                    UNIQUE KEY id (id)
-                    );";
-
-                dbDelta($sql);
-                
-                $sql = "CREATE TABLE " . $table_logs_name . " (
-                    id mediumint(9) NOT NULL AUTO_INCREMENT,
-                    meetingID text NOT NULL,
-                    recorded BOOLEAN NOT NULL DEFAULT FALSE,
-                    timestamp int NOT NULL,
-                    event text NOT NULL,
-                    UNIQUE KEY id (id)
-                    );";
-                
-                dbDelta($sql);
-                
-            }
-            	
-            ////////////////// Initialize Settings //////////////////
-            if( !get_option('bigbluebutton_url') ) update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
-            if( !get_option('bigbluebutton_salt') ) update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
-             
-        }
-
-        function plugin_update_check() {
-            global $wpdb, $bigbluebutton_plugin_version;
-            	
-            //Sets the name of the table
-            $table_name = $wpdb->prefix . "bigbluebutton";
-            $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
-            $table_name_old = $wpdb->prefix . "bbb_meetingRooms";
-
-            ////////////////// Updates for version 1.0.2 and earlier //////////////////
-            $bbb_db_version_installed = get_option("bbb_db_version");
-            if( $bbb_db_version_installed ){
-                ////////////////// Update Settings //////////////////
-                if( !get_option('mt_bbb_url') ) {
-                    update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
-                } else {
-                    update_option( 'bigbluebutton_url', get_option('mt_bbb_url') );
-                    delete_option('mt_bbb_url');
-                }
-
-                if( !get_option('mt_salt') ) {
-                    update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
-                } else {
-                    update_option( 'bigbluebutton_salt', get_option('mt_salt') );
-                    delete_option('mt_salt');
-                }
-
-                delete_option('mt_waitForModerator'); //deletes this option because it is no longer needed, it has been incorportated into the table.
-                delete_option('bbb_db_version'); //deletes this option because it is no longer needed, the versioning pattern has changed.
-
-                ////////////////// Update Database //////////////////
-                //Rename database
-                $sql = "ALTER TABLE " . $table_name_old . " RENAME TO " . $table_name . ";";
-                $wpdb->query($sql);
-
-                //Only for versions 1.0 and earlier
-                if( $bbb_db_version_installed && strcmp($bbb_db_version_installed, "1.0") <= 0 ){
-                    $sql = "ALTER TABLE " . $table_name . " ADD waitForModerator BOOLEAN NOT NULL DEFAULT FALSE;";
-                    $wpdb->query($sql);
-                }
-                //Common update
-                $sql = "ALTER TABLE " . $table_name . " ADD meetingName TEXT NOT NULL AFTER meetingID;";
-                $wpdb->query($sql);
-
-                $sql = "ALTER TABLE " . $table_name . " ADD recorded BOOLEAN NOT NULL DEFAULT FALSE;";
-                $wpdb->query($sql);
-
-
-            }
-
-            ////////////////// Updates for version 1.0.3 and larter //////////////////
-            $bigbluebutton_plugin_version_installed = get_option('bigbluebutton_plugin_version');
-            if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.0.3") == 0 ){
-                	
-            }
-            	
-            if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.0.4") == 0 ){
-
-            }
-
-            ////////////////// Set new bigbluebutton_plugin_version value //////////////////
-            update_option( "bigbluebutton_plugin_version", $bigbluebutton_plugin_version );
-
-        }
-
-        //Sets up the bigbluebutton table to store meetings in the wordpress database
-        function plugin_uninstall () {
-            global $wpdb;
-            
-            //In case is deactivateing an overwritten version
-            if( get_option('bbb_db_version') ){
-                $table_name_old = $wpdb->prefix . "bbb_meetingRooms";
-                $wpdb->query("DROP TABLE IF EXISTS $table_name_old");
-                delete_option('bbb_db_version');
-                delete_option('mt_bbb_url');
-                delete_option('mt_salt');
-            }
-            	
-            //Delete the options stored in the wordpress db
-            delete_option('bigbluebutton_plugin_version');
-            delete_option('bigbluebutton_url');
-            delete_option('bigbluebutton_salt');
-            	
-            //Sets the name of the table
-            $table_name = $wpdb->prefix . "bigbluebutton";
-            $wpdb->query("DROP TABLE IF EXISTS $table_name");
-
-            $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
-            $wpdb->query("DROP TABLE IF EXISTS $table_logs_name");
-            
-        }
-
-        /**
-         * Returns current plugin version.
-         *
-         * @return string Plugin version
-         */
-        function plugin_get_version() {
-            if ( !function_exists( 'get_plugins' ) )
-                require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-            $plugin_folder = get_plugins( '/' . plugin_basename( dirname( __FILE__ ) ) );
-            $plugin_file = basename( ( __FILE__ ) );
-            
-            return $plugin_folder[$plugin_file]['Version'];
-        }
-
-    }//End Class bigbluebuttonPlugin
-}
-
-
 //================================================================================
 //------------------------------------Main----------------------------------------
 //================================================================================
-if (class_exists("bigbluebuttonPlugin")) {
-    $bigbluebutton_plugin = new bigbluebuttonPlugin();
-}
+//hook definitions
+register_activation_hook(__FILE__, 'bigbluebutton_install' ); //Runs the install script (including the databse and options set up)
+//register_deactivation_hook(__FILE__, 'bigbluebutton_uninstall') ); //Runs the uninstall function (it includes the database and options delete)
+register_uninstall_hook(__FILE__, 'bigbluebutton_uninstall' ); //Runs the uninstall function (it includes the database and options delete)
 
-if (isset($bigbluebutton_plugin)) {
+//shortcode definitions
+add_shortcode('bigbluebutton', 'bigbluebutton_shortcode');
+add_shortcode('bigbluebutton_test', 'bigbluebutton_test_shortcode');
+add_shortcode('bigbluebutton_recordings', 'bigbluebutton_recordings_shortcode');
 
-    add_action('admin_menu', array(&$bigbluebutton_plugin, 'plugin_add_pages'), 1);
-
-    add_action('admin_init', array(&$bigbluebutton_plugin, 'plugin_admin_init'), 1);
-
-    add_action('plugins_loaded', array(&$bigbluebutton_plugin, 'plugin_update_check') );
-
-    add_action('plugins_loaded', array(&$bigbluebutton_plugin, 'plugin_widget_init') );
-
-    register_activation_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_install') ); //Runs the install script (including the databse and options set up)
-
-    //register_deactivation_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_uninstall') ); //Runs the uninstall function (it includes the database and options delete)
-
-    register_uninstall_hook(__FILE__, array(&$bigbluebutton_plugin, 'plugin_uninstall') ); //Runs the uninstall function (it includes the database and options delete)
-    
-    set_error_handler("bigbluebutton_warning_handler", E_WARNING);
-
-}
+//action definitions
+add_action('init', 'bigbluebutton_init_sessions');
+add_action('init', 'bigbluebutton_init_scripts');
+add_action('admin_menu', 'bigbluebutton_add_pages', 1);
+add_action('admin_init', 'bigbluebutton_admin_init', 1);
+add_action('plugins_loaded', 'bigbluebutton_update_check' );
+add_action('plugins_loaded', 'bigbluebutton_widget_init' );
+set_error_handler("bigbluebutton_warning_handler", E_WARNING);
 
 
+//================================================================================
+//------------------------------ Main Functions ----------------------------------
+//================================================================================
 //Adds the plugin stylesheet to wordpress
 function bigbluebutton_admin_styles(){
     wp_enqueue_style('bigbluebuttonStylesheet');
@@ -279,18 +79,146 @@ function bigbluebutton_admin_styles(){
 
 
 // Sessions are required by the plugin to work.
-function init_sessions() {
+function bigbluebutton_init_sessions() {
     if (!session_id()) {
         session_start();
     }
 }
 
-function init_scripts() {
+function bigbluebutton_init_scripts() {
     if (!is_admin()) {
 	    //wp_deregister_script('jquery');
         //wp_register_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js', false);
         wp_enqueue_script('jquery');
 	}    
+}
+
+//Registers the plugin's stylesheet
+function bigbluebutton_admin_init() {
+    wp_register_style('bigbluebuttonStylesheet', WP_PLUGIN_URL.'/bigbluebutton/css/bigbluebutton_stylesheet.css');
+}
+
+//Registers the bigbluebutton widget
+function bigbluebutton_widget_init(){
+    wp_register_sidebar_widget('bigbluebuttonsidebarwidget', __('BigBlueButton'), 'bigbluebutton_sidebar', array( 'description' => 'Displays a BigBlueButton login form in a sidebar.'));
+}
+
+//Inserts the plugin pages in the admin panel
+function bigbluebutton_add_pages() {
+
+    //Add a new submenu under Settings
+    $page = add_options_page(__('BigBlueButton','menu-test'), __('BigBlueButton','menu-test'), 'manage_options', 'bigbluebutton_general', 'bigbluebutton_general_options');
+
+    //Attaches the plugin's stylesheet to the plugin page just created
+    add_action('admin_print_styles-' . $page, 'bigbluebutton_admin_styles');
+
+}
+
+//Sets up the bigbluebutton table to store meetings in the wordpress database
+function bigbluebutton_install () {
+     
+    global $wpdb;
+
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+    //Sets the name of the table
+    $table_name = $wpdb->prefix . "bigbluebutton";
+    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+
+    //Installation code
+    if( !get_option('bigbluebutton_plugin_version') ){
+        ////////////////// Create Database //////////////////
+        $sql = "CREATE TABLE " . $table_name . " (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        meetingID text NOT NULL,
+        meetingName text NOT NULL,
+        meetingVersion int NOT NULL,
+        attendeePW text NOT NULL,
+        moderatorPW text NOT NULL,
+        waitForModerator BOOLEAN NOT NULL DEFAULT FALSE,
+        recorded BOOLEAN NOT NULL DEFAULT FALSE,
+        UNIQUE KEY id (id)
+        );";
+
+        dbDelta($sql);
+
+        $sql = "CREATE TABLE " . $table_logs_name . " (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        meetingID text NOT NULL,
+        recorded BOOLEAN NOT NULL DEFAULT FALSE,
+        timestamp int NOT NULL,
+        event text NOT NULL,
+        UNIQUE KEY id (id)
+        );";
+
+        dbDelta($sql);
+
+    }
+     
+    ////////////////// Initialize Settings //////////////////
+    if( !get_option('bigbluebutton_url') ) update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
+    if( !get_option('bigbluebutton_salt') ) update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
+    
+    update_option( "bigbluebutton_plugin_version", BIGBLUEBUTTON_PLUGIN_VERSION );
+    
+}
+
+function bigbluebutton_update_check() {
+    global $wpdb;
+     
+    //Sets the name of the table
+    $table_name = $wpdb->prefix . "bigbluebutton";
+    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+
+    ////////////////// Updates for version 1.3.1 and larter //////////////////
+    $bigbluebutton_plugin_version_installed = get_option('bigbluebutton_plugin_version');
+    if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.1") == 0 ){
+         
+    }
+     
+    if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.2") == 0 ){
+
+    }
+
+    ////////////////// Set new bigbluebutton_plugin_version value //////////////////
+    update_option( "bigbluebutton_plugin_version", BIGBLUEBUTTON_PLUGIN_VERSION );
+
+}
+
+function bigbluebutton_uninstall () {
+    global $wpdb;
+
+    //In case is deactivateing an overwritten version
+    if( get_option('bbb_db_version') ){
+        $table_name_old = $wpdb->prefix . "bbb_meetingRooms";
+        $wpdb->query("DROP TABLE IF EXISTS $table_name_old");
+        delete_option('bbb_db_version');
+        delete_option('mt_bbb_url');
+        delete_option('mt_salt');
+    }
+     
+    //Delete the options stored in the wordpress db
+    delete_option('bigbluebutton_plugin_version');
+    delete_option('bigbluebutton_url');
+    delete_option('bigbluebutton_salt');
+     
+    //Sets the name of the table
+    $table_name = $wpdb->prefix . "bigbluebutton";
+    $wpdb->query("DROP TABLE IF EXISTS $table_name");
+
+    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+    $wpdb->query("DROP TABLE IF EXISTS $table_logs_name");
+
+}
+
+//Returns current plugin version.
+function bigbluebutton_get_version() {
+    if ( !function_exists( 'get_plugins' ) )
+        require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+    $plugin_folder = get_plugins( '/' . plugin_basename( dirname( __FILE__ ) ) );
+    $plugin_file = basename( ( __FILE__ ) );
+
+    return $plugin_folder[$plugin_file]['Version'];
 }
 
 
@@ -375,7 +303,7 @@ function bigbluebutton_form($args) {
             $metadata = Array(
                 'origin' => 'Wordpress',
                 'originversion' => $wp_version,
-                'origintag' => 'wp_plugin-bigbluebutton '.$bigbluebutton_plugin_version,
+                'origintag' => 'wordpress-plugin_bigbluebutton '.BIGBLUEBUTTON_PLUGIN_VERSION,
                 //'originnameserver' => get_current_site_name( $current_site )
             );
             //Call for creating meeting on the bigbluebutton server
@@ -614,7 +542,7 @@ function bigbluebutton_general_settings() {
 //================================================================================
 // Displays all the meetings available in the bigbluebutton server
 function bigbluebutton_list_meetings() {
-    global $wpdb, $wp_version, $current_site, $current_user, $bigbluebutton_plugin_version;
+    global $wpdb, $wp_version, $current_site, $current_user;
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
     
@@ -643,7 +571,7 @@ function bigbluebutton_list_meetings() {
             $metadata = array(
                 'meta_origin' => 'WordPress',
                 'meta_originversion' => $wp_version,
-                'meta_origintag' => 'wp_plugin-bigbluebutton '.$bigbluebutton_plugin_version,
+                'meta_origintag' => 'wp_plugin-bigbluebutton '.BIGBLUEBUTTON_PLUGIN_VERSION,
                 'meta_originservername' => get_option('siteurl'),
                 'meta_originservercommonname' => get_bloginfo('name'),
             );
@@ -825,7 +753,7 @@ function bigbluebutton_list_meetings() {
 //---------------------------------List Recordings----------------------------------
 //================================================================================
 // Displays all the recordings available in the bigbluebutton server
-function bigbluebutton_list_recordings($title) {
+function bigbluebutton_list_recordings($title=null) {
     global $wpdb;
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
@@ -983,8 +911,6 @@ function bigbluebutton_list_recordings($title) {
     //Print end of the table
     echo '  </table>
           </div>';
-    
-    
     
 }
 

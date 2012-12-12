@@ -50,8 +50,6 @@ function bbb_wrap_simplexml_load_file($url){
 	return (simplexml_load_file($url));	
 }
 
-
-
 /*
 @param
 $userName = userName AND meetingID (string) 
