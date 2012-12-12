@@ -657,7 +657,7 @@ function bigbluebutton_list_meetings() {
             }
             else { //The meeting was terminated
                 $wpdb->query("DELETE FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
-                echo '<div class="updated"><p><strong>'.$meetingID.' meeting has been deleted.</strong></p></div>';
+                echo '<div class="updated"><p><strong>'.$meetingName.' meeting has been deleted.</strong></p></div>';
             }
             	
         }
@@ -786,6 +786,11 @@ function bigbluebutton_list_recordings($title=null) {
         }
     }
     
+    //Checks to see if there are no meetings in the wordpress db and if so alerts the user
+    if(count($listOfRecordings) == 0){
+        echo '<div class="updated"><p><strong>There are no recordings available.</strong></p></div>';
+        return;
+    }
     
     //Displays the title of the page
     echo "<h2>".$title."</h2>";
