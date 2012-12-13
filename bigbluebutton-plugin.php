@@ -514,9 +514,9 @@ function bigbluebutton_general_settings() {
 
     echo '
         <form name="form1" method="post" action="">
-          <p>URL of BigBlueButton server:<input type="text" name="bigbluebutton_url" value="'.$url_val.'" size="60"> eg. \'http://example.com/bigbluebutton/\'
+          <p>URL of BigBlueButton server:<input type="text" name="bigbluebutton_url" value="'.$url_val.'" size="60"> eg. \'http://test-install.blindsidenetworks.com/\'
           </p>
-          <p>Salt of BigBlueButton server:<input type="text" name="bigbluebutton_salt" value="'.$salt_val.'" size="40"> Can be found in /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+          <p>Salt of BigBlueButton server:<input type="text" name="bigbluebutton_salt" value="'.$salt_val.'" size="40"> It can be found in /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties. eg. \'8cd8ef52e8e101574e400365b55e11a6\'.
           </p>
 
           <p class="submit">
@@ -773,7 +773,7 @@ function bigbluebutton_list_recordings($title=null) {
     $listOfRecordings = Array();
     if($listOfMeetings){
         foreach ($listOfMeetings as $meeting) {
-            if( $meetingIDs != '' ) $meetingIDs .= ', ';
+            if( $meetingIDs != '' ) $meetingIDs .= ',';
             $meetingIDs .= $meeting->meetingID;
         }
     }
@@ -786,49 +786,51 @@ function bigbluebutton_list_recordings($title=null) {
         }
     }
     
+    //Displays the title of the page
+    echo "<h2>".$title."</h2>";
+
     //Checks to see if there are no meetings in the wordpress db and if so alerts the user
     if(count($listOfRecordings) == 0){
         echo '<div class="updated"><p><strong>There are no recordings available.</strong></p></div>';
         return;
     }
     
-    //Displays the title of the page
-    echo "<h2>".$title."</h2>";
-
     if ( current_user_can('activate_plugins') ) {
         echo '
           <script type="text/javascript">
               wwwroot = \''.get_bloginfo('url').'\'
               function actionCall(action, recordingid) {
                   
-                  actionurl = wwwroot + "/wp-content/plugins/bigbluebutton/php/broker.php?action=" + action + "&recordingID=" + recordingid;
-	              action = (typeof action == \'undefined\') ? \'publish\' : action;
+                  action = (typeof action == \'undefined\') ? \'publish\' : action;
 	              
-	              if (action == \'publish\' || action == \'unpublish\' || (action == \'delete\' && confirm("Are you sure to delete this recording?"))) {
-		              if (action == \'publish\' || action == \'unpublish\') {
-			              var el_a = document.getElementById(\'actionbar-publish-a-\'+ recordingid);
-			              if (el_a) {
-				              var el_img = document.getElementById(\'actionbar-publish-img-\'+ recordingid);
-				              if (el_a.title == \'Hide\' ) {
-					              el_a.title = \'Show\';
-					              el_img.src = wwwroot + \'/wp-content/plugins/bigbluebutton/images/show.gif\';
+                  if (action == \'publish\' || (action == \'delete\' && confirm("Are you sure to delete this recording?"))) {
+                      if (action == \'publish\') {
+                          var el_a = document.getElementById(\'actionbar-publish-a-\'+ recordingid);
+                          if (el_a) {
+                              var el_img = document.getElementById(\'actionbar-publish-img-\'+ recordingid);
+            	              if (el_a.title == \'Hide\' ) {
+                                  action = \'unpublish\';
+                                  el_a.title = \'Show\';
+                	              el_img.src = wwwroot + \'/wp-content/plugins/bigbluebutton/images/show.gif\';
                               } else {
+                                  action = \'publish\';
                                   el_a.title = \'Hide\';
                                   el_img.src = wwwroot + \'/wp-content/plugins/bigbluebutton/images/hide.gif\';
                               }
                           }
                       } else {
                           // Removes the line from the table
-                          $(document.getElementById(\'actionbar-tr-\'+ recordingid)).remove();
+                          jQuery(document.getElementById(\'actionbar-tr-\'+ recordingid)).remove();
                       }
+                      actionurl = wwwroot + "/wp-content/plugins/bigbluebutton/php/broker.php?action=" + action + "&recordingID=" + recordingid;
                       jQuery.ajax({
                           url : actionurl,
 	   		              async : false,
                           success : function(response){
                           },
-	   		              error : function(xmlHttpRequest, status, error) {
-	   		                  console.debug(xmlHttpRequest);
-			              }
+       		              error : function(xmlHttpRequest, status, error) {
+       		                  console.debug(xmlHttpRequest);
+                          }
                       });
                   }    
               }   
@@ -862,18 +864,10 @@ function bigbluebutton_list_recordings($title=null) {
         /// Prepare actionbar
         $actionbar = '';
         if ( current_user_can('activate_plugins') ) {
-            
-            $deleteURL = BigBluebutton::getDeleteRecordingsURL($recording['recordID'], $url_val, $salt_val);
-            if ( $recording['published'] == 'true' ){
-                $publishURL = BigBluebutton::getPublishRecordingsURL($recording['recordID'], 'false', $url_val, $salt_val);
-                $actionbar = "<a id=\"actionbar-publish-a-".$recording['recordID']."\" title=\"Hide\" href=\"#\"><img id=\"actionbar-publish-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/hide.gif\" class=\"iconsmall\" onClick=\"actionCall('unpublish', '".$recording['recordID']."'); return false;\" /></a>";
-            } else {
-                $publishURL = BigBluebutton::getPublishRecordingsURL($recording['recordID'], 'true', $url_val, $salt_val);
-                $actionbar = "<a id=\"actionbar-publish-a-".$recording['recordID']."\" title=\"Show\" href=\"#\"><img id=\"actionbar-publish-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/show.gif\" class=\"iconsmall\" onClick=\"actionCall('publish', '".$recording['recordID']."'); return false;\" /></a>";
-            }
+            $action = ($recording['published'] == 'true')? 'Hide': 'Show';
+            $actionbar = "<a id=\"actionbar-publish-a-".$recording['recordID']."\" title=\"".$action."\" href=\"#\"><img id=\"actionbar-publish-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/".strtolower($action).".gif\" class=\"iconsmall\" onClick=\"actionCall('publish', '".$recording['recordID']."'); return false;\" /></a>";
             $actionbar .= "<a id=\"actionbar-delete-a-".$recording['recordID']."\" title=\"Delete\" href=\"#\"><img id=\"actionbar-delete-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/delete.gif\" class=\"iconsmall\" onClick=\"actionCall('delete', '".$recording['recordID']."'); return false;\" /></a>";
         }
-        
         
         /// Prepare duration
         $endTime = isset($recording['endTime'])? intval(str_replace('"', '\"', $recording['endTime'])):0;
@@ -898,14 +892,14 @@ function bigbluebutton_list_recordings($title=null) {
         //Print detail
         echo '
               <tr id="actionbar-tr-'.$recording['recordID'].'">
-                <td class="hed" colspan="1">'.$type.'</td>
-                <td class="hed" colspan="1">'.$recording['meetingName'].'</td>
-                <td class="hed" colspan="1">'.$formatedStartDate.'</td>
-                <td class="hed" colspan="1">'.$duration.' min</td>';
+                <td>'.$type.'</td>
+                <td>'.$recording['meetingName'].'</td>
+                <td>'.$formatedStartDate.'</td>
+                <td>'.$duration.' min</td>';
         
         if ( current_user_can('activate_plugins') ) {
             echo '
-                <td class="hedextra" colspan="1">'.$actionbar.'</td>';
+                <td>'.$actionbar.'</td>';
         }
         
         echo '    
