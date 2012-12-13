@@ -6,7 +6,8 @@ Description: BigBlueButton is an open source web conferencing system. This plugi
 Version: 1.3.1
 Author: Blindside Networks
 Author URI: http://blindsidenetworks.com/
-License: GPLv2
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
 //================================================================================
