@@ -1,5 +1,5 @@
 === BigBlueButton ===
-Contributors: blindsidenetworks
+Contributors: blindsidenetworks, jfederico
 Donate link: http://www.blindsidenetworks.com/integrations/wordpress/
 Tags: blindsidenetworks, bigbluebutton, opensource, web, conferencing,
 Requires at least: 3.0.1
