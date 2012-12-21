@@ -117,43 +117,11 @@ function bigbluebutton_add_pages() {
 
 //Sets up the bigbluebutton table to store meetings in the wordpress database
 function bigbluebutton_install () {
-     
-    global $wpdb;
-
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-    //Sets the name of the table
-    $table_name = $wpdb->prefix . "bigbluebutton";
-    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+    //print_r("bigbluebutton_install");
 
     //Installation code
     if( !get_option('bigbluebutton_plugin_version') ){
-        ////////////////// Create Database //////////////////
-        $sql = "CREATE TABLE " . $table_name . " (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        meetingID text NOT NULL,
-        meetingName text NOT NULL,
-        meetingVersion int NOT NULL,
-        attendeePW text NOT NULL,
-        moderatorPW text NOT NULL,
-        waitForModerator BOOLEAN NOT NULL DEFAULT FALSE,
-        recorded BOOLEAN NOT NULL DEFAULT FALSE,
-        UNIQUE KEY id (id)
-        );";
-
-        dbDelta($sql);
-
-        $sql = "CREATE TABLE " . $table_logs_name . " (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        meetingID text NOT NULL,
-        recorded BOOLEAN NOT NULL DEFAULT FALSE,
-        timestamp int NOT NULL,
-        event text NOT NULL,
-        UNIQUE KEY id (id)
-        );";
-
-        dbDelta($sql);
-
+        bigbluebutton_init_database();
     }
      
     ////////////////// Initialize Settings //////////////////
@@ -164,17 +132,82 @@ function bigbluebutton_install () {
     
 }
 
+//Creates the bigbluebutton tables in the wordpress database
+function bigbluebutton_init_database(){
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    
+    global $wpdb;
+    
+    //Sets the name of the table
+    $table_name = $wpdb->prefix . "bigbluebutton";
+    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+
+    //Execute sql
+    $sql = "CREATE TABLE " . $table_name . " (
+    id mediumint(9) NOT NULL AUTO_INCREMENT,
+    meetingID text NOT NULL,
+    meetingName text NOT NULL,
+    meetingVersion int NOT NULL,
+    attendeePW text NOT NULL,
+    moderatorPW text NOT NULL,
+    waitForModerator BOOLEAN NOT NULL DEFAULT FALSE,
+    recorded BOOLEAN NOT NULL DEFAULT FALSE,
+    UNIQUE KEY id (id)
+    );";
+    dbDelta($sql);
+    
+    $sql = "CREATE TABLE " . $table_logs_name . " (
+    id mediumint(9) NOT NULL AUTO_INCREMENT,
+    meetingID text NOT NULL,
+    recorded BOOLEAN NOT NULL DEFAULT FALSE,
+    timestamp int NOT NULL,
+    event text NOT NULL,
+    UNIQUE KEY id (id)
+    );";
+    dbDelta($sql);
+    
+}
+
 function bigbluebutton_update_check() {
+    //print_r("bigbluebutton_update_check");
+    
     global $wpdb;
      
     //Sets the name of the table
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
 
-    ////////////////// Updates for version 1.3.1 and larter //////////////////
+    ////////////////// Updates for version 1.3.1 and earlier //////////////////
     $bigbluebutton_plugin_version_installed = get_option('bigbluebutton_plugin_version');
-    if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.1") == 0 ){
-         
+    //print_r("bigbluebutton_plugin_version [".get_option("bigbluebutton_plugin_version")."]");
+    //print_r("bbb_db_version [".get_option("bbb_db_version")."]");
+    //print_r("bigbluebutton_url [".get_option("bigbluebutton_url")."]");
+    if( !$bigbluebutton_plugin_version_installed                                                             //It's 1.0.2 or earlier
+     || (strcmp("1.3.1", $bigbluebutton_plugin_version_installed) <= 0 && get_option("bbb_db_version")) ){   //It's 1.3.1 not updated
+        ////////////////// Update Database //////////////////
+        /// Initialize database will create the tables added for the new version
+        bigbluebutton_init_database();
+        /// Transfer the data from old table to the new one
+        /// Remove the old database version control 
+        delete_option('bbb_db_version');
+        
+        ////////////////// Update Settings //////////////////
+        if( !get_option('mt_bbb_url') ) {
+            update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
+        } else {
+            update_option( 'bigbluebutton_url', get_option('mt_bbb_url') );
+            delete_option('mt_bbb_url');
+        }
+        
+        if( !get_option('mt_salt') ) {
+            update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
+        } else {
+            update_option( 'bigbluebutton_salt', get_option('mt_salt') );
+            delete_option('mt_salt');
+        }
+        
+        delete_option('mt_waitForModerator'); //deletes this option because it is no longer needed, it has been incorportated into the table.
+        delete_option('bbb_db_version'); //deletes this option because it is no longer needed, the versioning pattern has changed.
     }
      
     if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.2") == 0 ){
@@ -515,7 +548,7 @@ function bigbluebutton_general_settings() {
 
     echo '
         <form name="form1" method="post" action="">
-          <p>URL of BigBlueButton server:<input type="text" name="bigbluebutton_url" value="'.$url_val.'" size="60"> eg. \'http://test-install.blindsidenetworks.com/\'
+          <p>URL of BigBlueButton server:<input type="text" name="bigbluebutton_url" value="'.$url_val.'" size="60"> eg. \'http://test-install.blindsidenetworks.com/bigbluebutton/\'
           </p>
           <p>Salt of BigBlueButton server:<input type="text" name="bigbluebutton_salt" value="'.$salt_val.'" size="40"> It can be found in /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties. eg. \'8cd8ef52e8e101574e400365b55e11a6\'.
           </p>
