@@ -117,8 +117,6 @@ function bigbluebutton_add_pages() {
 
 //Sets up the bigbluebutton table to store meetings in the wordpress database
 function bigbluebutton_install () {
-    //print_r("bigbluebutton_install");
-
     //Installation code
     if( !get_option('bigbluebutton_plugin_version') ){
         bigbluebutton_init_database();
@@ -169,8 +167,6 @@ function bigbluebutton_init_database(){
 }
 
 function bigbluebutton_update_check() {
-    //print_r("bigbluebutton_update_check");
-    
     global $wpdb;
      
     //Sets the name of the table
@@ -179,17 +175,20 @@ function bigbluebutton_update_check() {
 
     ////////////////// Updates for version 1.3.1 and earlier //////////////////
     $bigbluebutton_plugin_version_installed = get_option('bigbluebutton_plugin_version');
-    //print_r("bigbluebutton_plugin_version [".get_option("bigbluebutton_plugin_version")."]");
-    //print_r("bbb_db_version [".get_option("bbb_db_version")."]");
-    //print_r("bigbluebutton_url [".get_option("bigbluebutton_url")."]");
     if( !$bigbluebutton_plugin_version_installed                                                             //It's 1.0.2 or earlier
      || (strcmp("1.3.1", $bigbluebutton_plugin_version_installed) <= 0 && get_option("bbb_db_version")) ){   //It's 1.3.1 not updated
         ////////////////// Update Database //////////////////
         /// Initialize database will create the tables added for the new version
         bigbluebutton_init_database();
         /// Transfer the data from old table to the new one
-        /// Remove the old database version control 
-        delete_option('bbb_db_version');
+        $table_name_old = $wpdb->prefix . "bbb_meetingRooms";
+        $listOfMeetings = $wpdb->get_results("SELECT * FROM ".$table_name_old." ORDER BY id");
+        foreach ($listOfMeetings as $meeting) {
+            $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW) VALUES ('".sha1($meeting->meetingID.strval($meeting->meetingVersion))."','".$meeting->meetingID."', '".$meeting->meetingVersion."', '".$meeting->attendeePW."', '".$meeting->moderatorPW."');";
+            $wpdb->query($sql);
+        }
+        /// Remove the old table 
+        $wpdb->query("DROP TABLE IF EXISTS $table_name_old");
         
         ////////////////// Update Settings //////////////////
         if( !get_option('mt_bbb_url') ) {
