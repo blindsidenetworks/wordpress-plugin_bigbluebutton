@@ -21,10 +21,14 @@ if(version_compare($wp_version, "2.5", "<")) {
     exit($exit_msg);
 }
 
-//constant definitions
+//constant definition
 define("BIGBLUEBUTTON_DIR", WP_PLUGIN_URL . '/bigbluebutton/' );
 define('BIGBLUEBUTTON_PLUGIN_VERSION', bigbluebutton_get_version());
 define('BIGBLUEBUTTON_PLUGIN_URL', plugin_dir_url( __FILE__ ));
+
+//constant message definition
+define('BIGBLUEBUTTON_STRING_WELCOME', '<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>To understand how BigBlueButton works see our <a href="event:http://www.bigbluebutton.org/content/videos"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the headset icon (upper-left hand corner). <b>Please use a headset to avoid causing noise for others.</b>');
+define('BIGBLUEBUTTON_STRING_MEETING_RECORDED', '<br><br>This session is being recorded.');
 
 //================================================================================
 //------------------Required Libraries and Global Variables-----------------------
@@ -57,7 +61,6 @@ register_uninstall_hook(__FILE__, 'bigbluebutton_uninstall' ); //Runs the uninst
 
 //shortcode definitions
 add_shortcode('bigbluebutton', 'bigbluebutton_shortcode');
-add_shortcode('bigbluebutton_test', 'bigbluebutton_test_shortcode');
 add_shortcode('bigbluebutton_recordings', 'bigbluebutton_recordings_shortcode');
 
 //action definitions
@@ -65,7 +68,7 @@ add_action('init', 'bigbluebutton_init_sessions');
 add_action('init', 'bigbluebutton_init_scripts');
 add_action('admin_menu', 'bigbluebutton_add_pages', 1);
 add_action('admin_init', 'bigbluebutton_admin_init', 1);
-add_action('plugins_loaded', 'bigbluebutton_update_check' );
+add_action('plugins_loaded', 'bigbluebutton_update' );
 add_action('plugins_loaded', 'bigbluebutton_widget_init' );
 set_error_handler("bigbluebutton_warning_handler", E_WARNING);
 
@@ -166,7 +169,7 @@ function bigbluebutton_init_database(){
     
 }
 
-function bigbluebutton_update_check() {
+function bigbluebutton_update() {
     global $wpdb;
      
     //Sets the name of the table
@@ -297,8 +300,6 @@ function bigbluebutton_sidebar($args) {
 }
 
 //================================================================================
-//---------------------------------Widget-----------------------------------------
-//================================================================================
 //Create the form called by the Shortcode and Widget functions
 
 function bigbluebutton_form($args) {
@@ -340,7 +341,9 @@ function bigbluebutton_form($args) {
                 //'originnameserver' => get_current_site_name( $current_site )
             );
             //Call for creating meeting on the bigbluebutton server
-            $response = BigBlueButton::createMeetingArray($name, $found->meetingID, $found->meetingName, "", $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false', $duration, $voicebridge, $metadata );
+            $welcome = (isset($args['welcome']))? $args['welcome']: BIGBLUEBUTTON_STRING_WELCOME;
+            if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
+            $response = BigBlueButton::createMeetingArray($name, $found->meetingID, $found->meetingName, $welcome, $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false', $duration, $voicebridge, $metadata );
 
             //Analyzes the bigbluebutton server's response
             if(!$response || $response['returncode'] == 'FAILED' ){//If the server is unreachable, or an error occured
@@ -610,7 +613,9 @@ function bigbluebutton_list_meetings() {
             );
             
             //Calls create meeting on the bigbluebutton server
-            $response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID, $meetingName, "", $moderatorPW, $attendeePW, $salt_val, $url_val, get_option('siteurl'), ($recorded? 'true':'false'), $duration, $voicebridge, $metadata );
+            $welcome = BIGBLUEBUTTON_STRING_WELCOME;
+            if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
+            $response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID, $meetingName, $welcome, $moderatorPW, $attendeePW, $salt_val, $url_val, get_option('siteurl'), ($recorded? 'true':'false'), $duration, $voicebridge, $metadata );
             
             $createNew = false;
             //Analyzes the bigbluebutton server's response
