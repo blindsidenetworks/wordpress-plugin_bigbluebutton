@@ -329,8 +329,10 @@ function bigbluebutton_form($args) {
 
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
         if($found->meetingID == $meetingID && ($found->moderatorPW == $password || $found->attendeePW == $password) ){
-            
             //Extra parameters
+            $recorded = $found->recorded;
+            $welcome = (isset($args['welcome']))? html_entity_decode($args['welcome']): BIGBLUEBUTTON_STRING_WELCOME;
+            if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
             $duration = 0;
             $voicebridge = 0;
             //Metadata for tagging recordings
@@ -341,8 +343,6 @@ function bigbluebutton_form($args) {
                 //'originnameserver' => get_current_site_name( $current_site )
             );
             //Call for creating meeting on the bigbluebutton server
-            $welcome = (isset($args['welcome']))? urldecode($args['welcome']): BIGBLUEBUTTON_STRING_WELCOME;
-            if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
             $response = BigBlueButton::createMeetingArray($name, $found->meetingID, $found->meetingName, $welcome, $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false', $duration, $voicebridge, $metadata );
 
             //Analyzes the bigbluebutton server's response

@@ -57,8 +57,10 @@ You should enable the curl extension in php.ini.
 = 1.3.2 =
 * Fixed an issue on update control that prevented 1.0.1 deployments to be properly updated
 * Fixed an issue that prevented the plugin to work on webservers running php 5.2
+* Fixed an issue that prevented meetings to be created in recording mode
 * Added a warning to the welcome message on the bigbluebutton chat box when the meeting is recorded
- 
+* A generic welcome message can be set as parameter using the shortcode [bigbluebutton welcome='<br>Custom message<br>%%CONFNAME%%']
+  
 = 1.3.1 =
 * Changed version control. 1:major version,2:wordpress version supported,3:minor version
 * Added shortcode [bigbluebutton] to render an access form into a page or post
@@ -85,7 +87,7 @@ You should enable the curl extension in php.ini.
 == Upgrade Notice ==
 
 = 1.3.2 =
-This version fixes an issue on deployments made on webservers with php 5.2 and a bug on the update control.
+This version fixes an issue on deployments made on webservers with php 5.2, a bug on the update control and a bug that prevented meetings to be created in recording mode.
 
 = 1.3.1 =
 This version provides support for playback recordings, better performance, and allows shortcode at posts and pages.
