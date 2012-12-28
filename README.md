@@ -46,6 +46,10 @@ You should enable the curl extension in php.ini.
 
 == Changelog ==
 
+= 1.3.2 =
+* Fixed an issue on update control that prevented 1.0.1 deployments to be properly updated
+* Fixed an issue that prevented the plugin to work on webservers running php 5.2
+ 
 = 1.3.1 =
 * Changed version control. 1:major version,2:wordpress version supported,3:minor version
 * Added shortcode [bigbluebutton] to render an access form into a page or post
@@ -70,6 +74,9 @@ You should enable the curl extension in php.ini.
 * Added the initial files.
 
 == Upgrade Notice ==
+
+= 1.3.2 =
+This version fixes an issue on deployments made on webservers with php 5.2 and a bug on the update control.
 
 = 1.3.1 =
 This version provides support for playback recordings, better performance, and allows shortcode at posts and pages.

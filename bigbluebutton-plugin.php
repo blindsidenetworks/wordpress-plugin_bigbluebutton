@@ -3,7 +3,7 @@
 Plugin Name: BigBlueButton
 Plugin URI: http://blindsidenetworks.com/integration
 Description: BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meetings rooms to interact with their readers. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit http://bigbluebutton.org/support
-Version: 1.3.1
+Version: 1.3.2
 Author: Blindside Networks
 Author URI: http://blindsidenetworks.com/
 License: GPLv2 or later
@@ -341,7 +341,7 @@ function bigbluebutton_form($args) {
                 //'originnameserver' => get_current_site_name( $current_site )
             );
             //Call for creating meeting on the bigbluebutton server
-            $welcome = (isset($args['welcome']))? $args['welcome']: BIGBLUEBUTTON_STRING_WELCOME;
+            $welcome = (isset($args['welcome']))? urldecode($args['welcome']): BIGBLUEBUTTON_STRING_WELCOME;
             if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
             $response = BigBlueButton::createMeetingArray($name, $found->meetingID, $found->meetingName, $welcome, $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false', $duration, $voicebridge, $metadata );
 
