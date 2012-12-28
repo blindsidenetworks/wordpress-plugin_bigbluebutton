@@ -448,7 +448,7 @@ class BigBlueButton {
 
             }
 	
-            usort($recordings, BigBlueButton::recordingBuildSorter('startTime'));
+            usort($recordings, 'BigBlueButton::recordingBuildSorter');
             return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey, 'recordings' => $recordings);
 	
         } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
@@ -457,16 +457,13 @@ class BigBlueButton {
             return NULL;
         }
     }
-	
-	private function recordingBuildSorter($key){
-	    return function ($a, $b) use ($key){
-	        if( $a[$key] < $b[$key]) return -1;
-	        else if( $a[$key] == $b[$key]) return 0;
-	        else return 1;
-	    };
-	}
-	
-	
+
+    private function recordingBuildSorter($a, $b){
+    	if( $a['startTime'] < $b['startTime']) return -1;
+    	else if( $a['startTime'] == $b['startTime']) return 0;
+    	else return 1;
+    }
+    
 	//----------------------------------------------getUsers---------------------------------------
 	/**
 	*This method prints the usernames of the attendees in the specified conference.
