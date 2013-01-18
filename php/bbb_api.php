@@ -50,21 +50,6 @@ function bbb_wrap_simplexml_load_file($url){
 	return (simplexml_load_file($url));	
 }
 
-/*
-@param
-$userName = userName AND meetingID (string) 
-$welcomeString = welcome message (string)
-
-$modPW = moderator password (string)
-$vPW = viewer password (string)
-$voiceBridge = voice bridge (integer)
-$logout = logout url (url)
-*/
-// create a meeting and return the url to join as moderator
-
-
-// TODO::
-// create some set methods 
 class BigBlueButton {
 	
 	var $userName = array();
@@ -625,56 +610,5 @@ class BigBlueButton {
 			return 'false';	
 	}
 
-	
-
-	
-
-	
-	
-	
-	
-	// TODO: WRITE AN ITERATOR WHICH GOES OVER WHATEVER IT IS BEING TOLD IN THE API AND LIST INFORMATION
-	/* we have to define at least 2 variable fields for getInformation to read out information at any position
-	The first is: An identifier to chose if we look for attendees or the meetings or something else
-	The second is: An identifier to chose what integrated functions are supposed to be used
-
-	@param IDENTIFIER -- needs to be put in for the function to identify the information to print out
-				 current values which can be used are 'attendee' and 'meetings'
-	@param meetingID -- needs to be put in to identify the meeting
-	@param modPW -- needs to be put in if the users are supposed to be shown or to retrieve information about the meetings
-	@param URL -- needs to be put in the URL to the bigbluebutton server
-	@param SALT -- needs to be put in for the security salt calculation
-
-	Note: If 'meetings' is used, then only the parameters URL and SALT needs to be used
-		  If 'attendee' is used, then all the parameters needs to be used
-	*/
-	public function getInformation( $IDENTIFIER, $meetingID, $modPW, $URL, $SALT ) {
-		// if the identifier is null or '', then return false
-		if( $IDENTIFIER == "" || $IDENTIFIER == null ) {
-			echo "You need to type in a valid value into the identifier.";
-			return false;
-		}
-		// if the identifier is attendee, call getUsers
-		else if( $IDENTIFIER == 'attendee' ) {
-			return BigBlueButton::getUsers( $meetingID, $modPW, $URL, $SALT );
-		}
-		// if the identifier is meetings, call getMeetings
-		else if( $IDENTIFIER == 'meetings' ) {
-			return BigBlueButton::getMeetings( $URL, $SALT );
-		}
-		// return nothing
-		else {
-			return true;
-		}
-		
-	}
-	
-	
-	
-	function getServerIP() {
-		// get the server url
-		$sIP = $_SERVER['SERVER_ADDR'];
-		return $serverIP = 'http://'.$sIP.'/bigbluebutton/';
-	}
 }
 ?>

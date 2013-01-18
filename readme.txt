@@ -1,7 +1,7 @@
 === BigBlueButton ===
 Contributors: blindsidenetworks, jfederico
 Donate link: http://www.blindsidenetworks.com/integrations/wordpress/
-Tags: blindsidenetworks, bigbluebutton, opensource, web, conferencing,
+Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 3.0.1
 Tested up to: 3.5
 Stable tag: 1.3.2
@@ -37,7 +37,7 @@ The easiest way to install is to watch this [installation video](http://www.yout
 
 **Why is it giving an error about creating a meeting room?**
 
-Make sure you are using BigBlueButton 0.7 or higher.
+Make sure you are using BigBlueButton 0.8 or higher.
 
 **What is this error: "Unable to display the meetings. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running."?**
 
@@ -62,7 +62,7 @@ You should enable the curl extension in php.ini.
 * A generic welcome message can be set as parameter using the shortcode [bigbluebutton welcome='<br>Custom message<br>%%CONFNAME%%']
   
 = 1.3.1 =
-* Changed version control. 1:major version,2:wordpress version supported,3:minor version
+* Changed version control. 1:major version (remains),2:minor version (former release version),3:release version
 * Added shortcode [bigbluebutton] to render an access form into a page or post
 * Meetings can be configured to be recorded (optional)
 * Configuration form shows the list of recordings available for the Wordpress server

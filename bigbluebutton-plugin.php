@@ -212,7 +212,7 @@ function bigbluebutton_update() {
         delete_option('bbb_db_version'); //deletes this option because it is no longer needed, the versioning pattern has changed.
     }
      
-    if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.2") == 0 ){
+    if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.2") <= 0 ){
 
     }
 
