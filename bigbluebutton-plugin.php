@@ -131,11 +131,11 @@ function bigbluebutton_install () {
     if( !get_option('bigbluebutton_url') ) update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
     if( !get_option('bigbluebutton_salt') ) update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
     
-    foreach($wp_roles->role_names as $role) {
-        if($role == "Administrator")
-    	    $permissions[$role] = "moderator";
+    foreach($wp_roles->role_names as $key => $value) {
+        if($value == "Administrator")
+    	    $permissions[$key] = "moderator";
         else
-    	    $permissions[$role] = "attendee";
+    	    $permissions[$key] = "attendee";
     }
     if( !get_option('bigbluebutton_permissions') ) update_option( 'bigbluebutton_permissions', $permissions );
     
@@ -187,11 +187,11 @@ function bigbluebutton_update() {
     }
      
     if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.2") <= 0 ){
-        foreach($wp_roles->role_names as $role) {
-        	if($role == "Administrator")
-        		$permissions[$role] = "moderator";
-        	else
-        		$permissions[$role] = "attendee";
+        foreach($wp_roles->role_names as $key => $value) {
+            if($value == "Administrator")
+                $permissions[$key] = "moderator";
+            else
+                $permissions[$key] = "attendee";
         }
         if( !get_option('bigbluebutton_permissions') ) update_option( 'bigbluebutton_permissions', $permissions );
     }
@@ -320,26 +320,25 @@ function bigbluebutton_sidebar($args) {
 //Create the form called by the Shortcode and Widget functions
 
 function bigbluebutton_form($args) {
-    global $current_user, $wp_roles;
-    print_r($current_user->caps);
-    if( $current_user->id )  {
-    	foreach($wp_roles->role_names as $role => $Role) {
-    		if (array_key_exists($role, $current_user->caps)){
-    		    break;
-    		}
-    	}
-    }
-    print_r($role);
-    
-
-    global $wpdb, $wp_version, $current_site;
+    global $wpdb, $wp_version, $current_site, $current_user, $wp_roles;
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
     
     //Read in existing option value from database
     $url_val = get_option('bigbluebutton_url');
     $salt_val = get_option('bigbluebutton_salt');
-
+    //Read in existing permission values from database
+    $permissions = get_option('bigbluebutton_permissions');
+    
+    //Set the role for the current user if is logged in
+    if( $current_user->ID ) {
+        foreach($wp_roles->role_names as $role => $Role) {
+            if (array_key_exists($role, $current_user->caps)){
+                break;
+            }
+        }
+    }
+    
     //Gets all the meetings from wordpress database
     $listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName, meetingVersion, attendeePW, moderatorPW FROM ".$table_name." ORDER BY meetingName");
     	
@@ -350,13 +349,27 @@ function bigbluebutton_form($args) {
         $dataSubmitted = true;
         $meetingExist = true;
 
-        //Read posted values
-        $name = $_POST['display_name'];
-        $password = $_POST['pwd'];
         $meetingID = $_POST['meetingID'];
-
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
-        if($found->meetingID == $meetingID && ($found->moderatorPW == $password || $found->attendeePW == $password) ){
+        if( $found->meetingID == $meetingID ){
+            
+            if( !$current_user->ID || $permissions[$role] == null || ($permissions[$role] != 'moderator' && $permissions[$role] != 'attendee') ) {
+                //Read posted values
+                $name = $_POST['display_name'];
+                $password = $_POST['pwd'];
+            } else {
+                if( $current_user->display_name != '' ){
+                    $name = $current_user->display_name;
+                } else if( $current_user->user_firstname != '' || $current_user->user_lastname != '' ){
+                    $name = $current_user->user_firstname != ''? $current_user->user_firstname.' ': '';
+                    $name .= $current_user->user_lastname != ''? $current_user->user_lastname.' ': '';
+                } else {
+                    $name = $current_user->user_login ;
+                }
+                $password = $permissions[$role] == 'moderator'? $found->moderatorPW: $found->attendeePW;
+                
+            }
+            
             //Extra parameters
             $recorded = $found->recorded;
             $welcome = (isset($args['welcome']))? html_entity_decode($args['welcome']): BIGBLUEBUTTON_STRING_WELCOME;
@@ -437,7 +450,11 @@ function bigbluebutton_form($args) {
 		
 		echo '
                   </select>
-                </tr>
+                </tr>';
+		
+		$permissions = get_option('bigbluebutton_permissions');
+        if( !$current_user->ID || $permissions[$role] == null || ($permissions[$role] != 'moderator' && $permissions[$role] != 'attendee') ) {
+            echo '
                 <tr>
                   <td>Name</td>
                   <td><INPUT type="text" id="name" name="display_name" size="10"></td>
@@ -445,7 +462,9 @@ function bigbluebutton_form($args) {
                 <tr>
                   <td>Password</td>
                   <td><INPUT type="password" name="pwd" size="10"></td>
-                </tr>
+                </tr>';
+        }
+        echo '
               </table>
               <INPUT type="submit" name="SubmitForm" value="Join">
             </form>';
@@ -615,8 +634,8 @@ function bigbluebutton_permission_settings() {
 
     echo '</br>';
     if( isset($_POST['SubmitPermissions']) && $_POST['SubmitPermissions'] == 'Save Permissions' ) {
-        foreach($wp_roles->role_names as $role) {
-            $permissions[$role] = ($_POST[$role] == null? ($role == "Administrator"?"moderator": "attendee"): $_POST[$role]);
+        foreach($wp_roles->role_names as $key => $value) {
+            $permissions[$key] = ($_POST[$value] == null? ($value == "Administrator"?"moderator": "attendee"): $_POST[$value]);
         }
         update_option( 'bigbluebutton_permissions', $permissions );
         
@@ -634,12 +653,12 @@ function bigbluebutton_permission_settings() {
           <th class="hed" colspan="1">Join as Attendee</th>
         </tr>';
     
-    foreach($wp_roles->role_names as $role) {
+    foreach($wp_roles->role_names as $key => $value) {
         echo '
         <tr>
-          <td>'.$role.'</td>
-          <td><input type="radio" name="'.$role.'" value="moderator" '.($permissions[$role]=="moderator"?'checked="checked"': '').' /></td>
-          <td><input type="radio" name="'.$role.'" value="attendee" '.($permissions[$role]=="attendee"?'checked="checked"': '').' /></td>
+          <td>'.$value.'</td>
+          <td><input type="radio" name="'.$value.'" value="moderator" '.($permissions[$key]=="moderator"?'checked="checked"': '').' /></td>
+          <td><input type="radio" name="'.$value.'" value="attendee" '.($permissions[$key]=="attendee"?'checked="checked"': '').' /></td>
         </tr>';
     }
     
