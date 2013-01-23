@@ -3,7 +3,7 @@
 Plugin Name: BigBlueButton
 Plugin URI: http://blindsidenetworks.com/integration
 Description: BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meetings rooms to interact with their readers. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit http://bigbluebutton.org/support
-Version: 1.3.2
+Version: 1.3.3
 Author: Blindside Networks
 Author URI: http://blindsidenetworks.com/
 License: GPLv2 or later
@@ -120,6 +120,8 @@ function bigbluebutton_add_pages() {
 
 //Sets up the bigbluebutton table to store meetings in the wordpress database
 function bigbluebutton_install () {
+    global $wp_roles;
+    
     //Installation code
     if( !get_option('bigbluebutton_plugin_version') ){
         bigbluebutton_init_database();
@@ -128,14 +130,21 @@ function bigbluebutton_install () {
     ////////////////// Initialize Settings //////////////////
     if( !get_option('bigbluebutton_url') ) update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
     if( !get_option('bigbluebutton_salt') ) update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
-    //if( !get_option('bigbluebutton_permissions') ) update_option( 'bigbluebutton_permissions', '8cd8ef52e8e101574e400365b55e11a6' );
+    
+    foreach($wp_roles->role_names as $role) {
+        if($role == "Administrator")
+    	    $permissions[$role] = "moderator";
+        else
+    	    $permissions[$role] = "attendee";
+    }
+    if( !get_option('bigbluebutton_permissions') ) update_option( 'bigbluebutton_permissions', $permissions );
     
     update_option( "bigbluebutton_plugin_version", BIGBLUEBUTTON_PLUGIN_VERSION );
     
 }
 
 function bigbluebutton_update() {
-    global $wpdb;
+    global $wpdb, $wp_roles;
      
     //Sets the name of the table
     $table_name = $wpdb->prefix . "bigbluebutton";
@@ -178,7 +187,13 @@ function bigbluebutton_update() {
     }
      
     if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.2") <= 0 ){
-
+        foreach($wp_roles->role_names as $role) {
+        	if($role == "Administrator")
+        		$permissions[$role] = "moderator";
+        	else
+        		$permissions[$role] = "attendee";
+        }
+        if( !get_option('bigbluebutton_permissions') ) update_option( 'bigbluebutton_permissions', $permissions );
     }
 
     ////////////////// Set new bigbluebutton_plugin_version value //////////////////
@@ -202,7 +217,8 @@ function bigbluebutton_uninstall () {
     delete_option('bigbluebutton_plugin_version');
     delete_option('bigbluebutton_url');
     delete_option('bigbluebutton_salt');
-     
+    delete_option('bigbluebutton_permissions');
+    
     //Sets the name of the table
     $table_name = $wpdb->prefix . "bigbluebutton";
     $wpdb->query("DROP TABLE IF EXISTS $table_name");
@@ -304,6 +320,17 @@ function bigbluebutton_sidebar($args) {
 //Create the form called by the Shortcode and Widget functions
 
 function bigbluebutton_form($args) {
+    global $current_user, $wp_roles;
+    print_r($current_user->caps);
+    if( $current_user->id )  {
+    	foreach($wp_roles->role_names as $role => $Role) {
+    		if (array_key_exists($role, $current_user->caps)){
+    		    break;
+    		}
+    	}
+    }
+    print_r($role);
+    
 
     global $wpdb, $wp_version, $current_site;
     $table_name = $wpdb->prefix . "bigbluebutton";
@@ -521,7 +548,7 @@ function bigbluebutton_general_settings() {
     $salt_val = get_option('bigbluebutton_salt');
     
     //Obtains the meeting information of the meeting that is going to be terminated
-    if( isset($_POST['SubmitSettings']) && $_POST['SubmitSettings'] == 'Save Changes') {
+    if( isset($_POST['SubmitSettings']) && $_POST['SubmitSettings'] == 'Save Settings') {
          
         //Reads their posted value
         $url_val = $_POST[ 'bigbluebutton_url' ];
@@ -559,7 +586,7 @@ function bigbluebutton_general_settings() {
           </p>
 
           <p class="submit">
-            <input type="submit" name="SubmitSettings" class="button-primary" value="Save Changes" />
+            <input type="submit" name="SubmitSettings" class="button-primary" value="Save Settings" />
           </p>
 
         </form>
@@ -581,11 +608,46 @@ function bigbluebutton_general_settings() {
 //================================================================================
 // The page allows the user grants permissions for accessing meetings
 function bigbluebutton_permission_settings() {
+    global $wp_roles;
+    
     //Displays the title of the page
     echo "<h2>BigBlueButton Permission Settings</h2>";
+
+    echo '</br>';
+    if( isset($_POST['SubmitPermissions']) && $_POST['SubmitPermissions'] == 'Save Permissions' ) {
+        foreach($wp_roles->role_names as $role) {
+            $permissions[$role] = ($_POST[$role] == null? ($role == "Administrator"?"moderator": "attendee"): $_POST[$role]);
+        }
+        update_option( 'bigbluebutton_permissions', $permissions );
+        
+    } else {
+        $permissions = get_option('bigbluebutton_permissions');
+        
+    }
     
-    global $wp_roles;
-    print_r($wp_roles);
+    echo '
+    <form name="form1" method="post" action="">
+      <table class="stats" cellspacing="5">
+        <tr>
+          <th class="hed" colspan="1">Role</td>
+          <th class="hed" colspan="1">Join as Moderator</th>
+          <th class="hed" colspan="1">Join as Attendee</th>
+        </tr>';
+    
+    foreach($wp_roles->role_names as $role) {
+        echo '
+        <tr>
+          <td>'.$role.'</td>
+          <td><input type="radio" name="'.$role.'" value="moderator" '.($permissions[$role]=="moderator"?'checked="checked"': '').' /></td>
+          <td><input type="radio" name="'.$role.'" value="attendee" '.($permissions[$role]=="attendee"?'checked="checked"': '').' /></td>
+        </tr>';
+    }
+    
+    echo '
+      </table>
+      <p class="submit"><input type="submit" name="SubmitPermissions" class="button-primary" value="Save Permissions" /></p>
+    </form>
+    <hr />';
 
 }
 
@@ -670,7 +732,7 @@ function bigbluebutton_create_meetings() {
 
     //Form to create a meeting, the fields are the meeting name, and the optional fields are the attendee password and moderator password
     echo '<form name="form1" method="post" action="">
-    <p>Meeting Room Name: <input type="text" name="meetingName" value=""	size="20"></p>
+    <p>Meeting Room Name: <input type="text" name="meetingName" value="" size="20"></p>
     <p>Attendee Password: <input type="text" name="attendeePW" value="" size="20"></p>
     <p>Moderator Password: <input type="text" name="moderatorPW" value="" size="20"></p>
     <p>Wait for moderator to start meeting: <input type="checkbox" name="waitForModerator" value="True" /></p>
