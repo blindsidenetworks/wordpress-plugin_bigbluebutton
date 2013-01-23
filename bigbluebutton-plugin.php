@@ -128,44 +128,9 @@ function bigbluebutton_install () {
     ////////////////// Initialize Settings //////////////////
     if( !get_option('bigbluebutton_url') ) update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
     if( !get_option('bigbluebutton_salt') ) update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
+    //if( !get_option('bigbluebutton_permissions') ) update_option( 'bigbluebutton_permissions', '8cd8ef52e8e101574e400365b55e11a6' );
     
     update_option( "bigbluebutton_plugin_version", BIGBLUEBUTTON_PLUGIN_VERSION );
-    
-}
-
-//Creates the bigbluebutton tables in the wordpress database
-function bigbluebutton_init_database(){
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    
-    global $wpdb;
-    
-    //Sets the name of the table
-    $table_name = $wpdb->prefix . "bigbluebutton";
-    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
-
-    //Execute sql
-    $sql = "CREATE TABLE " . $table_name . " (
-    id mediumint(9) NOT NULL AUTO_INCREMENT,
-    meetingID text NOT NULL,
-    meetingName text NOT NULL,
-    meetingVersion int NOT NULL,
-    attendeePW text NOT NULL,
-    moderatorPW text NOT NULL,
-    waitForModerator BOOLEAN NOT NULL DEFAULT FALSE,
-    recorded BOOLEAN NOT NULL DEFAULT FALSE,
-    UNIQUE KEY id (id)
-    );";
-    dbDelta($sql);
-    
-    $sql = "CREATE TABLE " . $table_logs_name . " (
-    id mediumint(9) NOT NULL AUTO_INCREMENT,
-    meetingID text NOT NULL,
-    recorded BOOLEAN NOT NULL DEFAULT FALSE,
-    timestamp int NOT NULL,
-    event text NOT NULL,
-    UNIQUE KEY id (id)
-    );";
-    dbDelta($sql);
     
 }
 
@@ -179,7 +144,7 @@ function bigbluebutton_update() {
     ////////////////// Updates for version 1.3.1 and earlier //////////////////
     $bigbluebutton_plugin_version_installed = get_option('bigbluebutton_plugin_version');
     if( !$bigbluebutton_plugin_version_installed                                                             //It's 1.0.2 or earlier
-     || (strcmp("1.3.1", $bigbluebutton_plugin_version_installed) <= 0 && get_option("bbb_db_version")) ){   //It's 1.3.1 not updated
+            || (strcmp("1.3.1", $bigbluebutton_plugin_version_installed) <= 0 && get_option("bbb_db_version")) ){   //It's 1.3.1 not updated
         ////////////////// Update Database //////////////////
         /// Initialize database will create the tables added for the new version
         bigbluebutton_init_database();
@@ -190,9 +155,9 @@ function bigbluebutton_update() {
             $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW) VALUES ('".sha1($meeting->meetingID.strval($meeting->meetingVersion))."','".$meeting->meetingID."', '".$meeting->meetingVersion."', '".$meeting->attendeePW."', '".$meeting->moderatorPW."');";
             $wpdb->query($sql);
         }
-        /// Remove the old table 
+        /// Remove the old table
         $wpdb->query("DROP TABLE IF EXISTS $table_name_old");
-        
+
         ////////////////// Update Settings //////////////////
         if( !get_option('mt_bbb_url') ) {
             update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
@@ -200,14 +165,14 @@ function bigbluebutton_update() {
             update_option( 'bigbluebutton_url', get_option('mt_bbb_url') );
             delete_option('mt_bbb_url');
         }
-        
+
         if( !get_option('mt_salt') ) {
             update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
         } else {
             update_option( 'bigbluebutton_salt', get_option('mt_salt') );
             delete_option('mt_salt');
         }
-        
+
         delete_option('mt_waitForModerator'); //deletes this option because it is no longer needed, it has been incorportated into the table.
         delete_option('bbb_db_version'); //deletes this option because it is no longer needed, the versioning pattern has changed.
     }
@@ -245,6 +210,42 @@ function bigbluebutton_uninstall () {
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
     $wpdb->query("DROP TABLE IF EXISTS $table_logs_name");
 
+}
+
+//Creates the bigbluebutton tables in the wordpress database
+function bigbluebutton_init_database(){
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    
+    global $wpdb;
+    
+    //Sets the name of the table
+    $table_name = $wpdb->prefix . "bigbluebutton";
+    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+
+    //Execute sql
+    $sql = "CREATE TABLE " . $table_name . " (
+    id mediumint(9) NOT NULL AUTO_INCREMENT,
+    meetingID text NOT NULL,
+    meetingName text NOT NULL,
+    meetingVersion int NOT NULL,
+    attendeePW text NOT NULL,
+    moderatorPW text NOT NULL,
+    waitForModerator BOOLEAN NOT NULL DEFAULT FALSE,
+    recorded BOOLEAN NOT NULL DEFAULT FALSE,
+    UNIQUE KEY id (id)
+    );";
+    dbDelta($sql);
+    
+    $sql = "CREATE TABLE " . $table_logs_name . " (
+    id mediumint(9) NOT NULL AUTO_INCREMENT,
+    meetingID text NOT NULL,
+    recorded BOOLEAN NOT NULL DEFAULT FALSE,
+    timestamp int NOT NULL,
+    event text NOT NULL,
+    UNIQUE KEY id (id)
+    );";
+    dbDelta($sql);
+    
 }
 
 //Returns current plugin version.
@@ -494,6 +495,8 @@ function bigbluebutton_general_options() {
      display the create meetings, and list meetings sections.*/
     if (bigbluebutton_general_settings()){
 
+        bigbluebutton_permission_settings();
+        
         bigbluebutton_create_meetings();
 
         bigbluebutton_list_meetings();
@@ -512,7 +515,7 @@ function bigbluebutton_general_settings() {
 
     //Displays the title of the page
     echo '<div class="wrap">';
-    echo "<h2>BigBlueButton Settings</h2>";
+    echo "<h2>BigBlueButton General Settings</h2>";
 
     $url_val = get_option('bigbluebutton_url');
     $salt_val = get_option('bigbluebutton_salt');
@@ -570,6 +573,111 @@ function bigbluebutton_general_settings() {
     }
 
     return true;
+
+}
+
+//================================================================================
+//------------------------------Permisssion Settings----------------------------------
+//================================================================================
+// The page allows the user grants permissions for accessing meetings
+function bigbluebutton_permission_settings() {
+    //Displays the title of the page
+    echo "<h2>BigBlueButton Permission Settings</h2>";
+    
+    global $wp_roles;
+    print_r($wp_roles);
+
+}
+
+//================================================================================
+//-----------------------------Create a Meeting-----------------------------------
+//================================================================================
+//This page allows the user to create a meeting
+function bigbluebutton_create_meetings() {
+
+    //Displays the title of the page
+    echo "<h2>Create a Meeting Room</h2>";
+
+    $url_val = get_option('bigbluebutton_url');
+    $salt_val = get_option('bigbluebutton_salt');
+
+    //Obtains the meeting information of the meeting that is going to be created
+    if( isset($_POST['SubmitCreate']) && $_POST['SubmitCreate'] == 'Create' ) {
+         
+        /// Reads the posted values
+        $meetingName = $_POST[ 'meetingName' ];
+        $attendeePW = $_POST[ 'attendeePW' ];
+        $moderatorPW = $_POST[ 'moderatorPW' ];
+        $waitForModerator = (isset($_POST[ 'waitForModerator' ]) && $_POST[ 'waitForModerator' ] == 'True')? true: false;
+        $recorded = (isset($_POST[ 'recorded' ]) && $_POST[ 'recorded' ] == 'True')? true: false;
+        $meetingVersion = time();
+        /// Assign a random unique ID based on the name and timestamp
+        $meetingID = sha1($meetingName.strval($meetingVersion));
+
+
+        //Checks to see if the meeting name, attendee password or moderator password was left blank
+        if($meetingName == '' || $attendeePW == '' || $moderatorPW == ''){
+            //If the meeting name was left blank, the user is prompted to fill it out
+            echo '<div class="updated">
+            <p>
+            <strong>All fields must be filled.</strong>
+            </p>
+            </div>';
+            	
+        } else {
+            $alreadyExists = false;
+            	
+            //Checks the meeting to be created to see if it already exists in wordpress database
+            global $wpdb;
+            $table_name = $wpdb->prefix . "bigbluebutton";
+            $listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName FROM ".$table_name);
+            	
+            foreach ($listOfMeetings as $meeting) {
+                if($meeting->meetingName == $meetingName){
+                    $alreadyExists = true;
+                    //Alerts the user to choose a different name
+                    echo '<div class="updated">
+                    <p>
+                    <strong>'.$meetingName.' meeting room already exists. Please select a different name.</strong>
+                    </p>
+                    </div>';
+                    break;
+                }
+            }
+            	
+            //If the meeting doesn't exist in the wordpress database then create it
+            if(!$alreadyExists){
+                $rows_affected = $wpdb->insert( $table_name, array( 'meetingID' => $meetingID, 'meetingName' => $meetingName, 'meetingVersion' => $meetingVersion, 'attendeePW' => $attendeePW, 'moderatorPW' => $moderatorPW, 'waitForModerator' => $waitForModerator? 1: 0, 'recorded' => $recorded? 1: 0) );
+
+                echo '<div class="updated">
+                <p>
+                <strong>Meeting Room Created.</strong>
+                </p>
+                </div>';
+
+            }
+            	
+            $meetingID = '';
+            $meetingName = '';
+            $meetingVersion = NULL;
+            $attendeePW = '';
+            $moderatorPW = '';
+            $waitForModerator = false;
+            $recorded = false;
+
+        }
+    }
+
+    //Form to create a meeting, the fields are the meeting name, and the optional fields are the attendee password and moderator password
+    echo '<form name="form1" method="post" action="">
+    <p>Meeting Room Name: <input type="text" name="meetingName" value=""	size="20"></p>
+    <p>Attendee Password: <input type="text" name="attendeePW" value="" size="20"></p>
+    <p>Moderator Password: <input type="text" name="moderatorPW" value="" size="20"></p>
+    <p>Wait for moderator to start meeting: <input type="checkbox" name="waitForModerator" value="True" /></p>
+    <p>Recorded meeting: <input type="checkbox" name="recorded" value="True" /></p>
+    <p class="submit"><input type="submit" name="SubmitCreate" class="button-primary" value="Create" /></p>
+    </form>
+    <hr />';
 
 }
 
@@ -964,96 +1072,4 @@ function bigbluebutton_print_table_header(){
                 <th class="hed" colspan="1">Recorded</td>
                 <th class="hedextra" colspan="1">Actions</td>
               </tr>';
-}
-
-//================================================================================
-//-----------------------------Create a Meeting-----------------------------------
-//================================================================================
-//This page allows the user to create a meeting
-function bigbluebutton_create_meetings() {
-
-    //Displays the title of the page
-    echo "<h2>Create a Meeting Room</h2>";
-
-    $url_val = get_option('bigbluebutton_url');
-    $salt_val = get_option('bigbluebutton_salt');
-
-    //Obtains the meeting information of the meeting that is going to be created
-    if( isset($_POST['SubmitCreate']) && $_POST['SubmitCreate'] == 'Create' ) {
-         
-        /// Reads the posted values
-        $meetingName = $_POST[ 'meetingName' ];
-        $attendeePW = $_POST[ 'attendeePW' ];
-        $moderatorPW = $_POST[ 'moderatorPW' ];
-        $waitForModerator = (isset($_POST[ 'waitForModerator' ]) && $_POST[ 'waitForModerator' ] == 'True')? true: false;
-        $recorded = (isset($_POST[ 'recorded' ]) && $_POST[ 'recorded' ] == 'True')? true: false;
-        $meetingVersion = time();
-        /// Assign a random unique ID based on the name and timestamp
-        $meetingID = sha1($meetingName.strval($meetingVersion));
-
-
-        //Checks to see if the meeting name, attendee password or moderator password was left blank
-        if($meetingName == '' || $attendeePW == '' || $moderatorPW == ''){
-			//If the meeting name was left blank, the user is prompted to fill it out
-			echo '<div class="updated">
-                    <p>
-                      <strong>All fields must be filled.</strong>
-                    </p>
-                  </div>';
-			
-		} else {
-			$alreadyExists = false;
-			
-			//Checks the meeting to be created to see if it already exists in wordpress database
-			global $wpdb;
-			$table_name = $wpdb->prefix . "bigbluebutton";
-			$listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName FROM ".$table_name);
-			
-			foreach ($listOfMeetings as $meeting) {
-				if($meeting->meetingName == $meetingName){
-					$alreadyExists = true;
-					//Alerts the user to choose a different name
-			        echo '<div class="updated">
-                            <p>
-                              <strong>'.$meetingName.' meeting room already exists. Please select a different name.</strong>
-                            </p>
-                          </div>';
-					break;
-				}
-			}
-			
-			//If the meeting doesn't exist in the wordpress database then create it
-			if(!$alreadyExists){ 
-				$rows_affected = $wpdb->insert( $table_name, array( 'meetingID' => $meetingID, 'meetingName' => $meetingName, 'meetingVersion' => $meetingVersion, 'attendeePW' => $attendeePW, 'moderatorPW' => $moderatorPW, 'waitForModerator' => $waitForModerator? 1: 0, 'recorded' => $recorded? 1: 0) );
-				
-			    echo '<div class="updated">
-                        <p>
-                          <strong>Meeting Room Created.</strong>
-                        </p>
-                      </div>';
-
-			}
-			
-			$meetingID = '';
-			$meetingName = '';
-			$meetingVersion = NULL;
-			$attendeePW = '';
-			$moderatorPW = '';
-			$waitForModerator = false;
-			$recorded = false;
-				
-		}		
-    }
-	
-    //Form to create a meeting, the fields are the meeting name, and the optional fields are the attendee password and moderator password
-    echo '<form name="form1" method="post" action="">
-            <p>Meeting Room Name: <input type="text" name="meetingName" value=""	size="20"></p>
-            <p>Attendee Password: <input type="text" name="attendeePW" value="" size="20"></p>
-            <p>Moderator Password: <input type="text" name="moderatorPW" value="" size="20"></p>
-            <p>Wait for moderator to start meeting: <input type="checkbox" name="waitForModerator" value="True" /></p>
-            <p>Recorded meeting: <input type="checkbox" name="recorded" value="True" /></p>
-            <p class="submit"><input type="submit" name="SubmitCreate" class="button-primary" value="Create" /></p>
-          </form>
-          <hr />';
-
 }
