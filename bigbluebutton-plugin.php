@@ -343,13 +343,13 @@ function bigbluebutton_form($args) {
     $listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName, meetingVersion, attendeePW, moderatorPW FROM ".$table_name." ORDER BY meetingName");
     	
     $dataSubmitted = false;
-    $validMeeting = false;
     $meetingExist = false;
-    if( isset($_POST['SubmitForm']) && $_POST['SubmitForm'] == 'Join' ) { //The user has submitted his login information
+    if( isset($_POST['SubmitForm']) ) { //The user has submitted his login information
         $dataSubmitted = true;
         $meetingExist = true;
 
         $meetingID = $_POST['meetingID'];
+        
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
         if( $found->meetingID == $meetingID ){
             
@@ -421,14 +421,8 @@ function bigbluebutton_form($args) {
         }
     }
 
-    //Displays the meetings in the wordpress database.
-    foreach ($listOfMeetings as $meeting) {
-        $validMeeting = true;
-        break;
-    }
-
     //If a valid meeting was found the login form is displayed
-    if($validMeeting){
+    if(sizeof($listOfMeetings) > 0){
         //Alerts the user if the password they entered does not match
         //the meeting's password
         if($dataSubmitted && !$meetingExist){
@@ -439,35 +433,53 @@ function bigbluebutton_form($args) {
         }
         echo '
             <form name="form1" method="post" action="">
-              <table>
+              <table>';
+        
+        if(sizeof($listOfMeetings) > 1){
+            echo '
                 <tr>
                   <td>Meeting</td>
                   <td><select name="meetingID">';
 
-        foreach ($listOfMeetings as $meeting) {
-            echo '                    <option value="'.$meeting->meetingID.'">'.$meeting->meetingName.'</option>';
-		}
+            foreach ($listOfMeetings as $meeting) {
+                echo '                    <option value="'.$meeting->meetingID.'">'.$meeting->meetingName.'</option>';
+		    }
 		
-		echo '
+		    echo '
                   </select>
-                </tr>';
+		        </tr>';
+		    
+        } else {
+            $meeting = reset($listOfMeetings);
+            echo '
+                <input type="hidden" name="meetingID" id="meetingID" value="'.$meeting->meetingID.'" />';
+            
+        }
 		
 		$permissions = get_option('bigbluebutton_permissions');
         if( !$current_user->ID || $permissions[$role] == null || ($permissions[$role] != 'moderator' && $permissions[$role] != 'attendee') ) {
             echo '
                 <tr>
                   <td>Name</td>
-                  <td><INPUT type="text" id="name" name="display_name" size="10"></td>
+                  <td><input type="text" id="name" name="display_name" size="10"></td>
                 </tr>
                 <tr>
                   <td>Password</td>
-                  <td><INPUT type="password" name="pwd" size="10"></td>
+                  <td><input type="password" name="pwd" size="10"></td>
                 </tr>';
         }
         echo '
-              </table>
-              <INPUT type="submit" name="SubmitForm" value="Join">
-            </form>';
+              </table>';
+        if(sizeof($listOfMeetings) > 1){
+            echo '
+              <input type="submit" name="SubmitForm" value="Join">';
+            
+        } else {
+            echo '
+            <input type="submit" name="SubmitForm" value="Join '.$meeting->meetingName.'">';
+            
+        }
+        echo '            </form>';
     
     } else if($dataSubmitted){
         //Alerts the user if the password they entered does not match
@@ -514,7 +526,7 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
               <tr>
                 <td>
                   Hi '.$name.',<br /><br />
-                  Now waiting for the moderator to start '.$meetingName.'.<br />
+                  '.$meetingName.' session has not been started yet.<br /><br />
                   <div align="center"><img src="./wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />
                   (Your browser will automatically refresh and join the meeting when it starts.)
                 </td>
