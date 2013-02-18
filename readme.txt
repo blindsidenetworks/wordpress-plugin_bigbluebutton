@@ -54,6 +54,10 @@ You should enable the curl extension in php.ini.
 
 == Changelog ==
 
+= 1.3.3 =
+* Changed permissions. Administrator can now set moderator or attendee permissions to the different roles available.
+* Changed interface on joining form. If there is only one meeting the selection box is not shown.
+
 = 1.3.2 =
 * Fixed an issue on update control that prevented 1.0.1 deployments to be properly updated
 * Fixed an issue that prevented the plugin to work on webservers running php 5.2
