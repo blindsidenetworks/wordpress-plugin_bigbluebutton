@@ -131,14 +131,19 @@ function bigbluebutton_install () {
     if( !get_option('bigbluebutton_url') ) update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
     if( !get_option('bigbluebutton_salt') ) update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
     if( !get_option('bigbluebutton_permissions') ){
-        foreach($wp_roles->role_names as $key => $value) {
-        	$permissions[$key]['participate'] = true;
-        	if($value == "Administrator"){
-        		$permissions[$key]['manageRecordings'] = true;
-        		$permissions[$key]['defaultRole'] = "moderator";
+        $roles = $wp_roles->role_names;
+        $roles['anonymous'] = 'Anonymous';
+        foreach($roles as $key => $value) {
+            $permissions[$key]['participate'] = true;
+            if($value == "Administrator"){
+                $permissions[$key]['manageRecordings'] = true;
+                $permissions[$key]['defaultRole'] = "moderator";
+            } else if($value == "Anonymous"){
+                $permissions[$key]['manageRecordings'] = false;
+                $permissions[$key]['defaultRole'] = "none";
         	} else {
-        		$permissions[$key]['manageRecordings'] = false;
-        		$permissions[$key]['defaultRole'] = "attendee";
+                $permissions[$key]['manageRecordings'] = false;
+                $permissions[$key]['defaultRole'] = "attendee";
         	}
         
         }
@@ -200,28 +205,37 @@ function bigbluebutton_update() {
     //Set the new permission schema
     if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.3") < 0 ){
         $old_permissions = get_option('bigbluebutton_permissions');
+        $roles = $wp_roles->role_names;
+        $roles['anonymous'] = 'Anonymous';
+        
         if( !$old_permissions ){                                //It's 1.3.1
-            foreach($wp_roles->role_names as $key => $value) {
+            foreach($roles as $key => $value) {
                 $permissions[$key]['participate'] = true;
                 if($value == "Administrator"){
                 	$permissions[$key]['manageRecordings'] = true;
                 	$permissions[$key]['defaultRole'] = "moderator";
+                } else if($value == "Anonymous"){
+                    $permissions[$key]['manageRecordings'] = false;
+                    $permissions[$key]['defaultRole'] = "none";
                 } else {
-                	$permissions[$key]['manageRecordings'] = false;
-                	$permissions[$key]['defaultRole'] = "attendee";
+                    $permissions[$key]['manageRecordings'] = false;
+                    $permissions[$key]['defaultRole'] = "attendee";
                 }
                 
             }
             
         } else {                                                //It's 1.3.2
-            foreach($wp_roles->role_names as $key => $value) {
+            foreach($roles as $key => $value) {
                 $permissions[$key]['participate'] = true;
-            	if($value == "Administrator"){
+                if($value == "Administrator"){
             	    $permissions[$key]['manageRecordings'] = true;
             	    $permissions[$key]['defaultRole'] = !$old_permissions[$key]? "moderator": $old_permissions[$key];
-            	} else {
-            	    $permissions[$key]['manageRecordings'] = false;
-            	    $permissions[$key]['defaultRole'] = !$old_permissions[$key]? "attendee": $old_permissions[$key];
+                } else if($value == "Anonymous"){
+                    $permissions[$key]['manageRecordings'] = false;
+                    $permissions[$key]['defaultRole'] = !$old_permissions[$key]? "none": $old_permissions[$key];
+                } else {
+                    $permissions[$key]['manageRecordings'] = false;
+                    $permissions[$key]['defaultRole'] = !$old_permissions[$key]? "attendee": $old_permissions[$key];
             	}
             }
             delete_option('bigbluebutton_permissions');
@@ -681,10 +695,36 @@ function bigbluebutton_general_settings() {
 // The page allows the user grants permissions for accessing meetings
 function bigbluebutton_permission_settings() {
     global $wp_roles;
+    $roles = $wp_roles->role_names;
+    $roles['anonymous'] = 'Anonymous';
     
     if( isset($_POST['SubmitPermissions']) && $_POST['SubmitPermissions'] == 'Save Permissions' ) {
-    	foreach($wp_roles->role_names as $key => $value) {
-    		$permissions[$key]['defaultRole'] = ($_POST[$value] == null? ($value == "Administrator"?"moderator": "attendee"): $_POST[$value]);
+        foreach($roles as $key => $value) {
+    	    if( $_POST[$value.'-defaultRole'] == null ){
+    	        if( $value == "Administrator" ) {
+    	            $permissions[$key]['defaultRole'] = 'moderator';
+    	        } else if ( $value == "Anonymous" ) {
+    	            $permissions[$key]['defaultRole'] = 'none';
+    	        } else {
+    	            $permissions[$key]['defaultRole'] = 'attendee';
+    	        }
+    	    } else {
+    	        $permissions[$key]['defaultRole'] = $_POST[$value.'-defaultRole'];
+    	    }
+    	    
+    	    if( $_POST[$value.'-participate'] == null ){
+    	        $permissions[$key]['participate'] = false;
+    	    } else {
+    	    	$permissions[$key]['participate'] = true;
+    	    }
+    	    	
+    	    if( $_POST[$value.'-manageRecordings'] == null ){
+    	    	$permissions[$key]['manageRecordings'] = false;
+    	    } else {
+    	    	$permissions[$key]['manageRecordings'] = true;
+    	    }
+    	    	
+    	    
     	}
     	update_option( 'bigbluebutton_permissions', $permissions );
     
@@ -692,7 +732,6 @@ function bigbluebutton_permission_settings() {
     	$permissions = get_option('bigbluebutton_permissions');
     
     }
-    print_r($permissions);
     
     //Displays the title of the page
     echo "<h2>BigBlueButton Permission Settings</h2>";
@@ -704,16 +743,22 @@ function bigbluebutton_permission_settings() {
       <table class="stats" cellspacing="5">
         <tr>
           <th class="hed" colspan="1">Role</td>
+          <th class="hed" colspan="1">Manage Recordings</th>
+          <th class="hed" colspan="1">Participate</th>
           <th class="hed" colspan="1">Join as Moderator</th>
           <th class="hed" colspan="1">Join as Attendee</th>
-        </tr>';
+          <th class="hed" colspan="1">Join with Password</th>
+          </tr>';
     
-    foreach($wp_roles->role_names as $key => $value) {
+    foreach($roles as $key => $value) {
         echo '
         <tr>
           <td>'.$value.'</td>
-          <td><input type="radio" name="'.$value.'" value="moderator" '.($permissions[$key]['defaultRole']=="moderator"?'checked="checked"': '').' /></td>
-          <td><input type="radio" name="'.$value.'" value="attendee" '.($permissions[$key]['defaultRole']=="attendee"?'checked="checked"': '').' /></td>
+          <td><input type="checkbox" name="'.$value.'-manageRecordings" '.($permissions[$key]['manageRecordings']?'checked="checked"': '').' /></td>
+          <td><input type="checkbox" name="'.$value.'-participate" '.($permissions[$key]['participate']?'checked="checked"': '').' /></td>
+          <td><input type="radio" name="'.$value.'-defaultRole" value="moderator" '.($permissions[$key]['defaultRole']=="moderator"?'checked="checked"': '').' /></td>
+          <td><input type="radio" name="'.$value.'-defaultRole" value="attendee" '.($permissions[$key]['defaultRole']=="attendee"?'checked="checked"': '').' /></td>
+          <td><input type="radio" name="'.$value.'-defaultRole" value="none" '.($permissions[$key]['defaultRole']=="none"?'checked="checked"': '').' /></td>
         </tr>';
     }
     
