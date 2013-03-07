@@ -121,6 +121,9 @@ function bigbluebutton_add_pages() {
 //Sets up the bigbluebutton table to store meetings in the wordpress database
 function bigbluebutton_install () {
     global $wp_roles;
+    // Load roles if not set
+    if ( ! isset( $wp_roles ) )
+        $wp_roles = new WP_Roles();
     
     //Installation code
     if( !get_option('bigbluebutton_plugin_version') ){
@@ -147,9 +150,6 @@ function bigbluebutton_install () {
         	}
         
         }
-        $permissions['Anonymous']['participate'] = false;
-        $permissions['Anonymous']['manageRecordings'] = false;
-        $permissions['Anonymous']['defaultRole'] = "none";
         
         update_option( 'bigbluebutton_permissions', $permissions );
         
@@ -161,7 +161,10 @@ function bigbluebutton_install () {
 
 function bigbluebutton_update() {
     global $wpdb, $wp_roles;
-     
+    // Load roles if not set
+    if ( ! isset( $wp_roles ) )
+        $wp_roles = new WP_Roles();
+    
     //Sets the name of the table
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
@@ -203,17 +206,16 @@ function bigbluebutton_update() {
     }
      
     //Set the new permission schema
-    if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.3") < 0 ){
-        $old_permissions = get_option('bigbluebutton_permissions');
+    if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.3") <= 0 ){
         $roles = $wp_roles->role_names;
         $roles['anonymous'] = 'Anonymous';
         
-        if( !$old_permissions ){                                //It's 1.3.1
+        if( !get_option('bigbluebutton_permissions') ){
             foreach($roles as $key => $value) {
                 $permissions[$key]['participate'] = true;
                 if($value == "Administrator"){
-                	$permissions[$key]['manageRecordings'] = true;
-                	$permissions[$key]['defaultRole'] = "moderator";
+                    $permissions[$key]['manageRecordings'] = true;
+                    $permissions[$key]['defaultRole'] = "moderator";
                 } else if($value == "Anonymous"){
                     $permissions[$key]['manageRecordings'] = false;
                     $permissions[$key]['defaultRole'] = "none";
@@ -221,31 +223,29 @@ function bigbluebutton_update() {
                     $permissions[$key]['manageRecordings'] = false;
                     $permissions[$key]['defaultRole'] = "attendee";
                 }
-                
             }
             
-        } else {                                                //It's 1.3.2
+        } else {
+            $old_permissions = get_option('bigbluebutton_permissions');
             foreach($roles as $key => $value) {
-                $permissions[$key]['participate'] = true;
-                if($value == "Administrator"){
-            	    $permissions[$key]['manageRecordings'] = true;
-            	    $permissions[$key]['defaultRole'] = !$old_permissions[$key]? "moderator": $old_permissions[$key];
-                } else if($value == "Anonymous"){
-                    $permissions[$key]['manageRecordings'] = false;
-                    $permissions[$key]['defaultRole'] = !$old_permissions[$key]? "none": $old_permissions[$key];
+                if( !isset($old_permissions[$key]['participate']) ){
+                    $permissions[$key]['participate'] = true;
+                    if($value == "Administrator"){
+                        $permissions[$key]['manageRecordings'] = true;
+                        $permissions[$key]['defaultRole'] = "moderator";
+                    } else if($value == "Anonymous"){
+                        $permissions[$key]['manageRecordings'] = false;
+                        $permissions[$key]['defaultRole'] = "none";
+                    } else {
+                        $permissions[$key]['manageRecordings'] = false;
+                        $permissions[$key]['defaultRole'] = "attendee";
+                    }
                 } else {
-                    $permissions[$key]['manageRecordings'] = false;
-                    $permissions[$key]['defaultRole'] = !$old_permissions[$key]? "attendee": $old_permissions[$key];
-            	}
+                    $permissions[$key] = $old_permissions[$key];
+                }
             }
-            delete_option('bigbluebutton_permissions');
             
         }
-        //In any case, the configuration by default when users are not logged in
-        $permissions['Anonymous']['participate'] = false;
-        $permissions['Anonymous']['manageRecordings'] = false;
-        $permissions['Anonymous']['defaultRole'] = "none";
-        
         
         update_option( 'bigbluebutton_permissions', $permissions );
         
@@ -700,7 +700,7 @@ function bigbluebutton_permission_settings() {
     
     if( isset($_POST['SubmitPermissions']) && $_POST['SubmitPermissions'] == 'Save Permissions' ) {
         foreach($roles as $key => $value) {
-    	    if( $_POST[$value.'-defaultRole'] == null ){
+    	    if( !isset($_POST[$value.'-defaultRole']) ){
     	        if( $value == "Administrator" ) {
     	            $permissions[$key]['defaultRole'] = 'moderator';
     	        } else if ( $value == "Anonymous" ) {
@@ -712,13 +712,13 @@ function bigbluebutton_permission_settings() {
     	        $permissions[$key]['defaultRole'] = $_POST[$value.'-defaultRole'];
     	    }
     	    
-    	    if( $_POST[$value.'-participate'] == null ){
+    	    if( !isset($_POST[$value.'-participate']) ){
     	        $permissions[$key]['participate'] = false;
     	    } else {
     	    	$permissions[$key]['participate'] = true;
     	    }
     	    	
-    	    if( $_POST[$value.'-manageRecordings'] == null ){
+    	    if( !isset($_POST[$value.'-manageRecordings']) ){
     	    	$permissions[$key]['manageRecordings'] = false;
     	    } else {
     	    	$permissions[$key]['manageRecordings'] = true;
