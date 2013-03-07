@@ -371,6 +371,20 @@ function bigbluebutton_sidebar($args) {
 
 }
 
+
+function bigbluebutton_can_participate($role){
+    $permissions = get_option('bigbluebutton_permissions');
+    return ( isset($permissions[$role]['participate']) && $permissions[$role]['participate'] );
+    
+}
+
+function bigbluebutton_can_manageRecordings($role){
+    $permissions = get_option('bigbluebutton_permissions');
+    return ( isset($permissions[$role]['manageRecordings']) && $permissions[$role]['manageRecordings'] );
+
+}
+
+
 //================================================================================
 //Create the form called by the Shortcode and Widget functions
 
@@ -379,20 +393,24 @@ function bigbluebutton_form($args) {
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
     
+    //Set the role for the current user if is logged in
+    $role = null;
+    if( $current_user->ID ) {
+        foreach($wp_roles->role_names as $_role => $Role) {
+            if (array_key_exists($_role, $current_user->caps)){
+                $role = $_role;
+                break;
+            }
+        }
+    } else {
+        $role = "anonymous";
+    }
+    
     //Read in existing option value from database
     $url_val = get_option('bigbluebutton_url');
     $salt_val = get_option('bigbluebutton_salt');
     //Read in existing permission values from database
     $permissions = get_option('bigbluebutton_permissions');
-    
-    //Set the role for the current user if is logged in
-    if( $current_user->ID ) {
-        foreach($wp_roles->role_names as $role => $Role) {
-            if (array_key_exists($role, $current_user->caps)){
-                break;
-            }
-        }
-    }
     
     //Gets all the meetings from wordpress database
     $listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName, meetingVersion, attendeePW, moderatorPW FROM ".$table_name." ORDER BY meetingName");
@@ -408,9 +426,10 @@ function bigbluebutton_form($args) {
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
         if( $found->meetingID == $meetingID ){
             
-            if( !$current_user->ID || $permissions[$role] == null || ($permissions[$role] != 'moderator' && $permissions[$role] != 'attendee') ) {
+            if( $permissions[$role]['defaultRole'] == null || ($permissions[$role]['defaultRole'] != 'moderator' && $permissions[$role]['defaultRole'] != 'attendee') ) {
                 //Read posted values
-                $name = $_POST['display_name'];
+                //////////!$current_user->ID ||
+                $name = isset($_POST['display_name']) && $_POST['display_name']?$_POST['display_name']: $role;
                 $password = $_POST['pwd'];
             } else {
                 if( $current_user->display_name != '' ){
@@ -418,10 +437,12 @@ function bigbluebutton_form($args) {
                 } else if( $current_user->user_firstname != '' || $current_user->user_lastname != '' ){
                     $name = $current_user->user_firstname != ''? $current_user->user_firstname.' ': '';
                     $name .= $current_user->user_lastname != ''? $current_user->user_lastname.' ': '';
+                } else if( $current_user->user_login != ''){
+                    $name = $current_user->user_login;
                 } else {
-                    $name = $current_user->user_login ;
+                    $name = $role;                    
                 }
-                $password = $permissions[$role] == 'moderator'? $found->moderatorPW: $found->attendeePW;
+                $password = $permissions[$role]['defaultRole'] == 'moderator'? $found->moderatorPW: $found->attendeePW;
                 
             }
             
@@ -486,55 +507,65 @@ function bigbluebutton_form($args) {
         else if($dataSubmitted){
             echo "***Incorrect Password***";
         }
-        echo '
-            <form name="form1" method="post" action="">
-              <table>';
         
-        if(sizeof($listOfMeetings) > 1){
+        if ( bigbluebutton_can_participate($role) ){
             echo '
-                <tr>
-                  <td>Meeting</td>
-                  <td><select name="meetingID">';
-
-            foreach ($listOfMeetings as $meeting) {
-                echo '                    <option value="'.$meeting->meetingID.'">'.$meeting->meetingName.'</option>';
-		    }
-		
-		    echo '
+          <form name="form1" method="post" action="">
+            <table>';
+            
+            if(sizeof($listOfMeetings) > 1){
+                echo '
+              <tr>
+                <td>Meeting</td>
+                <td>
+                  <select name="meetingID">';
+                
+                foreach ($listOfMeetings as $meeting) {
+                    echo '
+                    <option value="'.$meeting->meetingID.'">'.$meeting->meetingName.'</option>';
+                }
+                
+                echo '
                   </select>
-		        </tr>';
-		    
-        } else {
-            $meeting = reset($listOfMeetings);
-            echo '
-                <input type="hidden" name="meetingID" id="meetingID" value="'.$meeting->meetingID.'" />';
+                </td>
+              </tr>';
             
-        }
-		
-		$permissions = get_option('bigbluebutton_permissions');
-        if( !$current_user->ID || $permissions[$role] == null || ($permissions[$role] != 'moderator' && $permissions[$role] != 'attendee') ) {
-            echo '
-                <tr>
-                  <td>Name</td>
-                  <td><input type="text" id="name" name="display_name" size="10"></td>
-                </tr>
-                <tr>
-                  <td>Password</td>
-                  <td><input type="password" name="pwd" size="10"></td>
-                </tr>';
-        }
-        echo '
-              </table>';
-        if(sizeof($listOfMeetings) > 1){
-            echo '
-              <input type="submit" name="SubmitForm" value="Join">';
+            } else {
+                $meeting = reset($listOfMeetings);
+                echo '
+              <input type="hidden" name="meetingID" id="meetingID" value="'.$meeting->meetingID.'" />';
             
-        } else {
+            }
+            
+            if( $permissions[$role]['defaultRole'] == null || ($permissions[$role]['defaultRole'] != 'moderator' && $permissions[$role]['defaultRole'] != 'attendee') ) {
+                echo '
+              <tr>
+                <td>Name</td>
+                <td><input type="text" id="name" name="display_name" size="10"></td>
+              </tr>
+              <tr>
+                <td>Password</td>
+                <td><input type="password" name="pwd" size="10"></td>
+              </tr>';
+            }
             echo '
+            </table>';
+            if(sizeof($listOfMeetings) > 1){
+                echo '
+            <input type="submit" name="SubmitForm" value="Join">';
+            
+            } else {
+                echo '
             <input type="submit" name="SubmitForm" value="Join '.$meeting->meetingName.'">';
             
+            }
+            echo '
+          </form>';
+        
+        } else {
+            echo $role." users are not allowed to participate in meetings";
+            
         }
-        echo '            </form>';
     
     } else if($dataSubmitted){
         //Alerts the user if the password they entered does not match
@@ -580,7 +611,7 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
             <tbody>
               <tr>
                 <td>
-                  Hi '.$name.',<br /><br />
+                  Welcome '.$name.'!<br /><br />
                   '.$meetingName.' session has not been started yet.<br /><br />
                   <div align="center"><img src="./wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />
                   (Your browser will automatically refresh and join the meeting when it starts.)
@@ -1082,9 +1113,22 @@ function bigbluebutton_list_meetings() {
 //================================================================================
 // Displays all the recordings available in the bigbluebutton server
 function bigbluebutton_list_recordings($title=null) {
-    global $wpdb;
+    global $wpdb, $wp_roles, $current_user;
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+    
+    //Set the role for the current user if is logged in
+    $role = null;
+    if( $current_user->ID ) {
+        foreach($wp_roles->role_names as $_role => $Role) {
+            if (array_key_exists($_role, $current_user->caps)){
+                $role = $_role;
+                break;
+            }
+        }
+    } else {
+        $role = "anonymous";
+    }
     
     $url_val = get_option('bigbluebutton_url');
     $salt_val = get_option('bigbluebutton_salt');
@@ -1114,16 +1158,16 @@ function bigbluebutton_list_recordings($title=null) {
         }
     }
     
-    //Displays the title of the page
-    echo "<h2>".$title."</h2>";
-
     //Checks to see if there are no meetings in the wordpress db and if so alerts the user
     if(count($listOfRecordings) == 0){
         echo '<div class="updated"><p><strong>There are no recordings available.</strong></p></div>';
         return;
     }
+
+    //Displays the title of the page
+    echo "<h2>".$title."</h2>";
     
-    if ( current_user_can('activate_plugins') ) {
+    if ( bigbluebutton_can_manageRecordings($role) ) {
         echo '
           <script type="text/javascript">
               wwwroot = \''.get_bloginfo('url').'\'
@@ -1175,26 +1219,18 @@ function bigbluebutton_list_recordings($title=null) {
                 <th class="hed" colspan="1">Meeting Room Name</td>
                 <th class="hed" colspan="1">Date</td>
                 <th class="hed" colspan="1">Duration</td>';
-    if ( current_user_can('activate_plugins') ) {
+    if ( bigbluebutton_can_manageRecordings($role) ) {
         echo '
                 <th class="hedextra" colspan="1">Toolbar</td>';
     }
     echo '
               </tr>';
     foreach( $listOfRecordings as $recording){
-      if ( current_user_can('activate_plugins') || $recording['published'] == 'true') {
+      if ( bigbluebutton_can_manageRecordings($role) || $recording['published'] == 'true') {
         /// Prepare playback recording links
         $type = '';
         foreach ( $recording['playbacks'] as $playback ){
             $type .= '<a href="'.$playback['url'].'" target="_new">'.$playback['type'].'</a>&#32;';
-        }
-        
-        /// Prepare actionbar
-        $actionbar = '';
-        if ( current_user_can('activate_plugins') ) {
-            $action = ($recording['published'] == 'true')? 'Hide': 'Show';
-            $actionbar = "<a id=\"actionbar-publish-a-".$recording['recordID']."\" title=\"".$action."\" href=\"#\"><img id=\"actionbar-publish-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/".strtolower($action).".gif\" class=\"iconsmall\" onClick=\"actionCall('publish', '".$recording['recordID']."'); return false;\" /></a>";
-            $actionbar .= "<a id=\"actionbar-delete-a-".$recording['recordID']."\" title=\"Delete\" href=\"#\"><img id=\"actionbar-delete-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/delete.gif\" class=\"iconsmall\" onClick=\"actionCall('delete', '".$recording['recordID']."'); return false;\" /></a>";
         }
         
         /// Prepare duration
@@ -1225,7 +1261,11 @@ function bigbluebutton_list_recordings($title=null) {
                 <td>'.$formatedStartDate.'</td>
                 <td>'.$duration.' min</td>';
         
-        if ( current_user_can('activate_plugins') ) {
+        /// Prepare actionbar if role is allowed to manage the recordings
+        if ( bigbluebutton_can_manageRecordings($role) ) {
+            $action = ($recording['published'] == 'true')? 'Hide': 'Show';
+            $actionbar = "<a id=\"actionbar-publish-a-".$recording['recordID']."\" title=\"".$action."\" href=\"#\"><img id=\"actionbar-publish-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/".strtolower($action).".gif\" class=\"iconsmall\" onClick=\"actionCall('publish', '".$recording['recordID']."'); return false;\" /></a>";
+            $actionbar .= "<a id=\"actionbar-delete-a-".$recording['recordID']."\" title=\"Delete\" href=\"#\"><img id=\"actionbar-delete-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/delete.gif\" class=\"iconsmall\" onClick=\"actionCall('delete', '".$recording['recordID']."'); return false;\" /></a>";
             echo '
                 <td>'.$actionbar.'</td>';
         }
