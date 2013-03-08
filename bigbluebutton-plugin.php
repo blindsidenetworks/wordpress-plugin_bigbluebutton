@@ -374,14 +374,25 @@ function bigbluebutton_sidebar($args) {
 
 function bigbluebutton_can_participate($role){
     $permissions = get_option('bigbluebutton_permissions');
+    if( $role == 'unregistered' ) $role = 'anonymous';
     return ( isset($permissions[$role]['participate']) && $permissions[$role]['participate'] );
     
 }
 
 function bigbluebutton_can_manageRecordings($role){
     $permissions = get_option('bigbluebutton_permissions');
+    if( $role == 'unregistered' ) $role = 'anonymous';
     return ( isset($permissions[$role]['manageRecordings']) && $permissions[$role]['manageRecordings'] );
 
+}
+
+function bigbluebutton_validate_defaultRole($wp_role, $bbb_role){
+    $permissions = get_option('bigbluebutton_permissions');
+    if( $wp_role == null || $wp_role == 'unregistered' || $wp_role == '' ) 
+        $role = 'anonymous';
+    else
+        $role = $wp_role;
+    return ( isset($permissions[$role]['defaultRole']) && $permissions[$role]['defaultRole'] == $bbb_role );
 }
 
 
@@ -396,6 +407,7 @@ function bigbluebutton_form($args) {
     //Set the role for the current user if is logged in
     $role = null;
     if( $current_user->ID ) {
+        $role = "unregistered";
         foreach($wp_roles->role_names as $_role => $Role) {
             if (array_key_exists($_role, $current_user->caps)){
                 $role = $_role;
@@ -426,12 +438,13 @@ function bigbluebutton_form($args) {
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
         if( $found->meetingID == $meetingID ){
             
-            if( $permissions[$role]['defaultRole'] == null || ($permissions[$role]['defaultRole'] != 'moderator' && $permissions[$role]['defaultRole'] != 'attendee') ) {
+            if( !$current_user->ID || bigbluebutton_validate_defaultRole($role, 'none') ) {
+                print_r('It was considered to sign with the form');
                 //Read posted values
-                //////////!$current_user->ID ||
                 $name = isset($_POST['display_name']) && $_POST['display_name']?$_POST['display_name']: $role;
                 $password = $_POST['pwd'];
             } else {
+                print_r('It was considered to sign with wp credentials');
                 if( $current_user->display_name != '' ){
                     $name = $current_user->display_name;
                 } else if( $current_user->user_firstname != '' || $current_user->user_lastname != '' ){
@@ -537,7 +550,7 @@ function bigbluebutton_form($args) {
             
             }
             
-            if( $permissions[$role]['defaultRole'] == null || ($permissions[$role]['defaultRole'] != 'moderator' && $permissions[$role]['defaultRole'] != 'attendee') ) {
+            if( !$current_user->ID || bigbluebutton_validate_defaultRole($role, 'none') ) {
                 echo '
               <tr>
                 <td>Name</td>
@@ -1120,6 +1133,7 @@ function bigbluebutton_list_recordings($title=null) {
     //Set the role for the current user if is logged in
     $role = null;
     if( $current_user->ID ) {
+        $role = "unregistered";
         foreach($wp_roles->role_names as $_role => $Role) {
             if (array_key_exists($_role, $current_user->caps)){
                 $role = $_role;
