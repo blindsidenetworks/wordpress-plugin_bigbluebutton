@@ -921,8 +921,7 @@ function bigbluebutton_list_meetings() {
 
     $url_val = get_option('bigbluebutton_url');
     $salt_val = get_option('bigbluebutton_salt');
-
-    //---------------------------------------------------JOIN-----------------------------------------------
+    
     if( isset($_POST['SubmitList']) ) { //Creates then joins the meeting. If any problems occur the error is displayed
         // Read the posted value and delete
         $meetingID = $_POST['meetingID'];
@@ -933,6 +932,7 @@ function bigbluebutton_list_meetings() {
         $meetingVersion = $found->meetingVersion;
         $recorded = $found->recorded;
         
+        //---------------------------------------------------JOIN-------------------------------------------------
         if($_POST['SubmitList'] == 'Join'){
             //Extra parameters
             $duration = 0;
@@ -974,8 +974,8 @@ function bigbluebutton_list_meetings() {
                 }
                 
                 $bigbluebutton_joinURL = BigBlueButton::getJoinURL($meetingID, $current_user->display_name,$moderatorPW, $salt_val, $url_val );
-                echo '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'"; return false;</script>'."\n";
-                return;
+                print_r($bigbluebutton_joinURL);
+                echo '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'"; </script>'."\n";
             }
             	
         }
@@ -1034,8 +1034,7 @@ function bigbluebutton_list_meetings() {
             	
         }
     }
-
-
+    
     //Gets all the meetings from the wordpress db
     $listOfMeetings = $wpdb->get_results("SELECT * FROM ".$table_name." ORDER BY id");
 
