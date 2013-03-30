@@ -3,7 +3,7 @@ Contributors: blindsidenetworks, jfederico
 Donate link: http://www.blindsidenetworks.com/integrations/wordpress/
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 3.0.1
-Tested up to: 3.5
+Tested up to: 3.5.1
 Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -55,8 +55,11 @@ You should enable the curl extension in php.ini.
 == Changelog ==
 
 = 1.3.3 =
-* Changed permissions. Administrator can now set moderator or attendee permissions to the different roles available.
+* Changed permissions. Administrator can now set moderator or attendee as default bbb-roles to the different wp-roles available.
+* Changed permissions. Administrator can now set -manageRecordings and -participate permissions to any of the wp-roles available.
 * Changed interface on joining form. If there is only one meeting the selection box is not shown.
+* Fixed an issue on admin UI. Users were prevented to koin meetings using the meeting list.
+* Fixed an issue on installing and version updating functions.
 
 = 1.3.2 =
 * Fixed an issue on update control that prevented 1.0.1 deployments to be properly updated

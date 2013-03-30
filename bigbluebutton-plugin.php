@@ -371,34 +371,8 @@ function bigbluebutton_sidebar($args) {
 
 }
 
-
-function bigbluebutton_can_participate($role){
-    $permissions = get_option('bigbluebutton_permissions');
-    if( $role == 'unregistered' ) $role = 'anonymous';
-    return ( isset($permissions[$role]['participate']) && $permissions[$role]['participate'] );
-    
-}
-
-function bigbluebutton_can_manageRecordings($role){
-    $permissions = get_option('bigbluebutton_permissions');
-    if( $role == 'unregistered' ) $role = 'anonymous';
-    return ( isset($permissions[$role]['manageRecordings']) && $permissions[$role]['manageRecordings'] );
-
-}
-
-function bigbluebutton_validate_defaultRole($wp_role, $bbb_role){
-    $permissions = get_option('bigbluebutton_permissions');
-    if( $wp_role == null || $wp_role == 'unregistered' || $wp_role == '' ) 
-        $role = 'anonymous';
-    else
-        $role = $wp_role;
-    return ( isset($permissions[$role]['defaultRole']) && $permissions[$role]['defaultRole'] == $bbb_role );
-}
-
-
 //================================================================================
 //Create the form called by the Shortcode and Widget functions
-
 function bigbluebutton_form($args) {
     global $wpdb, $wp_version, $current_site, $current_user, $wp_roles;
     $table_name = $wpdb->prefix . "bigbluebutton";
@@ -465,15 +439,19 @@ function bigbluebutton_form($args) {
             if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
             $duration = 0;
             $voicebridge = 0;
+            $logouturl = (is_ssl()? "https://": "http://") . $_SERVER['HTTP_HOST']  . $_SERVER['REQUEST_URI'];
+            
             //Metadata for tagging recordings
             $metadata = Array(
-                'origin' => 'Wordpress',
-                'originversion' => $wp_version,
-                'origintag' => 'wordpress-plugin_bigbluebutton '.BIGBLUEBUTTON_PLUGIN_VERSION,
-                //'originnameserver' => get_current_site_name( $current_site )
+                'meta_origin' => 'WordPress',
+                'meta_originversion' => $wp_version,
+                'meta_origintag' => 'wp_plugin-bigbluebutton '.BIGBLUEBUTTON_PLUGIN_VERSION,
+                'meta_originservername' => home_url(),
+                'meta_originservercommonname' => get_bloginfo('name'),
+                'meta_originurl' => $logouturl
             );
             //Call for creating meeting on the bigbluebutton server
-            $response = BigBlueButton::createMeetingArray($name, $found->meetingID, $found->meetingName, $welcome, $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, get_option('siteurl'), $recorded? 'true':'false', $duration, $voicebridge, $metadata );
+            $response = BigBlueButton::createMeetingArray($name, $found->meetingID, $found->meetingName, $welcome, $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, $logouturl, $recorded? 'true':'false', $duration, $voicebridge, $metadata );
 
             //Analyzes the bigbluebutton server's response
             if(!$response || $response['returncode'] == 'FAILED' ){//If the server is unreachable, or an error occured
@@ -937,19 +915,22 @@ function bigbluebutton_list_meetings() {
             //Extra parameters
             $duration = 0;
             $voicebridge = 0;
+            $logouturl = (is_ssl()? "https://": "http://") . $_SERVER['HTTP_HOST']  . $_SERVER['REQUEST_URI'];
+            
             //Metadata for tagging recordings
             $metadata = array(
                 'meta_origin' => 'WordPress',
                 'meta_originversion' => $wp_version,
                 'meta_origintag' => 'wp_plugin-bigbluebutton '.BIGBLUEBUTTON_PLUGIN_VERSION,
-                'meta_originservername' => get_option('siteurl'),
+                'meta_originservername' => home_url(),
                 'meta_originservercommonname' => get_bloginfo('name'),
+                'meta_originurl' => $logouturl
             );
             
             //Calls create meeting on the bigbluebutton server
             $welcome = BIGBLUEBUTTON_STRING_WELCOME;
             if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
-            $response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID, $meetingName, $welcome, $moderatorPW, $attendeePW, $salt_val, $url_val, get_option('siteurl'), ($recorded? 'true':'false'), $duration, $voicebridge, $metadata );
+            $response = BigBlueButton::createMeetingArray($current_user->display_name, $meetingID, $meetingName, $welcome, $moderatorPW, $attendeePW, $salt_val, $url_val, $logouturl, ($recorded? 'true':'false'), $duration, $voicebridge, $metadata );
             
             $createNew = false;
             //Analyzes the bigbluebutton server's response
@@ -1247,12 +1228,12 @@ function bigbluebutton_list_recordings($title=null) {
         }
         
         /// Prepare duration
-        $endTime = isset($recording['endTime'])? intval(str_replace('"', '\"', $recording['endTime'])):0;
+        $endTime = isset($recording['endTime'])? floatval($recording['endTime']):0;
         $endTime = $endTime - ($endTime % 1000);
-        $startTime = isset($recording['startTime'])? intval(str_replace('"', '\"', $recording['startTime'])):0;
+        $startTime = isset($recording['startTime'])? floatval($recording['startTime']):0;
         $startTime = $startTime - ($startTime % 1000);
         $duration = intval(($endTime - $startTime) / 60000);
-        
+                
         /// Prepare date
         //Make sure the startTime is timestamp
         if( !is_numeric($recording['startTime']) ){
@@ -1308,3 +1289,33 @@ function bigbluebutton_print_table_header(){
                 <th class="hedextra" colspan="1">Actions</td>
               </tr>';
 }
+
+//================================================================================
+//------------------------------- Helping functions ------------------------------
+//================================================================================
+//Validation methods
+function bigbluebutton_can_participate($role){
+    $permissions = get_option('bigbluebutton_permissions');
+    if( $role == 'unregistered' ) $role = 'anonymous';
+    return ( isset($permissions[$role]['participate']) && $permissions[$role]['participate'] );
+
+}
+
+function bigbluebutton_can_manageRecordings($role){
+    $permissions = get_option('bigbluebutton_permissions');
+    if( $role == 'unregistered' ) $role = 'anonymous';
+    return ( isset($permissions[$role]['manageRecordings']) && $permissions[$role]['manageRecordings'] );
+
+}
+
+function bigbluebutton_validate_defaultRole($wp_role, $bbb_role){
+    $permissions = get_option('bigbluebutton_permissions');
+    if( $wp_role == null || $wp_role == 'unregistered' || $wp_role == '' )
+        $role = 'anonymous';
+    else
+        $role = $wp_role;
+    return ( isset($permissions[$role]['defaultRole']) && $permissions[$role]['defaultRole'] == $bbb_role );
+}
+
+
+
