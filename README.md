@@ -26,10 +26,33 @@ The easiest way to install is to watch this [installation video](http://www.yout
 
 == Frequently Asked Questions ==
 
+** Ho do I create meetings?
+
+**How users join meetings?**
+
+Users join meetings using a joining form that can be shown in a site as a sidebar element or as a page/post. 
+
+For setting up in the sidebar, add the bigbluebutton widget as you do with any other dragging the box to the position you want to. 
+
+For setting it up as page/post add the shortcode [bigbluebutton] where you want the form to appear in the page/post. If there a meetings pre-created in wordpress, they should appear in a listbox where users can select. If there is only one meeting pre-created there will not be a list box and a button with the name of the meeting will aprear instead.
+ 
+**Why sometimes the Name and Password are required, some others only the Name and others only the Password?**
+
+The plugin gatters the much information it cans from Wordpress, but what will be taken depends of the configuration. 
+
+For registered users their registered name or username will be taken as Name. The BigBlueButton role (moderator/attendee) can be assigned automatically depending of the permission settings. This way a registered user in a role which permissions has been previously set would not be required nether for Name nor Password.
+
+For registered users whose role has ben set for requiring always a password, only the Password will be required.
+
+For anonymous users the Name will be always required, but again the Password requirment will depend of the configuration. If Moderator/Attendee role has ben set for them no Password box will be shown in their joining form.   
+
+**How can I show the recordings?**
+
+The only way to show recordings to users is using the shortcode [bigbluebutton_recordings] in a page/post. 
 
 **Why is it giving an error about creating a meeting room?**
 
-Make sure you are using BigBlueButton 0.7 or higher.
+Make sure you are using BigBlueButton 0.8 or higher.
 
 **What is this error: "Unable to display the meetings. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running."?**
 
@@ -46,24 +69,48 @@ You should enable the curl extension in php.ini.
 
 == Changelog ==
 
+= 1.3.4 =
+* Fixed issue. List of recordings didn’t show the correct duration on 32-bit servers.
+* Fixed issue. When using short codes, the bigbluebutton content appeared at the very top on the page or post.
+* Fixed issue. For anonymous users the join meeting form was always shown, even though they were allowed to sign without password.
+* Fixed issue. Recording link broken when the recording is not published
+* Fixed issue. Anonymous user were not able to join meetings without password, even though the settings were correct
+* Changed meetingId. Wordpress meetingID is no longer the BBB meetingID. Instead a short 13 characters internal token is used to generate the real meetingID.
+* Added feature. Title on recording list can be set up using a shortcode parameter [bigbluebutton_recordings title='Example'].
+* Added feature. Included classes and ids to the html tags for enable designers to add style.
+* Added feature. Password are random generated when not included in create form.
+* Added feature. Extended shortcode can receive token id and submit message [bigbluebutton token="a7ccc7f752f65" submit"Meet me there!"]. [token] can be taken from the list of meeting romms created, when set the join button will link to the specific meeting. [submmit] will override the text in the join button.
+
+= 1.3.3 =
+* Fixed issue. On admin UI users were prevented to join meetings using the meeting list.
+* Fixed issue. When installing and/or updating a version the activate methods were not properly working.
+* Changed permissions. Administrator can now set moderator or attendee as default bbb-roles to the different wp-roles available.
+* Changed permissions. Administrator can now set -manageRecordings and -participate permissions to any of the wp-roles available.
+* Changed interface on joining form. If there is only one meeting the selection box is not shown.
+* Changed logouturl. The logout url is now the page from where the create/join call was made instead of the main page.
+* Added feature. Plugin can be used on multisite deployments.  
+
 = 1.3.2 =
-* Fixed an issue on update control that prevented 1.0.1 deployments to be properly updated
-* Fixed an issue that prevented the plugin to work on webservers running php 5.2
- 
+* Fixed an issue on update control that prevented 1.0.1 deployments to be properly updated.
+* Fixed an issue that prevented the plugin to work on webservers running php 5.2.
+* Fixed an issue that prevented meetings to be created in recording mode.
+* Added a warning to the welcome message on the bigbluebutton chat box when the meeting is recorded.
+* A generic welcome message can be set as parameter using the shortcode [bigbluebutton welcome='<br>Custom message<br>%%CONFNAME%%'].
+  
 = 1.3.1 =
-* Changed version control. 1:major version,2:wordpress version supported,3:minor version
-* Added shortcode [bigbluebutton] to render an access form into a page or post
-* Meetings can be configured to be recorded (optional)
-* Configuration form shows the list of recordings available for the Wordpress server
-* Admin users can publish/unpublish and delete recordings from the BigBlueButton server
-* Added shortcode [bigbluebutton_recordings] to render the list of recordings into a page or post
+* Changed version control. 1:major version (remains),2:minor version (former release version),3:release version.
+* Added shortcode [bigbluebutton] to render an access form into a page or post.
+* Meetings can be configured to be recorded (optional).
+* Configuration form shows the list of recordings available for the Wordpress server.
+* Admin users can publish/unpublish and delete recordings from the BigBlueButton server.
+* Added shortcode [bigbluebutton_recordings] to render the list of recordings into a page or post.
 * Performance improvements
-      (Important: This release does not support multi sites)
+      (Important: This release does not support multi sites and is not localized)
 
 = 1.0.2 =
-* Wait for moderator is now meeting specific
-* Added confirmation messages when ending or deleting a meeting
-* Performance improvements
+* Wait for moderator is now meeting specific.
+* Added confirmation messages when ending or deleting a meeting.
+* Performance improvements.
 
 = 1.0.1 =
 * Updated to use version 1.2 of the php api.
@@ -75,8 +122,14 @@ You should enable the curl extension in php.ini.
 
 == Upgrade Notice ==
 
+= 1.3.4 =
+This version fixes some presentation issues. Style and javascript functions can added using classes and ids included on html elements.
+
+= 1.3.3 =
+This version enable administrators to set permissions for accessing meetings. It also fixes few issues on deployments.
+
 = 1.3.2 =
-This version fixes an issue on deployments made on webservers with php 5.2 and a bug on the update control.
+This version fixes an issue on deployments made on webservers with php 5.2, a bug on the update control and a bug that prevented meetings to be created in recording mode.
 
 = 1.3.1 =
 This version provides support for playback recordings, better performance, and allows shortcode at posts and pages.

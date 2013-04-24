@@ -420,11 +420,15 @@ function bigbluebutton_form($args) {
         if( $found ){
             $found->meetingID = sha1(home_url().$found->meetingID);
 
-            if( !$current_user->ID || bigbluebutton_validate_defaultRole($role, 'none') ) {
-                print_r('It was considered to sign with the form');
-                //Read posted values
+            if( !$current_user->ID ) {
                 $name = isset($_POST['display_name']) && $_POST['display_name']?$_POST['display_name']: $role;
-                $password = $_POST['pwd'];
+                
+                if( bigbluebutton_validate_defaultRole($role, 'none') ) {
+                    $password = $_POST['pwd'];
+                } else {
+                    $password = $permissions[$role]['defaultRole'] == 'none'? $found->moderatorPW: $found->attendeePW;
+                }
+                    
             } else {
                 print_r('It was considered to sign with wp credentials');
                 if( $current_user->display_name != '' ){

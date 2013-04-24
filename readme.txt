@@ -82,6 +82,7 @@ You should enable the curl extension in php.ini.
 * Fixed issue. When using short codes, the bigbluebutton content appeared at the very top on the page or post.
 * Fixed issue. For anonymous users the join meeting form was always shown, even though they were allowed to sign without password.
 * Fixed issue. Recording link broken when the recording is not published
+* Fixed issue. Anonymous user were not able to join meetings without password, even though the settings were correct
 * Changed meetingId. Wordpress meetingID is no longer the BBB meetingID. Instead a short 13 characters internal token is used to generate the real meetingID.
 * Added feature. Title on recording list can be set up using a shortcode parameter [bigbluebutton_recordings title='Example'].
 * Added feature. Included classes and ids to the html tags for enable designers to add style.
