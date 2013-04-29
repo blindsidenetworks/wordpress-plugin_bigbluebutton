@@ -855,11 +855,12 @@ function bigbluebutton_create_meetings() {
     if( isset($_POST['SubmitCreate']) && $_POST['SubmitCreate'] == 'Create' ) {
          
         /// Reads the posted values
-        $meetingName = $_POST[ 'meetingName' ];
+        $meetingName = stripcslashes($_POST[ 'meetingName' ]);
         $attendeePW = $_POST[ 'attendeePW' ]? $_POST[ 'attendeePW' ]: bigbluebutton_generatePasswd(6, 2);
         $moderatorPW = $_POST[ 'moderatorPW' ]? $_POST[ 'moderatorPW' ]: bigbluebutton_generatePasswd(6, 2, $attendeePW);
         $waitForModerator = (isset($_POST[ 'waitForModerator' ]) && $_POST[ 'waitForModerator' ] == 'True')? true: false;
         $recorded = (isset($_POST[ 'recorded' ]) && $_POST[ 'recorded' ] == 'True')? true: false;
+        $meetingVersion = "";
         //$meetingVersion = time();
         /// Assign a random unique ID based on the name and timestamp
         //$meetingID = sha1($meetingName.strval($meetingVersion));
