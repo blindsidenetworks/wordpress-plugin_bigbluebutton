@@ -78,7 +78,7 @@ You should enable the curl extension in php.ini.
 == Changelog ==
 
 = 1.3.4 =
-* Fixed issue. List of recordings didn’t show the correct duration on 32-bit servers.
+* Fixed issue. List of recordings did not show the correct duration on 32-bit servers.
 * Fixed issue. When using short codes, the bigbluebutton content appeared at the very top on the page or post.
 * Fixed issue. For anonymous users the join meeting form was always shown, even though they were allowed to sign without password.
 * Fixed issue. Recording link broken when the recording is not published
