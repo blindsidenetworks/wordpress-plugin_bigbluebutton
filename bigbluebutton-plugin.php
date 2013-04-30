@@ -206,7 +206,7 @@ function bigbluebutton_update() {
     }
      
     //Set the new permission schema
-    if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.3") <= 0 ){
+    if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.3") < 0 ){
         $roles = $wp_roles->role_names;
         $roles['anonymous'] = 'Anonymous';
 
@@ -418,7 +418,7 @@ function bigbluebutton_form($args) {
 
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
         if( $found ){
-            $found->meetingID = sha1(home_url().$found->meetingID);
+            $found->meetingID = bigbluebutton_normalizeMeetingID($found->meetingID);
 
             if( !$current_user->ID ) {
                 $name = isset($_POST['display_name']) && $_POST['display_name']?$_POST['display_name']: $role;
@@ -430,7 +430,6 @@ function bigbluebutton_form($args) {
                 }
                     
             } else {
-                print_r('It was considered to sign with wp credentials');
                 if( $current_user->display_name != '' ){
                     $name = $current_user->display_name;
                 } else if( $current_user->user_firstname != '' || $current_user->user_lastname != '' ){
@@ -961,7 +960,7 @@ function bigbluebutton_list_meetings() {
         $meetingID = $_POST['meetingID'];
         $found = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
         if( $found ){
-            $found->meetingID = sha1(home_url().$meetingID);
+            $found->meetingID = bigbluebutton_normalizeMeetingID($found->meetingID);
             
             //---------------------------------------------------JOIN-------------------------------------------------
             if($_POST['SubmitList'] == 'Join'){
@@ -1028,7 +1027,7 @@ function bigbluebutton_list_meetings() {
             
             		//In case the meeting is created again it sets the meeting version to the time stamp. Therefore the meeting can be recreated before the 1 hour rule without any problems.
             		$meetingVersion = time();
-            		$wpdb->update( $table_name, array( 'meetingVersion' => $meetingVersion), array( 'meetingID' => $meetingID ));
+            		$wpdb->update( $table_name, array( 'meetingVersion' => $meetingVersion), array( 'meetingID' => $found->meetingID ));
             		 
             	}
             	else{ //If the meeting was unable to be termindated
@@ -1062,7 +1061,7 @@ function bigbluebutton_list_meetings() {
             		}
             	}
             	else { //The meeting was terminated
-            		$wpdb->query("DELETE FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
+            		$wpdb->query("DELETE FROM ".$table_name." WHERE meetingID = '".$found->meetingID."'");
             		$out .= '<div class="updated"><p><strong>'.$meetingName.' meeting has been deleted.</strong></p></div>';
             	}
             	 
@@ -1085,7 +1084,7 @@ function bigbluebutton_list_meetings() {
     //duplicate meetings, meaning if the same meeting already exists in the bigbluebutton server then it is
     //not displayed again in this for loop
     foreach ($listOfMeetings as $meeting) {
-        $info = BigBlueButton::getMeetingInfoArray( sha1(home_url().$meeting->meetingID), $meeting->moderatorPW, $url_val, $salt_val);
+        $info = BigBlueButton::getMeetingInfoArray( bigbluebutton_normalizeMeetingID($meeting->meetingID), $meeting->moderatorPW, $url_val, $salt_val);
         //Analyzes the bigbluebutton server's response
         if(!$info){//If the server is unreachable, then prompts the user of the necessary action
             $out .= '<div class="updated"><p><strong>Unable to display the meetings. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running.</strong></p></div>';
@@ -1398,3 +1397,8 @@ function bigbluebutton_generatePasswd($numAlpha=6, $numNonAlpha=2, $salt=''){
     
     return $pepper;
 }
+
+function bigbluebutton_normalizeMeetingID($meetingID){
+    return strlrn($meeting->meetingID) == 12? sha1(home_url().$meeting->meetingID): $meeting->meetingID;
+}
+
