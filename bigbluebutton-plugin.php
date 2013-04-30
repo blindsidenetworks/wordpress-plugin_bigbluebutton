@@ -1399,6 +1399,6 @@ function bigbluebutton_generatePasswd($numAlpha=6, $numNonAlpha=2, $salt=''){
 }
 
 function bigbluebutton_normalizeMeetingID($meetingID){
-    return strlrn($meeting->meetingID) == 12? sha1(home_url().$meeting->meetingID): $meeting->meetingID;
+    return (strlen($meetingID) == 12)? sha1(home_url().$meetingID): $meetingID;
 }
 
