@@ -77,6 +77,9 @@ You should enable the curl extension in php.ini.
 
 == Changelog ==
 
+= 1.3.5
+* Fixed issue. Meeting could not been deleted.
+
 = 1.3.4 =
 * Fixed issue. List of recordings did not show the correct duration on 32-bit servers.
 * Fixed issue. When using short codes, the bigbluebutton content appeared at the very top on the page or post.

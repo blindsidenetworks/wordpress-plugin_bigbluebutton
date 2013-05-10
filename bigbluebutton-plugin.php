@@ -1007,7 +1007,6 @@ function bigbluebutton_list_meetings() {
             		}
             
             		$bigbluebutton_joinURL = BigBlueButton::getJoinURL($found->meetingID, $current_user->display_name, $found->moderatorPW, $salt_val, $url_val );
-            		print_r($bigbluebutton_joinURL);
             		$out .= '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'"; </script>'."\n";
             	}
             	 
@@ -1023,7 +1022,7 @@ function bigbluebutton_list_meetings() {
             		$out .= '<div class="updated"><p><strong>Unable to terminate the meeting. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running.</strong></p></div>';
             	}
             	else if( $response['returncode'] == 'SUCCESS' ) { //The meeting was terminated
-            		$out .= '<div class="updated"><p><strong>'.$meetingName.' meeting has been terminated.</strong></p></div>';
+            	    $out .= '<div class="updated"><p><strong>'.$found->meetingName.' meeting has been terminated.</strong></p></div>';
             
             		//In case the meeting is created again it sets the meeting version to the time stamp. Therefore the meeting can be recreated before the 1 hour rule without any problems.
             		$meetingVersion = time();
@@ -1061,8 +1060,8 @@ function bigbluebutton_list_meetings() {
             		}
             	}
             	else { //The meeting was terminated
-            		$wpdb->query("DELETE FROM ".$table_name." WHERE meetingID = '".$found->meetingID."'");
-            		$out .= '<div class="updated"><p><strong>'.$meetingName.' meeting has been deleted.</strong></p></div>';
+            	    $wpdb->query("DELETE FROM ".$table_name." WHERE meetingID = '".$meetingID."'");
+            	    $out .= '<div class="updated"><p><strong>'.$found->meetingName.' meeting has been deleted.</strong></p></div>';
             	}
             	 
             }
