@@ -180,7 +180,7 @@ function bigbluebutton_update() {
         $table_name_old = $wpdb->prefix . "bbb_meetingRooms";
         $listOfMeetings = $wpdb->get_results("SELECT * FROM ".$table_name_old." ORDER BY id");
         foreach ($listOfMeetings as $meeting) {
-            $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW) VALUES ('".sha1($meeting->meetingID.strval($meeting->meetingVersion))."','".$meeting->meetingID."', '".$meeting->meetingVersion."', '".$meeting->attendeePW."', '".$meeting->moderatorPW."');";
+            $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW) VALUES ('".bin2hex(openssl_random_pseudo_bytes(6))."','".$meeting->meetingID."', '".$meeting->meetingVersion."', '".$meeting->attendeePW."', '".$meeting->moderatorPW."');";
             $wpdb->query($sql);
         }
         /// Remove the old table
@@ -859,12 +859,8 @@ function bigbluebutton_create_meetings() {
         $moderatorPW = $_POST[ 'moderatorPW' ]? $_POST[ 'moderatorPW' ]: bigbluebutton_generatePasswd(6, 2, $attendeePW);
         $waitForModerator = (isset($_POST[ 'waitForModerator' ]) && $_POST[ 'waitForModerator' ] == 'True')? true: false;
         $recorded = (isset($_POST[ 'recorded' ]) && $_POST[ 'recorded' ] == 'True')? true: false;
-        $meetingVersion = "";
-        //$meetingVersion = time();
-        /// Assign a random unique ID based on the name and timestamp
-        //$meetingID = sha1($meetingName.strval($meetingVersion));
-        //$meetingID = md5(uniqid(rand(), true));
-        //$meetingID = uniqid();
+        $meetingVersion = time();
+        /// Assign a random seed to generate unique ID on a BBB server
         $meetingID = bin2hex(openssl_random_pseudo_bytes(6));
 
 
@@ -909,14 +905,6 @@ function bigbluebutton_create_meetings() {
 
             }
              
-            $meetingID = '';
-            $meetingName = '';
-            $meetingVersion = NULL;
-            $attendeePW = '';
-            $moderatorPW = '';
-            $waitForModerator = false;
-            $recorded = false;
-
         }
 
     }

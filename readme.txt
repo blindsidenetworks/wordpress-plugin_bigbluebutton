@@ -79,6 +79,7 @@ You should enable the curl extension in php.ini.
 
 = 1.3.5
 * Fixed issue. Meeting could not been deleted.
+* Fixed issue. Meeting could not been added when using non updated MySQL versions.
 
 = 1.3.4 =
 * Fixed issue. List of recordings did not show the correct duration on 32-bit servers.
