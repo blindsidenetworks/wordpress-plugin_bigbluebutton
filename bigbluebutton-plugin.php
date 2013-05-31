@@ -64,8 +64,7 @@ add_shortcode('bigbluebutton', 'bigbluebutton_shortcode');
 add_shortcode('bigbluebutton_recordings', 'bigbluebutton_recordings_shortcode');
 
 //action definitions
-add_action('init', 'bigbluebutton_init_sessions');
-add_action('init', 'bigbluebutton_init_scripts');
+add_action('init', 'bigbluebutton_init');
 add_action('admin_menu', 'bigbluebutton_add_pages', 1);
 add_action('admin_init', 'bigbluebutton_admin_init', 1);
 add_action('plugins_loaded', 'bigbluebutton_update' );
@@ -76,13 +75,16 @@ set_error_handler("bigbluebutton_warning_handler", E_WARNING);
 //================================================================================
 //------------------------------ Main Functions ----------------------------------
 //================================================================================
-//Adds the plugin stylesheet to wordpress
-function bigbluebutton_admin_styles(){
-    wp_enqueue_style('bigbluebuttonStylesheet');
+// Sessions are required by the plugin to work.
+function bigbluebutton_init() {
+    bigbluebutton_init_sessions();
+    bigbluebutton_init_scripts();
+    bigbluebutton_init_styles();
+    
+    //Attaches the plugin's stylesheet to the plugin page just created
+    add_action('wp_print_styles', 'bigbluebutton_admin_styles');
 }
 
-
-// Sessions are required by the plugin to work.
 function bigbluebutton_init_sessions() {
     if (!session_id()) {
         session_start();
@@ -91,15 +93,23 @@ function bigbluebutton_init_sessions() {
 
 function bigbluebutton_init_scripts() {
     if (!is_admin()) {
-        //wp_deregister_script('jquery');
-        //wp_register_script('jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js', false);
         wp_enqueue_script('jquery');
     }
 }
 
+function bigbluebutton_init_styles() {
+    wp_register_style('bigbluebuttonStylesheet', WP_PLUGIN_URL.'/bigbluebutton/css/bigbluebutton_stylesheet.css');
+}
+
+
 //Registers the plugin's stylesheet
 function bigbluebutton_admin_init() {
-    wp_register_style('bigbluebuttonStylesheet', WP_PLUGIN_URL.'/bigbluebutton/css/bigbluebutton_stylesheet.css');
+    bigbluebutton_init_styles();
+}
+
+//Adds the plugin stylesheet to wordpress
+function bigbluebutton_admin_styles(){
+    wp_enqueue_style('bigbluebuttonStylesheet');
 }
 
 //Registers the bigbluebutton widget
