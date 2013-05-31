@@ -649,7 +649,7 @@ setInterval("bigbluebutton_ping()", 5000);
     <td>
     Welcome '.$name.'!<br /><br />
     '.$meetingName.' session has not been started yet.<br /><br />
-    <div align="center"><img src="./wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />
+    <div align="center"><img src="'.WP_PLUGIN_URL.'/bigbluebutton/images/polling.gif" /></div><br />
     (Your browser will automatically refresh and join the meeting when it starts.)
     </td>
     </tr>
