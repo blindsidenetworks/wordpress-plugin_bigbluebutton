@@ -97,10 +97,10 @@ function bigbluebutton_init_scripts() {
     }
 }
 
+//Registers the plugin's stylesheet
 function bigbluebutton_init_styles() {
     wp_register_style('bigbluebuttonStylesheet', WP_PLUGIN_URL.'/bigbluebutton/css/bigbluebutton_stylesheet.css');
 }
-
 
 //Registers the plugin's stylesheet
 function bigbluebutton_admin_init() {
@@ -513,6 +513,7 @@ function bigbluebutton_form($args) {
     if(sizeof($listOfMeetings) > 0){
         //Alerts the user if the password they entered does not match
         //the meeting's password
+        
         if($dataSubmitted && !$meetingExist){
             $out .= "***".$meetingID." no longer exists.***";
         }
@@ -522,16 +523,12 @@ function bigbluebutton_form($args) {
 
         if ( bigbluebutton_can_participate($role) ){
             $out .= '
-            <form id="bbb-join-form" class="bbb-join" name="form1" method="post" action="">
-            <div class="bbb-join">
-            <table>';
+            <form id="bbb-join-form" class="bbb-join" name="form1" method="post" action="">';
 
             if(sizeof($listOfMeetings) > 1 && !$token ){
                 $out .= '
-                <tr>
-                <td>Meeting</td>
-                <td>
-                <select class="bbb-join" name="meetingID">';
+                <label>Meeting:</label>
+                <select name="meetingID">';
 
                 foreach ($listOfMeetings as $meeting) {
                     $out .= '
@@ -539,9 +536,7 @@ function bigbluebutton_form($args) {
                 }
 
                 $out .= '
-                </select>
-                </td>
-                </tr>';
+                </select>';
             } else if ($token) {
                 $out .= '
                 <input type="hidden" name="meetingID" id="meetingID" value="'.$token.'" />';
@@ -555,24 +550,20 @@ function bigbluebutton_form($args) {
 
             if( !$current_user->ID ) {
                 $out .= '
-                <tr>
-                <td>Name</td>
-                <td><input class="bbb-join" type="text" id="name" name="display_name" size="10"></td>
-                </tr>';
+                <label>Name:</label>
+                <input type="text" id="name" name="display_name" size="10">';
             }
             if( bigbluebutton_validate_defaultRole($role, 'none') ) {
                 $out .= '
-                <tr>
-                <td>Password</td>
-                <td><input class="bbb-join" type="password" name="pwd" size="10"></td>
-                </tr>';
+                <label>Password:</label>
+                <input type="password" name="pwd" size="10">';
             }
             $out .= '
             </table>';
             if(sizeof($listOfMeetings) > 1 && !$token ){
                 $out .= '
-                <input id="bbb-join-submit" class="bbb-join" type="submit" name="SubmitForm" value="'.($submit? $submit: 'Join').'">';
-
+                
+                <input type="submit" name="SubmitForm" value="'.($submit? $submit: 'Join').'">';
             } else if ($token) {
                 foreach ($listOfMeetings as $meeting) {
                     if($meeting->meetingID == $token ){
@@ -593,7 +584,6 @@ function bigbluebutton_form($args) {
 
             }
             $out .= '
-            </div>
             </form>';
 
         } else {
@@ -611,7 +601,7 @@ function bigbluebutton_form($args) {
         $out .= "No meeting rooms are currently available to join.";
 
     }
-
+    
     return $out;
 }
 
@@ -619,41 +609,41 @@ function bigbluebutton_form($args) {
 //Displays the javascript that handles redirecting a user, when the meeting has started
 //the meetingName is the meetingID
 function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingID, $meetingName, $name){
-
     $out = '
     <script type="text/javascript">
-    function bigbluebutton_ping() {
-    jQuery.ajax({
-    url : "./wp-content/plugins/bigbluebutton/php/broker.php?action=ping&meetingID='.urlencode($meetingID).'",
-    async : true,
-    dataType : "xml",
-    success : function(xmlDoc){
-    $xml = jQuery( xmlDoc ), $running = $xml.find( "running" );
-    if($running.text() == "true"){
-    window.location = "'.$bigbluebutton_joinURL.'";
-}
-},
-error : function(xmlHttpRequest, status, error) {
-console.debug(xmlHttpRequest);
-}
-});
+        function bigbluebutton_ping() {
+            jQuery.ajax({
+                url : "./wp-content/plugins/bigbluebutton/php/broker.php?action=ping&meetingID='.urlencode($meetingID).'",
+                async : true,
+                dataType : "xml",
+                success : function(xmlDoc){
+                    $xml = jQuery( xmlDoc ), $running = $xml.find( "running" );
+                    if($running.text() == "true"){
+                        window.location = "'.$bigbluebutton_joinURL.'";
+                    }
+                },
+                error : function(xmlHttpRequest, status, error) {
+                    console.debug(xmlHttpRequest);
+                }
+            });
 
-}
+        }
 
-setInterval("bigbluebutton_ping()", 5000);
-</script>';
+        setInterval("bigbluebutton_ping()", 5000);
+    </script>';
 
-    $out .= '<table>
-    <tbody>
-    <tr>
-    <td>
-    Welcome '.$name.'!<br /><br />
-    '.$meetingName.' session has not been started yet.<br /><br />
-    <div align="center"><img src="'.WP_PLUGIN_URL.'/bigbluebutton/images/polling.gif" /></div><br />
-    (Your browser will automatically refresh and join the meeting when it starts.)
-    </td>
-    </tr>
-    </tbody>
+    $out .= '
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            Welcome '.$name.'!<br /><br />
+            '.$meetingName.' session has not been started yet.<br /><br />
+            <div align="center"><img src="./wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />
+            (Your browser will automatically refresh and join the meeting when it starts.)
+          </td>
+        </tr>
+      </tbody>
     </table>';
 
     return $out;
@@ -1222,43 +1212,43 @@ function bigbluebutton_list_recordings($title=null) {
     if ( bigbluebutton_can_manageRecordings($role) ) {
         $out .= '
         <script type="text/javascript">
-        wwwroot = \''.get_bloginfo('url').'\'
-        function actionCall(action, recordingid) {
+            wwwroot = \''.get_bloginfo('url').'\'
+            function actionCall(action, recordingid) {
 
-        action = (typeof action == \'undefined\') ? \'publish\' : action;
+                action = (typeof action == \'undefined\') ? \'publish\' : action;
          
-        if (action == \'publish\' || (action == \'delete\' && confirm("Are you sure to delete this recording?"))) {
-        if (action == \'publish\') {
-        var el_a = document.getElementById(\'actionbar-publish-a-\'+ recordingid);
-        if (el_a) {
-        var el_img = document.getElementById(\'actionbar-publish-img-\'+ recordingid);
-        if (el_a.title == \'Hide\' ) {
-        action = \'unpublish\';
-        el_a.title = \'Show\';
-        el_img.src = wwwroot + \'/wp-content/plugins/bigbluebutton/images/show.gif\';
-    } else {
-    action = \'publish\';
-    el_a.title = \'Hide\';
-    el_img.src = wwwroot + \'/wp-content/plugins/bigbluebutton/images/hide.gif\';
-    }
-    }
-    } else {
-    // Removes the line from the table
-    jQuery(document.getElementById(\'actionbar-tr-\'+ recordingid)).remove();
-    }
-    actionurl = wwwroot + "/wp-content/plugins/bigbluebutton/php/broker.php?action=" + action + "&recordingID=" + recordingid;
-    jQuery.ajax({
-    url : actionurl,
-    async : false,
-    success : function(response){
-    },
-    error : function(xmlHttpRequest, status, error) {
-    console.debug(xmlHttpRequest);
-    }
-    });
-    }
-    }
-    </script>';
+                if (action == \'publish\' || (action == \'delete\' && confirm("Are you sure to delete this recording?"))) {
+                    if (action == \'publish\') {
+                        var el_a = document.getElementById(\'actionbar-publish-a-\'+ recordingid);
+                        if (el_a) {
+                            var el_img = document.getElementById(\'actionbar-publish-img-\'+ recordingid);
+                            if (el_a.title == \'Hide\' ) {
+                                action = \'unpublish\';
+                                el_a.title = \'Show\';
+                                el_img.src = wwwroot + \'/wp-content/plugins/bigbluebutton/images/show.gif\';
+                            } else {
+                                action = \'publish\';
+                                el_a.title = \'Hide\';
+                                el_img.src = wwwroot + \'/wp-content/plugins/bigbluebutton/images/hide.gif\';
+                            }
+                        }
+                    } else {
+                        // Removes the line from the table
+                        jQuery(document.getElementById(\'actionbar-tr-\'+ recordingid)).remove();
+                    }
+                    actionurl = wwwroot + "/wp-content/plugins/bigbluebutton/php/broker.php?action=" + action + "&recordingID=" + recordingid;
+                    jQuery.ajax({
+                            url : actionurl,
+                            async : false,
+                            success : function(response){
+                            },
+                            error : function(xmlHttpRequest, status, error) {
+                                console.debug(xmlHttpRequest);
+                            }
+                        });
+                }
+            }
+        </script>';
     }
 
 
@@ -1266,17 +1256,17 @@ function bigbluebutton_list_recordings($title=null) {
     $out .= '
     <div id="bbb-recordings-div" class="bbb-recordings">
     <table class="stats" cellspacing="5">
-    <tr>
-    <th class="hed" colspan="1">Recording</td>
-    <th class="hed" colspan="1">Meeting Room Name</td>
-    <th class="hed" colspan="1">Date</td>
-    <th class="hed" colspan="1">Duration</td>';
+      <tr>
+        <th class="hed" colspan="1">Recording</td>
+        <th class="hed" colspan="1">Meeting Room Name</td>
+        <th class="hed" colspan="1">Date</td>
+        <th class="hed" colspan="1">Duration</td>';
     if ( bigbluebutton_can_manageRecordings($role) ) {
         $out .= '
         <th class="hedextra" colspan="1">Toolbar</td>';
     }
     $out .= '
-    </tr>';
+      </tr>';
     foreach( $listOfRecordings as $recording){
         if ( bigbluebutton_can_manageRecordings($role) || $recording['published'] == 'true') {
             /// Prepare playback recording links
@@ -1312,10 +1302,10 @@ function bigbluebutton_list_recordings($title=null) {
             //Print detail
             $out .= '
             <tr id="actionbar-tr-'.$recording['recordID'].'">
-            <td>'.$type.'</td>
-            <td>'.$recording['meetingName'].'</td>
-            <td>'.$formatedStartDate.'</td>
-            <td>'.$duration.' min</td>';
+              <td>'.$type.'</td>
+              <td>'.$recording['meetingName'].'</td>
+              <td>'.$formatedStartDate.'</td>
+              <td>'.$duration.' min</td>';
 
             /// Prepare actionbar if role is allowed to manage the recordings
             if ( bigbluebutton_can_manageRecordings($role) ) {
@@ -1345,15 +1335,15 @@ function bigbluebutton_print_table_header(){
     return '
     <div>
     <table class="stats" cellspacing="5">
-    <tr>
-    <th class="hed" colspan="1">Meeting Room Name</td>
-    <th class="hed" colspan="1">Meeting Token</td>
-    <th class="hed" colspan="1">Attendee Password</td>
-    <th class="hed" colspan="1">Moderator Password</td>
-    <th class="hed" colspan="1">Wait for Moderator</td>
-    <th class="hed" colspan="1">Recorded</td>
-    <th class="hedextra" colspan="1">Actions</td>
-    </tr>';
+      <tr>
+        <th class="hed" colspan="1">Meeting Room Name</td>
+        <th class="hed" colspan="1">Meeting Token</td>
+        <th class="hed" colspan="1">Attendee Password</td>
+        <th class="hed" colspan="1">Moderator Password</td>
+        <th class="hed" colspan="1">Wait for Moderator</td>
+        <th class="hed" colspan="1">Recorded</td>
+        <th class="hedextra" colspan="1">Actions</td>
+      </tr>';
 }
 
 //================================================================================

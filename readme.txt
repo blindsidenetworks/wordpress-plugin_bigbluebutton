@@ -79,6 +79,7 @@ You should enable the curl extension in php.ini.
 
 = 1.3.6 =
 * Added feature. Form presentation can be customized using css.
+* Fixed issue. Polling image not showing up on multisite deployments.
 
 = 1.3.5 =
 * Fixed issue. Meeting could not been deleted.
