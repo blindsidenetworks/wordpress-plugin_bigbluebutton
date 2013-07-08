@@ -190,7 +190,7 @@ function bigbluebutton_update() {
         $table_name_old = $wpdb->prefix . "bbb_meetingRooms";
         $listOfMeetings = $wpdb->get_results("SELECT * FROM ".$table_name_old." ORDER BY id");
         foreach ($listOfMeetings as $meeting) {
-            $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW) VALUES ('".bin2hex(openssl_random_pseudo_bytes(6))."','".$meeting->meetingID."', '".$meeting->meetingVersion."', '".$meeting->attendeePW."', '".$meeting->moderatorPW."');";
+            $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW) VALUES ('".bigbluebutton_generateToken()."','".$meeting->meetingID."', '".$meeting->meetingVersion."', '".$meeting->attendeePW."', '".$meeting->moderatorPW."');";
             $wpdb->query($sql);
         }
         /// Remove the old table
@@ -861,7 +861,7 @@ function bigbluebutton_create_meetings() {
         $recorded = (isset($_POST[ 'recorded' ]) && $_POST[ 'recorded' ] == 'True')? true: false;
         $meetingVersion = time();
         /// Assign a random seed to generate unique ID on a BBB server
-        $meetingID = bin2hex(openssl_random_pseudo_bytes(6));
+        $meetingID = bigbluebutton_generateToken();
 
 
         //Checks to see if the meeting name, attendee password or moderator password was left blank
@@ -1371,6 +1371,25 @@ function bigbluebutton_validate_defaultRole($wp_role, $bbb_role){
     else
         $role = $wp_role;
     return ( isset($permissions[$role]['defaultRole']) && $permissions[$role]['defaultRole'] == $bbb_role );
+}
+
+function bigbluebutton_generateToken($tokenLength=6){
+    $token = '';
+    
+    if(function_exists('openssl_random_pseudo_bytes')) {
+        $token .= bin2hex(openssl_random_pseudo_bytes($tokenLength));
+    } else {
+        //fallback to mt_rand if php < 5.3 or no openssl available
+        $characters = '0123456789abcdef';
+        $charactersLength = strlen($characters)-1;
+    
+        //select some random characters
+        for ($i = 0; $i < $length; $i++) {
+            $token .= $characters[mt_rand(0, $charactersLength)];
+        }
+    }
+     
+    return $token;
 }
 
 function bigbluebutton_generatePasswd($numAlpha=6, $numNonAlpha=2, $salt=''){
