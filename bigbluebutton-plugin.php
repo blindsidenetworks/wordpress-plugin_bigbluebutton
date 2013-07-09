@@ -1384,7 +1384,7 @@ function bigbluebutton_generateToken($tokenLength=6){
         $charactersLength = strlen($characters)-1;
     
         //select some random characters
-        for ($i = 0; $i < $length; $i++) {
+        for ($i = 0; $i < $tokenLength; $i++) {
             $token .= $characters[mt_rand(0, $charactersLength)];
         }
     }
