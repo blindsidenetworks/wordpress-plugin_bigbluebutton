@@ -1382,7 +1382,8 @@ function bigbluebutton_generateToken($tokenLength=6){
         //fallback to mt_rand if php < 5.3 or no openssl available
         $characters = '0123456789abcdef';
         $charactersLength = strlen($characters)-1;
-    
+        $tokenLength *= 2;
+        
         //select some random characters
         for ($i = 0; $i < $tokenLength; $i++) {
             $token .= $characters[mt_rand(0, $charactersLength)];

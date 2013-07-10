@@ -72,6 +72,7 @@ You should enable the curl extension in php.ini.
 = 1.3.6 =
 * Added feature. Form presentation can be customized using css.
 * Fixed issue. Polling image not showing up on multisite deployments.
+* Fixed issue. Token generation causes an error when php < 5.3 or no openssl available.
 
 = 1.3.5 =
 * Fixed issue. Meeting could not been deleted.
