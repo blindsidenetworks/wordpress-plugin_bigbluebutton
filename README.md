@@ -26,16 +26,16 @@ The easiest way to install is to watch this [installation video](http://www.yout
 
 == Frequently Asked Questions ==
 
-** Ho do I create meetings?
+**How do I create meetings?**
 
 **How users join meetings?**
 
-Users join meetings using a joining form that can be shown in a site as a sidebar element or as a page/post. 
+Users join meetings using a joining form. This form can be shown in a site as a sidebar element or as a page/post. 
 
-For setting up in the sidebar, add the bigbluebutton widget as you do with any other dragging the box to the position you want to. 
+For setting up in the sidebar, add the bigbluebutton widget, as you do with any other, dragging the box to the position you want to. 
 
-For setting it up as page/post add the shortcode [bigbluebutton] where you want the form to appear in the page/post. If there a meetings pre-created in wordpress, they should appear in a listbox where users can select. If there is only one meeting pre-created there will not be a list box and a button with the name of the meeting will aprear instead.
- 
+For setting the joining form up as a page/post, add the shortcode [bigbluebutton] right where you want the form to appear in the page/post. If there are pre-created meetings in wordpress, their names should appear in a listbox from which users can select. If there is only one pre-created meeting the listbox will not be shown and one button with the name of the meeting will appear instead. 
+
 **Why sometimes the Name and Password are required, some others only the Name and others only the Password?**
 
 The plugin gatters the much information it cans from Wordpress, but what will be taken depends of the configuration. 
@@ -45,6 +45,12 @@ For registered users their registered name or username will be taken as Name. Th
 For registered users whose role has ben set for requiring always a password, only the Password will be required.
 
 For anonymous users the Name will be always required, but again the Password requirment will depend of the configuration. If Moderator/Attendee role has ben set for them no Password box will be shown in their joining form.   
+
+**Is there any way users can go directly into a meeting?**
+
+Since version 1.3.4 it is possible to provide direct access to the meeting rooms by adding the meeting token ID to the shortcode: (eg. [bigbluebutton token=aa2817f3a1e1]). 
+
+The joining form is the same, so with the right permission configuration users would be able to join meetings in one click. 
 
 **How can I show the recordings?**
 
