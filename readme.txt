@@ -85,6 +85,7 @@ You should enable the curl extension in php.ini.
 
 = 1.3.6 =
 * Added feature. Form presentation can be customized using css.
+* Added feature. Two demo meetings are created by default when the plugin is installed.
 * Fixed issue. Polling image not showing up on multisite deployments.
 * Fixed issue. Token generation causes an error when php < 5.3 or no openssl available.
 

@@ -317,6 +317,14 @@ function bigbluebutton_init_database(){
     );";
     dbDelta($sql);
 
+    $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW)
+    VALUES ('".bigbluebutton_generateToken()."','Demo meeting', '".time()."', 'ap', 'mp');";
+    dbDelta($sql);
+
+    $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW, recorded)
+    VALUES ('".bigbluebutton_generateToken()."','Demo meeting (recorded)', '".time()."', 'ap', 'mp', TRUE);";
+    dbDelta($sql);
+
     $sql = "CREATE TABLE " . $table_logs_name . " (
     id mediumint(9) NOT NULL AUTO_INCREMENT,
     meetingID text NOT NULL,
