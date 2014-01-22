@@ -562,6 +562,10 @@ function bigbluebutton_form($args) {
                 $out .= '
                 <label>Name:</label>
                 <input type="text" id="name" name="display_name" size="10">';
+            } else {
+                 $out .= '
+                <label>Name:</label>
+                <input type="text" id="name" name="display_name" size="10" value="'.$current_user->display_name.'" readonly="readonly">';
             }
             if( bigbluebutton_validate_defaultRole($role, 'none') ) {
                 $out .= '
