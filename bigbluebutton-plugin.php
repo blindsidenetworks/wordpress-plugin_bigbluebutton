@@ -649,7 +649,7 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
           <td>
             Welcome '.$name.'!<br /><br />
             '.$meetingName.' session has not been started yet.<br /><br />
-            <div align="center"><img src="./wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />
+            <div align="center"><img src="/wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />
             (Your browser will automatically refresh and join the meeting when it starts.)
           </td>
         </tr>
