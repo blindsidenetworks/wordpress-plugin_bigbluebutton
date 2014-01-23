@@ -400,7 +400,8 @@ function bigbluebutton_form($args) {
     $passwordLabel = isset($args['password_label']) ?$args['password_label']: 'Password:';
     $nameLabel = isset($args['name_label']) ?$args['name_label']: 'Name:';
     $submit = isset($args['submit']) ?$args['submit']: null;
-    
+    $waitingText = isset($args['waiting_text']) ?$args['waiting_text']: null;
+
     //Initializes the variable that will collect the output
     $out = '';
 
@@ -517,7 +518,7 @@ function bigbluebutton_form($args) {
                     $_SESSION['mt_bbb_url'] = $url_val;
                     $_SESSION['mt_salt'] = $salt_val;
                     //Displays the javascript to automatically redirect the user when the meeting begins
-                    $out .= bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $found->meetingID, $found->meetingName, $name);
+                    $out .= bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $found->meetingID, $found->meetingName, $name, $waitingText);
                     return $out;
                 }
             }
@@ -637,7 +638,7 @@ function bigbluebutton_form($args) {
 
 //Displays the javascript that handles redirecting a user, when the meeting has started
 //the meetingName is the meetingID
-function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingID, $meetingName, $name){
+function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingID, $meetingName, $name, $waitingText=null){
     $out = '
     <script type="text/javascript">
         function bigbluebutton_ping() {
@@ -661,19 +662,18 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
         setInterval("bigbluebutton_ping()", 5000);
     </script>';
 
-    $out .= '
-    <table>
-      <tbody>
-        <tr>
-          <td>
-            Welcome '.$name.'!<br /><br />
-            '.$meetingName.' session has not been started yet.<br /><br />
-            <div align="center"><img src="/wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />
-            (Your browser will automatically refresh and join the meeting when it starts.)
-          </td>
-        </tr>
-      </tbody>
-    </table>';
+    $out .= '<div class="bbb-wait-for-moderator">';
+    if ($waitingText){
+        $waitingText = str_replace("%USER%", $name, $waitingText);
+        $waitingText = str_replace("%MEETING%", $meetingName, $waitingText);
+        $out .= $waitingText;
+    } else {
+        $out .= 'Welcome '.$name.'!<br /><br />
+                '.$meetingName.' session has not been started yet.<br /><br />
+                <div align="center"><img src="/wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />
+                (Your browser will automatically refresh and join the meeting when it starts.)';
+    }
+    $out .= '</div>';
 
     return $out;
 }
