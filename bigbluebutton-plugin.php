@@ -489,7 +489,9 @@ function bigbluebutton_form($args) {
 
             //Analyzes the bigbluebutton server's response
             if(!$response || $response['returncode'] == 'FAILED' ){//If the server is unreachable, or an error occured
+                $out .= '<div class="bbb-error">';
                 $out .= "Sorry an error occured while joining the meeting.";
+                $out .= '</div>';
                 return $out;
                  
             } else{ //The user can join the meeting, as it is valid
@@ -528,10 +530,14 @@ function bigbluebutton_form($args) {
         //the meeting's password
         
         if($dataSubmitted && !$meetingExist){
+            $out .= '<div class="bbb-error">';
             $out .= "***".$meetingID." no longer exists.***";
+            $out .= '</div>';
         }
         else if($dataSubmitted){
+            $out .= '<div class="bbb-error">';
             $out .= "***Incorrect Password***";
+            $out .= '</div>';
         }
 
         if ( bigbluebutton_can_participate($role) ){
@@ -592,7 +598,7 @@ function bigbluebutton_form($args) {
                 
                 if($meeting->meetingID != $token ){
                     $out .= '
-                <div>Invalid meeting token</div>';
+                <div class="bbb-error">Invalid meeting token</div>';
                 }
                 
             } else {
@@ -604,18 +610,24 @@ function bigbluebutton_form($args) {
             </form>';
 
         } else {
+            $out .= '<div class="bbb-error">';
             $out .= $role." users are not allowed to participate in meetings";
+            $out .= '</div>';
 
         }
 
     } else if($dataSubmitted){
         //Alerts the user if the password they entered does not match
         //the meeting's password
+        $out .= '<div class="bbb-error">';
         $out .= "***".$meetingID." no longer exists.***<br />";
         $out .= "No meeting rooms are currently available to join.";
+        $out .= '</div>';
 
     } else{
+        $out .= '<div class="bbb-error">';
         $out .= "No meeting rooms are currently available to join.";
+        $out .= '</div>';
 
     }
     
