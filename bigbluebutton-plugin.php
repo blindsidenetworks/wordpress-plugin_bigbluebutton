@@ -396,6 +396,9 @@ function bigbluebutton_form($args) {
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
     
     $token = isset($args['token']) ?$args['token']: null;
+    $meetingLabel = isset($args['meeting_label']) ?$args['meeting_label']: 'Meeting:';
+    $passwordLabel = isset($args['password_label']) ?$args['password_label']: 'Password:';
+    $nameLabel = isset($args['name_label']) ?$args['name_label']: 'Name:';
     $submit = isset($args['submit']) ?$args['submit']: null;
     
     //Initializes the variable that will collect the output
@@ -537,7 +540,7 @@ function bigbluebutton_form($args) {
 
             if(sizeof($listOfMeetings) > 1 && !$token ){
                 $out .= '
-                <label>Meeting:</label>
+                <label>'.$meetingLabel.'</label>
                 <select name="meetingID">';
 
                 foreach ($listOfMeetings as $meeting) {
@@ -560,16 +563,16 @@ function bigbluebutton_form($args) {
 
             if( !$current_user->ID ) {
                 $out .= '
-                <label>Name:</label>
+                <label>'.$nameLabel.'</label>
                 <input type="text" id="name" name="display_name" size="10">';
             } else {
                  $out .= '
-                <label>Name:</label>
+                <label>'.$nameLabel.'</label>
                 <input type="text" id="name" name="display_name" size="10" value="'.$current_user->display_name.'" readonly="readonly">';
             }
             if( bigbluebutton_validate_defaultRole($role, 'none') ) {
                 $out .= '
-                <label>Password:</label>
+                <label>'.$passwordLabel.'</label>
                 <input type="password" name="pwd" size="10">';
             }
             $out .= '
