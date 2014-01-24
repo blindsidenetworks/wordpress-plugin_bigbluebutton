@@ -470,8 +470,12 @@ function bigbluebutton_form($args) {
 
             //Extra parameters
             $recorded = $found->recorded;
-            $welcome = (isset($args['welcome']))? html_entity_decode($args['welcome']): BIGBLUEBUTTON_STRING_WELCOME;
-            if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
+            if (isset($args['welcome'])) {
+                $welcome = html_entity_decode($args['welcome']):
+            } else {
+                $welcome = BIGBLUEBUTTON_STRING_WELCOME;
+                if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
+            }
             $duration = 0;
             $voicebridge = 0;
             $logouturl = (is_ssl()? "https://": "http://") . $_SERVER['HTTP_HOST']  . $_SERVER['REQUEST_URI'];
