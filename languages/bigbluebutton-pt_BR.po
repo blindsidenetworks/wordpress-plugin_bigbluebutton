@@ -1,0 +1,103 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BigBlueButton\n"
+"POT-Creation-Date: 2014-01-24 22:31-0300\n"
+"PO-Revision-Date: 2014-01-24 22:35-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../bigbluebutton-plugin.php:31
+#, php-format
+msgid ""
+"<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>To understand how BigBlueButton "
+"works see our <a href=\"event:http://www.bigbluebutton.org/content/videos"
+"\"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the "
+"headset icon (upper-left hand corner). <b>Please use a headset to avoid "
+"causing noise for others.</b>"
+msgstr ""
+"<br>Bem-vindo(a) a <b>%%CONFNAME%%</b>!<br><br>Para entender como o "
+"BigBlueButton funciona, veja nossos <a href=\"event:http://www.bigbluebutton."
+"org/content/videos\"><u>vídeos tutoriais (em inglês)</u></a>.<br><br>Para "
+"entrar na conferência de áudio clique no ícone com um headset (fone de "
+"ouvido e microfone) no canto superior esquerdo. <b>Por favor utilize um "
+"headset para evitar causar ruído para os outros.</b>"
+
+#: ../bigbluebutton-plugin.php:32
+msgid "<br><br>This session is being recorded."
+msgstr "<br><br>Esta sessão está sendo gravada."
+
+#: ../bigbluebutton-plugin.php:119 ../bigbluebutton-plugin.php:131
+msgid "BigBlueButton"
+msgstr "BigBlueButton"
+
+#: ../bigbluebutton-plugin.php:406
+msgid "Meeting:"
+msgstr "Reunião:"
+
+#: ../bigbluebutton-plugin.php:407
+msgid "Password:"
+msgstr "Senha:"
+
+#: ../bigbluebutton-plugin.php:408
+msgid "Name:"
+msgstr "Nome:"
+
+#: ../bigbluebutton-plugin.php:505
+msgid "Sorry an error occured while joining the meeting."
+msgstr "Desculpe, um erro aconteceu ao tentar entrar na reunião."
+
+#: ../bigbluebutton-plugin.php:546
+#, php-format
+msgid "The meeting %s no longer exists"
+msgstr "A reunião %s não existe mais"
+
+#: ../bigbluebutton-plugin.php:551
+msgid "Incorrect password"
+msgstr "Senha incorreta"
+
+#: ../bigbluebutton-plugin.php:613
+msgid "Invalid meeting token"
+msgstr "Token de reunião inválido"
+
+#: ../bigbluebutton-plugin.php:627
+#, php-format
+msgid "Users with the role %s are not allowed to participate in meetings"
+msgstr ""
+"Usuários com o papel %s não possuem permissão para participar de reuniões"
+
+#: ../bigbluebutton-plugin.php:636
+#, php-format
+msgid ""
+"%s no longer exists.<br />No meeting rooms are currently available to join."
+msgstr ""
+"%s não existe mais.<br />Nenhuma reunião está atualmente disponível para "
+"ingresso."
+
+#: ../bigbluebutton-plugin.php:641
+msgid "No meeting rooms are currently available to join."
+msgstr "Nenhuma reunião está atualmente disponível para ingresso."
+
+#: ../bigbluebutton-plugin.php:682
+#, php-format
+msgid "Welcome %s!<br /><br />%s session has not been started yet.<br /><br />"
+msgstr "Bem-vindo(a) %s!<br /><br />A sessão %s não iniciou ainda.<br /><br />"
+
+#: ../bigbluebutton-plugin.php:684
+msgid ""
+"(Your browser will automatically refresh and join the meeting when it "
+"starts.)"
+msgstr ""
+"(Seu navegador será atualizado automaticamente e ingressará a reunião assim "
+"que ela começar.)"
+
+#: ../bigbluebutton-plugin.php:701
+msgid "You do not have sufficient permissions to access this page."
+msgstr "Você não possui permissões suficientes para acessar esta página."

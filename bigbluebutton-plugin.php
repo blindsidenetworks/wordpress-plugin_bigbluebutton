@@ -8,6 +8,7 @@ Author: Blindside Networks
 Author URI: http://blindsidenetworks.com/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: bigbluebutton
 */
 
 //================================================================================
@@ -27,8 +28,8 @@ define('BIGBLUEBUTTON_PLUGIN_VERSION', bigbluebutton_get_version());
 define('BIGBLUEBUTTON_PLUGIN_URL', plugin_dir_url( __FILE__ ));
 
 //constant message definition
-define('BIGBLUEBUTTON_STRING_WELCOME', '<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>To understand how BigBlueButton works see our <a href="event:http://www.bigbluebutton.org/content/videos"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the headset icon (upper-left hand corner). <b>Please use a headset to avoid causing noise for others.</b>');
-define('BIGBLUEBUTTON_STRING_MEETING_RECORDED', '<br><br>This session is being recorded.');
+define('BIGBLUEBUTTON_STRING_WELCOME', __( '<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>To understand how BigBlueButton works see our <a href="event:http://www.bigbluebutton.org/content/videos"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the headset icon (upper-left hand corner). <b>Please use a headset to avoid causing noise for others.</b>', 'bigbluebutton' ));
+define('BIGBLUEBUTTON_STRING_MEETING_RECORDED', __( '<br><br>This session is being recorded.', 'bigbluebutton' ));
 
 //================================================================================
 //------------------Required Libraries and Global Variables-----------------------
@@ -69,6 +70,7 @@ add_action('admin_menu', 'bigbluebutton_add_pages', 1);
 add_action('admin_init', 'bigbluebutton_admin_init', 1);
 add_action('plugins_loaded', 'bigbluebutton_update' );
 add_action('plugins_loaded', 'bigbluebutton_widget_init' );
+add_action('plugins_loaded', 'bigbluebutton_load_locale');
 set_error_handler("bigbluebutton_warning_handler", E_WARNING);
 
 
@@ -114,14 +116,19 @@ function bigbluebutton_admin_styles(){
 
 //Registers the bigbluebutton widget
 function bigbluebutton_widget_init(){
-    wp_register_sidebar_widget('bigbluebuttonsidebarwidget', __('BigBlueButton'), 'bigbluebutton_sidebar', array( 'description' => 'Displays a BigBlueButton login form in a sidebar.'));
+    wp_register_sidebar_widget('bigbluebuttonsidebarwidget', __('BigBlueButton', 'bigbluebutton'), 'bigbluebutton_sidebar', array( 'description' => 'Displays a BigBlueButton login form in a sidebar.'));
+}
+
+//Loads the language file
+function bigbluebutton_load_locale() {
+    load_plugin_textdomain('bigbluebutton', false, basename( dirname( __FILE__ ) ) . '/languages/' );
 }
 
 //Inserts the plugin pages in the admin panel
 function bigbluebutton_add_pages() {
 
     //Add a new submenu under Settings
-    $page = add_options_page(__('BigBlueButton','menu-test'), __('BigBlueButton','menu-test'), 'manage_options', 'bigbluebutton_general', 'bigbluebutton_general_options');
+    $page = add_options_page(__('BigBlueButton','bigbluebutton'), __('BigBlueButton','bigbluebutton'), 'manage_options', 'bigbluebutton_general', 'bigbluebutton_general_options');
 
     //Attaches the plugin's stylesheet to the plugin page just created
     add_action('admin_print_styles-' . $page, 'bigbluebutton_admin_styles');
@@ -396,9 +403,9 @@ function bigbluebutton_form($args) {
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
     
     $token = isset($args['token']) ?$args['token']: null;
-    $meetingLabel = isset($args['meeting_label']) ?$args['meeting_label']: 'Meeting:';
-    $passwordLabel = isset($args['password_label']) ?$args['password_label']: 'Password:';
-    $nameLabel = isset($args['name_label']) ?$args['name_label']: 'Name:';
+    $meetingLabel = isset($args['meeting_label']) ?$args['meeting_label']: __( 'Meeting:', 'bigbluebutton' );
+    $passwordLabel = isset($args['password_label']) ?$args['password_label']: __( 'Password:', 'bigbluebutton' );
+    $nameLabel = isset($args['name_label']) ?$args['name_label']: __( 'Name:', 'bigbluebutton' );
     $submit = isset($args['submit']) ?$args['submit']: null;
     $waitingText = isset($args['waiting_text']) ?$args['waiting_text']: null;
 
@@ -471,7 +478,7 @@ function bigbluebutton_form($args) {
             //Extra parameters
             $recorded = $found->recorded;
             if (isset($args['welcome'])) {
-                $welcome = html_entity_decode($args['welcome']):
+                $welcome = html_entity_decode($args['welcome']);
             } else {
                 $welcome = BIGBLUEBUTTON_STRING_WELCOME;
                 if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
@@ -495,7 +502,7 @@ function bigbluebutton_form($args) {
             //Analyzes the bigbluebutton server's response
             if(!$response || $response['returncode'] == 'FAILED' ){//If the server is unreachable, or an error occured
                 $out .= '<div class="bbb-error">';
-                $out .= "Sorry an error occured while joining the meeting.";
+                $out .= __( 'Sorry an error occured while joining the meeting.', 'bigbluebuton' );
                 $out .= '</div>';
                 return $out;
                  
@@ -536,12 +543,12 @@ function bigbluebutton_form($args) {
         
         if($dataSubmitted && !$meetingExist){
             $out .= '<div class="bbb-error">';
-            $out .= "***".$meetingID." no longer exists.***";
+            $out .= printf( __( 'The meeting %s no longer exists', 'bigbluebutton' ), $meetingID );
             $out .= '</div>';
         }
         else if($dataSubmitted){
             $out .= '<div class="bbb-error">';
-            $out .= "***Incorrect Password***";
+            $out .= __( 'Incorrect password', 'bigbluebutton' );
             $out .= '</div>';
         }
 
@@ -602,8 +609,9 @@ function bigbluebutton_form($args) {
                 }
                 
                 if($meeting->meetingID != $token ){
-                    $out .= '
-                <div class="bbb-error">Invalid meeting token</div>';
+                    $out .= '<div class="bbb-error">';
+                    $out .= __( 'Invalid meeting token', 'bigbluebutton' );
+                    $out .= '</div>';
                 }
                 
             } else {
@@ -616,7 +624,7 @@ function bigbluebutton_form($args) {
 
         } else {
             $out .= '<div class="bbb-error">';
-            $out .= $role." users are not allowed to participate in meetings";
+            $out .= printf( __( 'Users with the role %s are not allowed to participate in meetings', 'bigbluebutton' ), $role );
             $out .= '</div>';
 
         }
@@ -625,13 +633,12 @@ function bigbluebutton_form($args) {
         //Alerts the user if the password they entered does not match
         //the meeting's password
         $out .= '<div class="bbb-error">';
-        $out .= "***".$meetingID." no longer exists.***<br />";
-        $out .= "No meeting rooms are currently available to join.";
+        $out .= printf( __( '%s no longer exists.<br />No meeting rooms are currently available to join.', 'bigbluebutton' ), $meetingID );
         $out .= '</div>';
 
     } else{
         $out .= '<div class="bbb-error">';
-        $out .= "No meeting rooms are currently available to join.";
+        $out .= __( 'No meeting rooms are currently available to join.', 'bigbluebutton' );
         $out .= '</div>';
 
     }
@@ -672,10 +679,9 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
         $waitingText = str_replace("%MEETING%", $meetingName, $waitingText);
         $out .= $waitingText;
     } else {
-        $out .= 'Welcome '.$name.'!<br /><br />
-                '.$meetingName.' session has not been started yet.<br /><br />
-                <div align="center"><img src="/wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />
-                (Your browser will automatically refresh and join the meeting when it starts.)';
+        $out .= printf( __( 'Welcome %s!<br /><br />%s session has not been started yet.<br /><br />', 'bigbluebutton' ), $name, $meetingName );
+        $out .= '<div align="center"><img src="/wp-content/plugins/bigbluebutton/images/polling.gif" /></div><br />';
+        $out .= __( '(Your browser will automatically refresh and join the meeting when it starts.)', 'bigbluebutton' );
     }
     $out .= '</div>';
 
@@ -692,7 +698,7 @@ function bigbluebutton_general_options() {
     //Checks to see if the user has the sufficient persmissions and capabilities
     if (!current_user_can('manage_options'))
     {
-        wp_die( __('You do not have sufficient permissions to access this page.') );
+        wp_die( __('You do not have sufficient permissions to access this page.', 'bigbluebutton') );
     }
 
     echo bigbluebutton_general_settings();

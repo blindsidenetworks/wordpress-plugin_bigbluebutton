@@ -1,0 +1,101 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BigBlueButton\n"
+"POT-Creation-Date: 2014-01-24 22:30-0300\n"
+"PO-Revision-Date: 2014-01-24 22:31-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../bigbluebutton-plugin.php:31
+#, php-format
+msgid ""
+"<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>To understand how BigBlueButton "
+"works see our <a href=\"event:http://www.bigbluebutton.org/content/videos"
+"\"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the "
+"headset icon (upper-left hand corner). <b>Please use a headset to avoid "
+"causing noise for others.</b>"
+msgstr ""
+"<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>To understand how BigBlueButton "
+"works see our <a href=\"event:http://www.bigbluebutton.org/content/videos"
+"\"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the "
+"headset icon (upper-left hand corner). <b>Please use a headset to avoid "
+"causing noise for others.</b>"
+
+#: ../bigbluebutton-plugin.php:32
+msgid "<br><br>This session is being recorded."
+msgstr "<br><br>This session is being recorded."
+
+#: ../bigbluebutton-plugin.php:119 ../bigbluebutton-plugin.php:131
+msgid "BigBlueButton"
+msgstr "BigBlueButton"
+
+#: ../bigbluebutton-plugin.php:406
+msgid "Meeting:"
+msgstr "Meeting:"
+
+#: ../bigbluebutton-plugin.php:407
+msgid "Password:"
+msgstr "Password:"
+
+#: ../bigbluebutton-plugin.php:408
+msgid "Name:"
+msgstr "Name:"
+
+#: ../bigbluebutton-plugin.php:505
+msgid "Sorry an error occured while joining the meeting."
+msgstr "Sorry an error occured while joining the meeting."
+
+#: ../bigbluebutton-plugin.php:546
+#, php-format
+msgid "The meeting %s no longer exists"
+msgstr "The meeting %s no longer exists"
+
+#: ../bigbluebutton-plugin.php:551
+msgid "Incorrect password"
+msgstr "Incorrect password"
+
+#: ../bigbluebutton-plugin.php:613
+msgid "Invalid meeting token"
+msgstr "Invalid meeting token"
+
+#: ../bigbluebutton-plugin.php:627
+#, php-format
+msgid "Users with the role %s are not allowed to participate in meetings"
+msgstr "Users with the role %s are not allowed to participate in meetings"
+
+#: ../bigbluebutton-plugin.php:636
+#, php-format
+msgid ""
+"%s no longer exists.<br />No meeting rooms are currently available to join."
+msgstr ""
+"%s no longer exists.<br />No meeting rooms are currently available to join."
+
+#: ../bigbluebutton-plugin.php:641
+msgid "No meeting rooms are currently available to join."
+msgstr "No meeting rooms are currently available to join."
+
+#: ../bigbluebutton-plugin.php:682
+#, php-format
+msgid "Welcome %s!<br /><br />%s session has not been started yet.<br /><br />"
+msgstr ""
+"Welcome %s!<br /><br />%s session has not been started yet.<br /><br />"
+
+#: ../bigbluebutton-plugin.php:684
+msgid ""
+"(Your browser will automatically refresh and join the meeting when it "
+"starts.)"
+msgstr ""
+"(Your browser will automatically refresh and join the meeting when it "
+"starts.)"
+
+#: ../bigbluebutton-plugin.php:701
+msgid "You do not have sufficient permissions to access this page."
+msgstr "You do not have sufficient permissions to access this page."
