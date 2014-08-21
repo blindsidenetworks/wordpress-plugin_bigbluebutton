@@ -85,6 +85,14 @@ You should enable the curl extension in php.ini.
 = 1.3.7 =
 * Fixed issue. Password required option not working for registered users. Only for Anonymous.
 * Fixed issue. Form was rendered out of bounds when using the widget.
+* Fixed issue. Auto login would fail if the login form was inside a nested page (e.g. http://site.com/mypage/).
+* Fixed issue. Wrong path for polling.gif if the login form was inside a nested page (e.g. http://site.com/mypage/).
+* Fixed issue. If the user set the welcome msg, don't add anything to it, let the user decide exactly how the message should be.
+* Added feature. Enable localization. Added languages "en" and "pt_BR".
+* Added feature. Show the user's name in the join session form even if there's a user signed in.
+* Added feature. Add options to configure labels in the shortcode 'bigbluebutton_form', helps with localization.
+* Added feature. Add class "bbb-error" around all possible errors, so it can be customized in the application's css.
+* Added feature. Allow customized text for 'waiting for moderator', useful to localize the text and adapt its appearance.
 
 = 1.3.6 =
 * Added feature. Form presentation can be customized using css.
