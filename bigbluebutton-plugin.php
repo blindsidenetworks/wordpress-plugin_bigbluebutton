@@ -654,7 +654,7 @@ function bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $meetingI
     <script type="text/javascript">
         function bigbluebutton_ping() {
             jQuery.ajax({
-                url : "./wp-content/plugins/bigbluebutton/php/broker.php?action=ping&meetingID='.urlencode($meetingID).'",
+                url : "/wp-content/plugins/bigbluebutton/php/broker.php?action=ping&meetingID='.urlencode($meetingID).'",
                 async : true,
                 dataType : "xml",
                 success : function(xmlDoc){
