@@ -17,7 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 Versions:
-   1.0  --  Updated by Jesus Federico 
+   1.0  --  Updated by Jesus Federico
                     (email : federico DOT jesus [a t ] g m ail DOT com)
 
 */
@@ -40,7 +40,7 @@ $meetingID_name = 'meetingID';
 //Retrieves the bigbluebutton url, and salt from the seesion
 if ( !isset($_SESSION[$salt_name]) || !isset($_SESSION[$url_name]) ) {
     header("HTTP/1.0 400 Bad Request. BigBlueButton Url or Salt are not accessible.");
-    
+
 } else if ( !isset($_GET[$action_name]) ) {
     header("HTTP/1.0 400 Bad Request. [action] parameter was not included in this query.");
 
@@ -53,7 +53,7 @@ if ( !isset($_SESSION[$salt_name]) || !isset($_SESSION[$url_name]) ) {
             header('Content-Type: text/plain; charset=utf-8');
             if( !isset($_GET[$recordingID_name])) {
                 header("HTTP/1.0 400 Bad Request. [recordingID] parameter was not included in this query.");
-            } else {    
+            } else {
                 $recordingID = $_GET[$recordingID_name];
                 echo BigBlueButton::doPublishRecordings($recordingID, 'true', $url_val, $salt_val);
             }
@@ -62,7 +62,7 @@ if ( !isset($_SESSION[$salt_name]) || !isset($_SESSION[$url_name]) ) {
             header('Content-Type: text/plain; charset=utf-8');
             if( !isset($_GET[$recordingID_name])) {
                 header("HTTP/1.0 400 Bad Request. [recordingID] parameter was not included in this query.");
-            } else {    
+            } else {
                 $recordingID = $_GET[$recordingID_name];
                 echo BigBlueButton::doPublishRecordings($recordingID, 'false', $url_val, $salt_val);
             }
@@ -71,7 +71,7 @@ if ( !isset($_SESSION[$salt_name]) || !isset($_SESSION[$url_name]) ) {
             header('Content-Type: text/plain; charset=utf-8');
             if( !isset($_GET[$recordingID_name])) {
                 header("HTTP/1.0 400 Bad Request. [recordingID] parameter was not included in this query.");
-            } else {    
+            } else {
                 $recordingID = $_GET[$recordingID_name];
                 echo BigBlueButton::doDeleteRecordings($recordingID, $url_val, $salt_val);
             }
