@@ -150,20 +150,7 @@ function bigbluebutton_install () {
     if( !get_option('bigbluebutton_permissions') ) {
         $roles = $wp_roles->role_names;
         $roles['anonymous'] = 'Anonymous';
-        foreach($roles as $key => $value) {
-            $permissions[$key]['participate'] = true;
-            if($value == "Administrator") {
-                $permissions[$key]['manageRecordings'] = true;
-                $permissions[$key]['defaultRole'] = "moderator";
-            } else if($value == "Anonymous") {
-                $permissions[$key]['manageRecordings'] = false;
-                $permissions[$key]['defaultRole'] = "none";
-            } else {
-                $permissions[$key]['manageRecordings'] = false;
-                $permissions[$key]['defaultRole'] = "attendee";
-            }
-
-        }
+        bigbluebutton_permissionsAssignment($roles);
 
         update_option( 'bigbluebutton_permissions', $permissions );
 
@@ -227,19 +214,7 @@ function bigbluebutton_update() {
         $roles['anonymous'] = 'Anonymous';
 
         if( !get_option('bigbluebutton_permissions') ) {
-            foreach($roles as $key => $value) {
-                $permissions[$key]['participate'] = true;
-                if($value == "Administrator") {
-                    $permissions[$key]['manageRecordings'] = true;
-                    $permissions[$key]['defaultRole'] = "moderator";
-                } else if($value == "Anonymous") {
-                    $permissions[$key]['manageRecordings'] = false;
-                    $permissions[$key]['defaultRole'] = "none";
-                } else {
-                    $permissions[$key]['manageRecordings'] = false;
-                    $permissions[$key]['defaultRole'] = "attendee";
-                }
-            }
+           bigbluebutton_permissionsAssignment($roles);
 
         } else {
             $old_permissions = get_option('bigbluebutton_permissions');
@@ -352,15 +327,6 @@ function bigbluebutton_get_version() {
 
     return $plugin_folder[$plugin_file]['Version'];
 }
-
-
-//================================================================================
-//------------------------------Error Handler-------------------------------------
-//================================================================================
-function bigbluebutton_warning_handler($errno, $errstr) {
-    //Do Nothing
-}
-
 
 //================================================================================
 //---------------------------------ShortCode functions----------------------------
@@ -1448,3 +1414,20 @@ function bigbluebutton_normalizeMeetingID($meetingID) {
     return (strlen($meetingID) == 12)? sha1(home_url().$meetingID): $meetingID;
 }
 
+function bigbluebutton_permissionsAssignment($roles){
+  foreach($roles as $key => $value) {
+      $permissions = array();
+      $permissions[$key]['participate'] = true;
+      if($value == "Administrator") {
+          $permissions[$key]['manageRecordings'] = true;
+          $permissions[$key]['defaultRole'] = "moderator";
+      } else if($value == "Anonymous") {
+          $permissions[$key]['manageRecordings'] = false;
+          $permissions[$key]['defaultRole'] = "none";
+      } else {
+          $permissions[$key]['manageRecordings'] = false;
+          $permissions[$key]['defaultRole'] = "attendee";
+      }
+
+  }
+}
