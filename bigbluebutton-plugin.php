@@ -150,7 +150,8 @@ function bigbluebutton_install () {
     if( !get_option('bigbluebutton_permissions') ) {
         $roles = $wp_roles->role_names;
         $roles['anonymous'] = 'Anonymous';
-        bigbluebutton_permissionsAssignment($roles);
+        $permissions = array();
+        bigbluebutton_permissionsAssignment($roles, $permissions);
 
         update_option( 'bigbluebutton_permissions', $permissions );
 
@@ -214,12 +215,14 @@ function bigbluebutton_update() {
         $roles['anonymous'] = 'Anonymous';
 
         if( !get_option('bigbluebutton_permissions') ) {
-           bigbluebutton_permissionsAssignment($roles);
+          $permissions = array();
+          bigbluebutton_permissionsAssignment($roles, $permissions);
 
         } else {
             $old_permissions = get_option('bigbluebutton_permissions');
             foreach($roles as $key => $value) {
                 if( !isset($old_permissions[$key]['participate']) ) {
+                    $permissions = array();
                     $permissions[$key]['participate'] = true;
                     if($value == "Administrator") {
                         $permissions[$key]['manageRecordings'] = true;
@@ -760,6 +763,7 @@ function bigbluebutton_permission_settings() {
     if( isset($_POST['SubmitPermissions']) && $_POST['SubmitPermissions'] == 'Save Permissions' ) {
         foreach($roles as $key => $value) {
             if( !isset($_POST[$key.'-defaultRole']) ) {
+                $permissions = array();
                 if( $value == "Administrator" ) {
                     $permissions[$key]['defaultRole'] = 'moderator';
                 } else if ( $value == "Anonymous" ) {
@@ -1414,9 +1418,8 @@ function bigbluebutton_normalizeMeetingID($meetingID) {
     return (strlen($meetingID) == 12)? sha1(home_url().$meetingID): $meetingID;
 }
 
-function bigbluebutton_permissionsAssignment($roles){
+function bigbluebutton_permissionsAssignment($roles, $permissions){
   foreach($roles as $key => $value) {
-      $permissions = array();
       $permissions[$key]['participate'] = true;
       if($value == "Administrator") {
           $permissions[$key]['manageRecordings'] = true;
