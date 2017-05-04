@@ -1,20 +1,34 @@
 <?php
+
+global $wpdb, $wp_version, $current_site, $current_user, $wp_roles;
+$table_name = $wpdb->prefix . "bigbluebutton";
+$table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+
+$token = isset($args['token']) ?$args['token']: null;
+$tokens = isset($args['tokens']) ?$args['tokens']: null;
+$submit = isset($args['submit']) ?$args['submit']: null;
+
+//Initializes the variable that will collect the output
+$out = '';
+
+//Set the role for the current user if is logged in
+$role = null;
+
+//Read in existing option value from database
+$url_val = get_option('bigbluebutton_url');
+$salt_val = get_option('bigbluebutton_salt');
+//Read in existing permission values from database
+$permissions = get_option('bigbluebutton_permissions');
+
+//Gets all the meetings from wordpress database
+$listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName, meetingVersion, attendeePW, moderatorPW FROM ".$table_name." ORDER BY meetingName");
+
+$dataSubmitted = false;
+$meetingExist = false;
 //================================================================================
 //Create the form called by the Shortcode and Widget functions
 function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
-    global $wpdb, $wp_version, $current_site, $current_user, $wp_roles;
-    $table_name = $wpdb->prefix . "bigbluebutton";
-    $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
 
-    $token = isset($args['token']) ?$args['token']: null;
-    $tokens = isset($args['tokens']) ?$args['tokens']: null;
-    $submit = isset($args['submit']) ?$args['submit']: null;
-
-    //Initializes the variable that will collect the output
-    $out = '';
-
-    //Set the role for the current user if is logged in
-    $role = null;
     if( $current_user->ID ) {
         $role = "unregistered";
         foreach($wp_roles->role_names as $_role => $Role) {
@@ -27,17 +41,6 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
         $role = "anonymous";
     }
 
-    //Read in existing option value from database
-    $url_val = get_option('bigbluebutton_url');
-    $salt_val = get_option('bigbluebutton_salt');
-    //Read in existing permission values from database
-    $permissions = get_option('bigbluebutton_permissions');
-
-    //Gets all the meetings from wordpress database
-    $listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName, meetingVersion, attendeePW, moderatorPW FROM ".$table_name." ORDER BY meetingName");
-
-    $dataSubmitted = false;
-    $meetingExist = false;
     if( isset($_POST['SubmitForm']) ) { //The user has submitted his login information
         $dataSubmitted = true;
         $meetingExist = true;
