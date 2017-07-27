@@ -106,7 +106,7 @@ function bigbluebutton_init_scripts() {
 
 //Registers the plugin's stylesheet
 function bigbluebutton_init_styles() {
-    wp_register_style('bigbluebuttonStylesheet', WP_PLUGIN_URL.'/bigbluebutton/css/bigbluebutton_stylesheet.css');
+    wp_register_style('bigbluebuttonStylesheet', WP_PLUGIN_URL.'/wordpress-plugin_bigbluebutton/css/bigbluebutton_stylesheet.css');
 }
 
 //Registers the plugin's stylesheet
