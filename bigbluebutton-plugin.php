@@ -39,6 +39,27 @@ define("BIGBLUEBUTTON_FORM_IN_WIDGET", TRUE );
 //================================================================================
 require('php/bbb_api.php');
 
+
+
+function plugin_get_version() {
+  $plugin_data = get_plugin_data( __FILE__ );
+  $plugin_version = $plugin_data[‘Version’];
+  return $plugin_version;
+}
+if(plugin_get_version() < 2.0){
+  error_log("\n\n *********test**********". json_encode()."\n\n");
+  // $out = bigbluebutton_general_settings();
+  // if($out.include("BigBlueButton URL:")){
+  //   error_log("\n\n *********tessst2**********". json_encode()."\n\n");
+  //   str_replace("BigBlueButton URL:","Endpoint","BigBlueButton URL:");
+  //   return $out;
+  // }
+}
+
+function bigbluebutton_migrate(){
+
+}
+
 //================================================================================
 //------------------Code for development------------------------------------------
 //================================================================================
@@ -422,7 +443,13 @@ function bigbluebutton_general_options() {
         wp_die( __('You do not have sufficient permissions to access this page.') );
     }
 
-    echo bigbluebutton_general_settings() ;
+    $out2 = bigbluebutton_general_settings();
+    if($out2.include("BigBlueButton URL:")){
+      error_log("\n\n *********tessdsdst2**********". json_encode()."\n\n");
+      $test = strpos($out2, "BigBlueButton URL:");
+      echo substr_replace($out2,'Endpoint: ',$test,18);
+
+    }
     /* If the bigbluebutton server url and salt are empty then it does not
      display the create meetings, and list meetings sections.*/
     $url_val = get_option('bigbluebutton_url');
