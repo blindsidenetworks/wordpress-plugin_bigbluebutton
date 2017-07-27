@@ -39,6 +39,23 @@ define("BIGBLUEBUTTON_FORM_IN_WIDGET", TRUE );
 //================================================================================
 require('php/bbb_api.php');
 
+
+
+// function plugin_get_version() {
+//   $plugin_data = get_plugin_data( __FILE__ );
+//   $plugin_version = $plugin_data[‘Version’];
+//   return $plugin_version;
+// }
+// if(plugin_get_version() < 2.0){
+//   error_log("\n\n *********test**********". json_encode()."\n\n");
+//
+//
+// }
+//
+// function bigbluebutton_migrate(){
+
+//}
+
 //================================================================================
 //------------------Code for development------------------------------------------
 //================================================================================
@@ -423,6 +440,7 @@ function bigbluebutton_general_options() {
     }
 
     echo bigbluebutton_general_settings() ;
+
     /* If the bigbluebutton server url and salt are empty then it does not
      display the create meetings, and list meetings sections.*/
     $url_val = get_option('bigbluebutton_url');
