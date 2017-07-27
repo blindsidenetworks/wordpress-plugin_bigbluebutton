@@ -78,7 +78,7 @@ add_action('plugins_loaded', 'bigbluebutton_update' );
 add_action('plugins_loaded', 'bigbluebutton_widget_init' );
 set_error_handler("bigbluebutton_warning_handler", E_WARNING);
 
-
+//test
 //================================================================================
 //------------------------------ Main Functions ----------------------------------
 //================================================================================
