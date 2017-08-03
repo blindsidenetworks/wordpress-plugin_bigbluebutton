@@ -4,7 +4,7 @@ Plugin Name: BigBlueButton
 Plugin URI: http://blindsidenetworks.com/integrations/wordpress
 Description: BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meeting rooms to interact with their readers. It was developed and is maintained by <a href="http://blindsidenetworks.com/" target="_blank">Blindside Networks</a>. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit <a href= "http://bigbluebutton.org/support" target="_blank">BigBlueButton support</a>.
 
-Version: 1.4.2
+Version: 1.4.3
 Author: Blindside Networks
 Author URI: http://blindsidenetworks.com/
 License: GPLv2 or later
@@ -84,7 +84,7 @@ function bigbluebutton_init() {
     bigbluebutton_init_sessions();
     bigbluebutton_init_scripts();
     bigbluebutton_init_styles();
-    
+
     //Attaches the plugin's stylesheet to the plugin page just created
     add_action('wp_print_styles', 'bigbluebutton_admin_styles');
 }
@@ -143,7 +143,7 @@ function bigbluebutton_install () {
     if( !get_option('bigbluebutton_plugin_version') ) {
         bigbluebutton_init_database();
     }
-     
+
     ////////////////// Initialize Settings //////////////////
     if( !get_option('bigbluebutton_url') ) update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
     if( !get_option('bigbluebutton_salt') ) update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
@@ -220,7 +220,7 @@ function bigbluebutton_update() {
         delete_option('mt_waitForModerator'); //deletes this option because it is no longer needed, it has been incorportated into the table.
         delete_option('bbb_db_version'); //deletes this option because it is no longer needed, the versioning pattern has changed.
     }
-     
+
     //Set the new permission schema
     if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.3") < 0 ) {
         $roles = $wp_roles->role_names;
@@ -283,7 +283,7 @@ function bigbluebutton_uninstall () {
         delete_option('mt_bbb_url');
         delete_option('mt_salt');
     }
-     
+
     //Delete the options stored in the wordpress db
     delete_option('bigbluebutton_plugin_version');
     delete_option('bigbluebutton_url');
@@ -400,11 +400,11 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
     global $wpdb, $wp_version, $current_site, $current_user, $wp_roles;
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
-    
+
     $token = isset($args['token']) ?$args['token']: null;
     $tokens = isset($args['tokens']) ?$args['tokens']: null;
     $submit = isset($args['submit']) ?$args['submit']: null;
-    
+
     //Initializes the variable that will collect the output
     $out = '';
 
@@ -430,7 +430,7 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
 
     //Gets all the meetings from wordpress database
     $listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName, meetingVersion, attendeePW, moderatorPW FROM ".$table_name." ORDER BY meetingName");
-     
+
     $dataSubmitted = false;
     $meetingExist = false;
     if( isset($_POST['SubmitForm']) ) { //The user has submitted his login information
@@ -448,13 +448,13 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
 
             if( !$current_user->ID ) {
                 $name = isset($_POST['display_name']) && $_POST['display_name']? htmlspecialchars($_POST['display_name']): $role;
-                
+
                 if( bigbluebutton_validate_defaultRole($role, 'none') ) {
                     $password = $_POST['pwd'];
                 } else {
                     $password = $permissions[$role]['defaultRole'] == 'none'? $found->moderatorPW: $found->attendeePW;
                 }
-                    
+
             } else {
                 if( $current_user->display_name != '' ) {
                     $name = $current_user->display_name;
@@ -498,7 +498,7 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
             if(!$response || $response['returncode'] == 'FAILED' ) {//If the server is unreachable, or an error occured
                 $out .= "Sorry an error occured while joining the meeting.";
                 return $out;
-                 
+
             } else{ //The user can join the meeting, as it is valid
                 if( !isset($response['messageKey']) || $response['messageKey'] == '' ) {
                     // The meeting was just created, insert the create event to the log
@@ -533,7 +533,7 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
     if(sizeof($listOfMeetings) > 0) {
         //Alerts the user if the password they entered does not match
         //the meeting's password
-        
+
         if($dataSubmitted && !$meetingExist) {
             $out .= "***".$meetingID." no longer exists.***";
         }
@@ -571,7 +571,7 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
             } else if ($token) {
                 $out .= '
                 <input type="hidden" name="meetingID" id="meetingID" value="'.$token.'" />';
-                
+
             } else {
                 $meeting = reset($listOfMeetings);
                 $out .= '
@@ -593,7 +593,7 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
             </table>';
             if(sizeof($listOfMeetings) > 1 && !$token ) {
                 $out .= '
-                
+
                 <input type="submit" name="SubmitForm" value="'.($submit? $submit: 'Join').'">';
             } else if ($token) {
                 foreach ($listOfMeetings as $meeting) {
@@ -603,12 +603,12 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
                         break;
                     }
                 }
-                
+
                 if($meeting->meetingID != $token ) {
                     $out .= '
                 <div>Invalid meeting token</div>';
                 }
-                
+
             } else {
                 $out .= '
                 <input type="submit" name="SubmitForm" value="'.($submit? $submit: 'Join '.$meeting->meetingName).'">';
@@ -632,7 +632,7 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
         $out .= "No meeting rooms are currently available to join.";
 
     }
-    
+
     return $out;
 }
 
@@ -732,7 +732,7 @@ function bigbluebutton_general_settings() {
 
     //Obtains the meeting information of the meeting that is going to be terminated
     if( isset($_POST['SubmitSettings']) && $_POST['SubmitSettings'] == 'Save Settings') {
-         
+
         //Reads their posted value
         $url_val = $_POST[ 'bigbluebutton_url' ];
         $salt_val = $_POST[ 'bigbluebutton_salt' ];
@@ -746,7 +746,7 @@ function bigbluebutton_general_settings() {
                 $url_val .= "/bigbluebutton/";
             }
         }
-         
+
         // Save the posted value in the database
         update_option('bigbluebutton_url', $url_val );
         update_option('bigbluebutton_salt', $salt_val );
@@ -804,7 +804,7 @@ function bigbluebutton_permission_settings() {
             } else {
                 $permissions[$key]['defaultRole'] = $_POST[$key.'-defaultRole'];
             }
-            	
+
             if( !isset($_POST[$key.'-participate']) ) {
                 $permissions[$key]['participate'] = false;
             } else {
@@ -817,7 +817,7 @@ function bigbluebutton_permission_settings() {
                 $permissions[$key]['manageRecordings'] = true;
             }
 
-            	
+
         }
         update_option( 'bigbluebutton_permissions', $permissions );
 
@@ -883,7 +883,7 @@ function bigbluebutton_create_meetings() {
 
     //Obtains the meeting information of the meeting that is going to be created
     if( isset($_POST['SubmitCreate']) && $_POST['SubmitCreate'] == 'Create' ) {
-         
+
         /// Reads the posted values
         $meetingName = htmlspecialchars(stripcslashes($_POST[ 'meetingName' ]));
         $attendeePW = $_POST[ 'attendeePW' ]? $_POST[ 'attendeePW' ]: bigbluebutton_generatePasswd(6, 2);
@@ -903,14 +903,14 @@ function bigbluebutton_create_meetings() {
             <strong>All fields must be filled.</strong>
             </p>
             </div>';
-             
+
         } else {
             $alreadyExists = false;
-             
+
             //Checks the meeting to be created to see if it already exists in wordpress database
             $table_name = $wpdb->prefix . "bigbluebutton";
             $listOfMeetings = $wpdb->get_results("SELECT meetingID, meetingName FROM ".$table_name);
-             
+
             foreach ($listOfMeetings as $meeting) {
                 if($meeting->meetingName == $meetingName) {
                     $alreadyExists = true;
@@ -923,7 +923,7 @@ function bigbluebutton_create_meetings() {
                     break;
                 }
             }
-             
+
             //If the meeting doesn't exist in the wordpress database then create it
             if(!$alreadyExists) {
                 $rows_affected = $wpdb->insert( $table_name, array( 'meetingID' => $meetingID, 'meetingName' => $meetingName, 'meetingVersion' => $meetingVersion, 'attendeePW' => $attendeePW, 'moderatorPW' => $moderatorPW, 'waitForModerator' => $waitForModerator? 1: 0, 'recorded' => $recorded? 1: 0) );
@@ -935,7 +935,7 @@ function bigbluebutton_create_meetings() {
                 </div>';
 
             }
-             
+
         }
 
     }
@@ -991,7 +991,7 @@ function bigbluebutton_list_meetings() {
             	$duration = 0;
             	$voicebridge = 0;
             	$logouturl = (is_ssl()? "https://": "http://") . $_SERVER['HTTP_HOST']  . $_SERVER['REQUEST_URI'];
-            
+
             	//Metadata for tagging recordings
             	$metadata = array(
             			'meta_origin' => 'WordPress',
@@ -1001,12 +1001,12 @@ function bigbluebutton_list_meetings() {
             			'meta_originservercommonname' => get_bloginfo('name'),
             			'meta_originurl' => $logouturl
             	);
-            
+
             	//Calls create meeting on the bigbluebutton server
             	$welcome = BIGBLUEBUTTON_STRING_WELCOME;
             	if( $recorded ) $welcome .= BIGBLUEBUTTON_STRING_MEETING_RECORDED;
             	$response = BigBlueButton::createMeetingArray($current_user->display_name, $found->meetingID, $found->meetingName, $welcome, $found->moderatorPW, $found->attendeePW, $salt_val, $url_val, $logouturl, ($found->recorded? 'true':'false'), $duration, $voicebridge, $metadata );
-            
+
             	$createNew = false;
             	//Analyzes the bigbluebutton server's response
             	if(!$response) {//If the server is unreachable, then prompts the user of the necessary action
@@ -1028,29 +1028,29 @@ function bigbluebutton_list_meetings() {
             			// The meeting was just created, insert the create event to the log
             			$rows_affected = $wpdb->insert( $table_logs_name, array( 'meetingID' => $found->meetingID, 'recorded' => $found->recorded, 'timestamp' => time(), 'event' => 'Create' ) );
             		}
-            
+
             		$bigbluebutton_joinURL = BigBlueButton::getJoinURL($found->meetingID, $current_user->display_name, $found->moderatorPW, $salt_val, $url_val );
             		$out .= '<script type="text/javascript">window.location = "'.$bigbluebutton_joinURL.'"; </script>'."\n";
             	}
-            	 
+
             }
             //---------------------------------------------------END-------------------------------------------------
             else if($_POST['SubmitList'] == 'End' ) { //Obtains the meeting information of the meeting that is going to be terminated
-            	 
+
             	//Calls endMeeting on the bigbluebutton server
             	$response = BigBlueButton::endMeeting($found->meetingID, $found->moderatorPW, $url_val, $salt_val );
-            
+
             	//Analyzes the bigbluebutton server's response
             	if(!$response) {//If the server is unreachable, then prompts the user of the necessary action
             		$out .= '<div class="updated"><p><strong>Unable to terminate the meeting. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running.</strong></p></div>';
             	}
             	else if( $response['returncode'] == 'SUCCESS' ) { //The meeting was terminated
             	    $out .= '<div class="updated"><p><strong>'.$found->meetingName.' meeting has been terminated.</strong></p></div>';
-            
+
             		//In case the meeting is created again it sets the meeting version to the time stamp. Therefore the meeting can be recreated before the 1 hour rule without any problems.
             		$meetingVersion = time();
             		$wpdb->update( $table_name, array( 'meetingVersion' => $meetingVersion), array( 'meetingID' => $found->meetingID ));
-            		 
+
             	}
             	else{ //If the meeting was unable to be termindated
             		if($response['messageKey'] == 'checksumError') {
@@ -1060,16 +1060,16 @@ function bigbluebutton_list_meetings() {
             			$out .= '<div class="updated"><p><strong>'.$response['message'].'</strong></p></div>';
             		}
             	}
-            	 
-            	 
-            	 
+
+
+
             }
             //---------------------------------------------------DELETE-------------------------------------------------
             else if($_POST['SubmitList'] == 'Delete' ) { //Obtains the meeting information of the meeting that is going to be delete
-            
+
             	//Calls endMeeting on the bigbluebutton server
             	$response = BigBlueButton::endMeeting($found->meetingID, $found->moderatorPW, $url_val, $salt_val );
-            
+
             	//Analyzes the bigbluebutton server's response
             	if(!$response) {//If the server is unreachable, then prompts the user of the necessary action
             		$out .= '<div class="updated"><p><strong>Unable to delete the meeting. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running.</strong></p></div>';
@@ -1087,10 +1087,10 @@ function bigbluebutton_list_meetings() {
             	    $wpdb->query(
             	            $wpdb->prepare($sql, $meetingID)
             	    );
-            	     
+
             	    $out .= '<div class="updated"><p><strong>'.$found->meetingName.' meeting has been deleted.</strong></p></div>';
             	}
-            	 
+
             }
         }
     }
@@ -1255,7 +1255,7 @@ function bigbluebutton_list_recordings($title=null) {
             function actionCall(action, recordingid) {
 
                 action = (typeof action == \'undefined\') ? \'publish\' : action;
-         
+
                 if (action == \'publish\' || (action == \'delete\' && confirm("Are you sure to delete this recording?"))) {
                     if (action == \'publish\') {
                         var el_a = document.getElementById(\'actionbar-publish-a-\'+ recordingid);
@@ -1414,7 +1414,7 @@ function bigbluebutton_validate_defaultRole($wp_role, $bbb_role) {
 
 function bigbluebutton_generateToken($tokenLength=6) {
     $token = '';
-    
+
     if(function_exists('openssl_random_pseudo_bytes')) {
         $token .= bin2hex(openssl_random_pseudo_bytes($tokenLength));
     } else {
@@ -1422,25 +1422,25 @@ function bigbluebutton_generateToken($tokenLength=6) {
         $characters = '0123456789abcdef';
         $charactersLength = strlen($characters)-1;
         $tokenLength *= 2;
-        
+
         //select some random characters
         for ($i = 0; $i < $tokenLength; $i++) {
             $token .= $characters[mt_rand(0, $charactersLength)];
         }
     }
-     
+
     return $token;
 }
 
 function bigbluebutton_generatePasswd($numAlpha=6, $numNonAlpha=2, $salt='') {
     $listAlpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     $listNonAlpha = ',;:!?.$/*-+&@_+;./*&?$-!,';
-    
+
     $pepper = '';
     do{
         $pepper = str_shuffle( substr(str_shuffle($listAlpha),0,$numAlpha) . substr(str_shuffle($listNonAlpha),0,$numNonAlpha) );
     } while($pepper == $salt);
-    
+
     return $pepper;
 }
 

@@ -1,7 +1,7 @@
 wordpress-plugin_bigbluebutton
 ==============================
 
-This plugin integrates BigBlueButton functionality into Wordpress. 
+This plugin integrates BigBlueButton functionality into Wordpress.
 
 == Description ==
 
@@ -30,15 +30,15 @@ The easiest way to install is to watch this [installation video](http://www.yout
 
 **How users join meetings?**
 
-Users join meetings using a joining form. This form can be shown in a site as a sidebar element or as a page/post. 
+Users join meetings using a joining form. This form can be shown in a site as a sidebar element or as a page/post.
 
-For setting up in the sidebar, add the bigbluebutton widget, as you do with any other, dragging the box to the position you want to. 
+For setting up in the sidebar, add the bigbluebutton widget, as you do with any other, dragging the box to the position you want to.
 
-For setting the joining form up as a page/post, add the shortcode [bigbluebutton] right where you want the form to appear in the page/post. If there are pre-created meetings in wordpress, their names should appear in a listbox from which users can select. If there is only one pre-created meeting the listbox will not be shown and one button with the name of the meeting will appear instead. 
+For setting the joining form up as a page/post, add the shortcode [bigbluebutton] right where you want the form to appear in the page/post. If there are pre-created meetings in wordpress, their names should appear in a listbox from which users can select. If there is only one pre-created meeting the listbox will not be shown and one button with the name of the meeting will appear instead.
 
 **Why sometimes the Name and Password are required, some others only the Name and others only the Password?**
 
-The plugin gatters the much information it cans from Wordpress, but what will be taken depends of the configuration. 
+The plugin gatters the much information it cans from Wordpress, but what will be taken depends of the configuration.
 
 For registered users their registered name or username will be taken as Name. The BigBlueButton role (moderator/attendee) can be assigned automatically depending of the permission settings. This way a registered user in a role which permissions has been previously set would not be required nether for Name nor Password.
 
@@ -48,13 +48,13 @@ For anonymous users the Name will be always required, but again the Password req
 
 **Is there any way users can go directly into a meeting?**
 
-Since version 1.3.4 it is possible to provide direct access to the meeting rooms by adding the meeting token ID to the shortcode: (eg. [bigbluebutton token=aa2817f3a1e1]). 
+Since version 1.3.4 it is possible to provide direct access to the meeting rooms by adding the meeting token ID to the shortcode: (eg. [bigbluebutton token=aa2817f3a1e1]).
 
-The joining form is the same, so with the right permission configuration users would be able to join meetings in one click. 
+The joining form is the same, so with the right permission configuration users would be able to join meetings in one click.
 
 **How can I show the recordings?**
 
-The only way to show recordings to users is using the shortcode [bigbluebutton_recordings] in a page/post. 
+The only way to show recordings to users is using the shortcode [bigbluebutton_recordings] in a page/post.
 
 **Why is it giving an error about creating a meeting room?**
 
@@ -62,18 +62,50 @@ Make sure you are using BigBlueButton 0.8 or higher.
 
 **What is this error: "Unable to display the meetings. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running."?**
 
-You must make sure that your url ends with "/bigbluebutton/" at the end. 
+You must make sure that your url ends with "/bigbluebutton/" at the end.
 
 So as an example:
 
 * Wrong - "http://example.com/"
-* Correct - "http://example.com/bigbluebutton/" 
+* Correct - "http://example.com/bigbluebutton/"
 
 **How can I improve security?**
 
-You should enable the curl extension in php.ini. 
+You should enable the curl extension in php.ini.
 
 == Changelog ==
+
+= 1.4.3 =
+* Updated. Tested on WP 4.8.1 and updated version tag.
+
+= 1.4.2 =
+* Updated. Updated version tag.
+* Fixed issue. Fixed issue with permissions to roles rised after the change to custom roles in the previous release.
+
+= 1.4.1 =
+* Updated. Tested on WP 4.3 and updated tag.
+* Fixed issue. Fixed issue with custom roles not being considered for matching with BigBlueButton roles.
+* Added feature. An static voicebridge can be passed as a parameter using the shortcodes e.g. voicebridge="99999".
+* Added feature. An specific set of meetings can be included in the form by adding the list of tokens to the shortcode. e.g. tokens="12345,54321".
+
+= 1.4.0 =
+* Updated. Tested on WP 4.1 and updated tag.
+* Fixed issue. Fixed two potential security vulnerabilities.
+* Fixed issue. Increased the interval for polling BBB meetings when waiting for moderator is used.
+* Fixed issue. Relative links for polling request and spinning wheel image where not working in some deployments.
+
+= 1.3.10 =
+* Updated. Tested on WP 4.0 and updated tag.
+
+= 1.3.9 =
+* Fixed issue. The password form in the widget was not rendered correctly.
+
+= 1.3.8 =
+* Fixed issue. The login form was rendered out of the limits when the widget was used in a narrow side column.
+
+= 1.3.7 =
+* Fixed issue. Password required option not working for registered users. Only for Anonymous.
+* Fixed issue. Form was rendered out of bounds when using the widget.
 
 = 1.3.6 =
 * Added feature. Form presentation can be customized using css.
@@ -111,7 +143,7 @@ You should enable the curl extension in php.ini.
 * Fixed an issue that prevented meetings to be created in recording mode.
 * Added a warning to the welcome message on the bigbluebutton chat box when the meeting is recorded.
 * A generic welcome message can be set as parameter using the shortcode [bigbluebutton welcome='<br>Custom message<br>%%CONFNAME%%'].
-  
+
 = 1.3.1 =
 * Changed version control. 1:major version (remains),2:minor version (former release version),3:release version.
 * Added shortcode [bigbluebutton] to render an access form into a page or post.

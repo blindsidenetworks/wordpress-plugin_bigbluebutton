@@ -3,17 +3,17 @@ Contributors: blindsidenetworks, jfederico
 Donate link: http://www.blindsidenetworks.com/integrations/wordpress/
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 3.0.1
-Tested up to: 4.3
-Stable tag: 1.4.2
+Tested up to: 4.8.1
+Stable tag: 1.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 
-This plugin integrates BigBlueButton functionality into Wordpress. 
+This plugin integrates BigBlueButton functionality into Wordpress.
 
 == Description ==
 
-[BigBlueButton](http://bigbluebutton.org/ "BigBlueButton") is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meetings rooms to interact with their readers. It was developed and is maintained by <a href="http://blindsidenetworks.com/" target="_blank">Blindside Networks</a>. 
+[BigBlueButton](http://bigbluebutton.org/ "BigBlueButton") is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meetings rooms to interact with their readers. It was developed and is maintained by <a href="http://blindsidenetworks.com/" target="_blank">Blindside Networks</a>.
 
 For more information on setting up your own BigBlueButton server or for using an external hosting provider visit [http://bigbluebutton.org/support](http://bigbluebutton.org/support "http://bigbluebutton.org/support").
 
@@ -38,31 +38,31 @@ The easiest way to install is to watch this [installation video](http://www.yout
 
 **How users join meetings?**
 
-Users join meetings using a joining form. This form can be shown in a site as a sidebar element or as a page/post. 
+Users join meetings using a joining form. This form can be shown in a site as a sidebar element or as a page/post.
 
-For setting up in the sidebar, add the bigbluebutton widget, as you do with any other, dragging the box to the position you want to. 
+For setting up in the sidebar, add the bigbluebutton widget, as you do with any other, dragging the box to the position you want to.
 
-For setting the joining form up as a page/post, add the shortcode [bigbluebutton] right where you want the form to appear in the page/post. If there are pre-created meetings in wordpress, their names should appear in a listbox from which users can select. If there is only one pre-created meeting the listbox will not be shown and one button with the name of the meeting will appear instead. 
+For setting the joining form up as a page/post, add the shortcode [bigbluebutton] right where you want the form to appear in the page/post. If there are pre-created meetings in wordpress, their names should appear in a listbox from which users can select. If there is only one pre-created meeting the listbox will not be shown and one button with the name of the meeting will appear instead.
 
 **Why sometimes the Name and Password are required, some others only the Name and others only the Password?**
 
-The plugin gatters the much information it cans from Wordpress, but what will be taken depends of the configuration. 
+The plugin gatters the much information it cans from Wordpress, but what will be taken depends of the configuration.
 
 For registered users their registered name or username will be taken as Name. The BigBlueButton role (moderator/attendee) can be assigned automatically depending of the permission settings. This way a registered user in a role which permissions has been previously set would not be required nether for Name nor Password.
 
 For registered users whose role has ben set for requiring always a password, only the Password will be required.
 
-For anonymous users the Name will be always required, but again the Password requirment will depend of the configuration. If Moderator/Attendee role has ben set for them no Password box will be shown in their joining form.   
+For anonymous users the Name will be always required, but again the Password requirment will depend of the configuration. If Moderator/Attendee role has ben set for them no Password box will be shown in their joining form.
 
 **Is there any way users can go directly into a meeting?**
 
-Since version 1.3.4 it is possible to provide direct access to the meeting rooms by adding the meeting token ID to the shortcode: (eg. [bigbluebutton token=aa2817f3a1e1]). 
+Since version 1.3.4 it is possible to provide direct access to the meeting rooms by adding the meeting token ID to the shortcode: (eg. [bigbluebutton token=aa2817f3a1e1]).
 
-The joining form is the same, so with the right permission configuration users would be able to join meetings in one click. 
+The joining form is the same, so with the right permission configuration users would be able to join meetings in one click.
 
 **How can I show the recordings?**
 
-The only way to show recordings to users is using the shortcode [bigbluebutton_recordings] in a page/post. 
+The only way to show recordings to users is using the shortcode [bigbluebutton_recordings] in a page/post.
 
 **Why is it giving an error about creating a meeting room?**
 
@@ -70,16 +70,16 @@ Make sure you are using BigBlueButton 0.8 or higher.
 
 **What is this error: "Unable to display the meetings. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running."?**
 
-You must make sure that your url ends with "/bigbluebutton/" at the end. 
+You must make sure that your url ends with "/bigbluebutton/" at the end.
 
 So as an example:
 
 * Wrong - "http://example.com/"
-* Correct - "http://example.com/bigbluebutton/" 
+* Correct - "http://example.com/bigbluebutton/"
 
 **How can I improve security?**
 
-You should enable the curl extension in php.ini. 
+You should enable the curl extension in php.ini.
 
 == Screenshots ==
 
@@ -91,6 +91,9 @@ You should enable the curl extension in php.ini.
 6. Recordings in a front end page.
 
 == Changelog ==
+= 1.4.3 =
+* Updated. Tested on WP 4.8.1 and updated version tag.
+
 = 1.4.2 =
 * Updated. Updated tag.
 * Fixed issue. Fixed issue with permissions to roles rised after the change to custom roles in the previous release.
@@ -149,7 +152,7 @@ You should enable the curl extension in php.ini.
 * Changed permissions. Administrator can now set -manageRecordings and -participate permissions to any of the wp-roles available.
 * Changed interface on joining form. If there is only one meeting the selection box is not shown.
 * Changed logouturl. The logout url is now the page from where the create/join call was made instead of the main page.
-* Added feature. Plugin can be used on multisite deployments.  
+* Added feature. Plugin can be used on multisite deployments.
 
 = 1.3.2 =
 * Fixed an issue on update control that prevented 1.0.1 deployments to be properly updated.
@@ -157,7 +160,7 @@ You should enable the curl extension in php.ini.
 * Fixed an issue that prevented meetings to be created in recording mode.
 * Added a warning to the welcome message on the bigbluebutton chat box when the meeting is recorded.
 * A generic welcome message can be set as parameter using the shortcode [bigbluebutton welcome='<br>Custom message<br>%%CONFNAME%%'].
-  
+
 = 1.3.1 =
 * Changed version control. 1:major version (remains),2:minor version (former release version),3:release version.
 * Added shortcode [bigbluebutton] to render an access form into a page or post.
