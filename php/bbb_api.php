@@ -30,7 +30,8 @@ Versions:
 */
 
 function bbb_wrap_simplexml_load_file($url){
-	
+	$response = false;
+
 	if (extension_loaded('curl')) {
 		$ch = curl_init() or die ( curl_error() );
 		$timeout = 10;
@@ -42,12 +43,12 @@ function bbb_wrap_simplexml_load_file($url){
 		curl_close( $ch );
 		
 		if($data)
-			return (new SimpleXMLElement($data));
-		else
-			return false;
+			$response = new SimpleXMLElement($data);
+	} else {
+	    $response = simplexml_load_file($url);
 	}
-	
-	return (simplexml_load_file($url));	
+
+	return $response;
 }
 
 class BigBlueButton {
