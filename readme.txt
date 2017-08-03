@@ -3,8 +3,8 @@ Contributors: blindsidenetworks, jfederico
 Donate link: http://www.blindsidenetworks.com/integrations/wordpress/
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 3.0.1
-Tested up to: 4.1
-Stable tag: 1.4.0
+Tested up to: 4.3
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,12 @@ You should enable the curl extension in php.ini.
 6. Recordings in a front end page.
 
 == Changelog ==
+= 1.4.1 =
+* Updated. Tested on WP 4.3 and updated tag.
+* Fixed issue. Fixed with custom roles not being considered for matching with BigBlueButton roles.
+* Added feature. An static voicebridge can be passed as a parameter using the shortcodes e.g. voicebridge="99999".
+* Added feature. An specific set of meetings can be included in the form by adding the list of tokens to the shortcode. e.g. tokens="12345,54321".
+
 = 1.4.0 =
 * Updated. Tested on WP 4.1 and updated tag.
 * Fixed issue. Fixed two potential security vulnerabilities.
