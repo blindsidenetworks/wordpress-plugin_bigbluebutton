@@ -3,8 +3,8 @@ Contributors: blindsidenetworks, jfederico
 Donate link: http://www.blindsidenetworks.com/integrations/wordpress/
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 3.0.1
-Tested up to: 3.5.1
-Stable tag: 1.3.6
+Tested up to: 3.7.1
+Stable tag: 1.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -82,6 +82,9 @@ So as an example:
 You should enable the curl extension in php.ini. 
 
 == Changelog ==
+= 1.3.7 =
+* Fixed issue. Password required option not working for registered users. Only for Anonymous.
+* Fixed issue. Form was rendered out of bounds when using the widget.
 
 = 1.3.6 =
 * Added feature. Form presentation can be customized using css.
@@ -103,7 +106,7 @@ You should enable the curl extension in php.ini.
 * Added feature. Title on recording list can be set up using a shortcode parameter [bigbluebutton_recordings title='Example'].
 * Added feature. Included classes and ids to the html tags for enable designers to add style.
 * Added feature. Password are random generated when not included in create form.
-* Added feature. Extended shortcode can receive token id and submit message [bigbluebutton token="a7ccc7f752f65" submit"Meet me there!"]. [token] can be taken from the list of meeting romms created, when set the join button will link to the specific meeting. [submmit] will override the text in the join button.
+* Added feature. Extended shortcode can receive token id and submit message [bigbluebutton token="a7ccc7f752f65" submit"Meet me there!"]. [token] can be taken from the list of meeting rooms created, when set the join button will link to the specific meeting. [submmit] will override the text in the join button.
 
 = 1.3.3 =
 * Fixed issue. On admin UI users were prevented to join meetings using the meeting list.
