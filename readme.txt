@@ -3,8 +3,8 @@ Contributors: blindsidenetworks, jfederico
 Donate link: http://www.blindsidenetworks.com/integrations/wordpress/
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 3.0.1
-Tested up to: 3.9.1
-Stable tag: 1.3.9
+Tested up to: 4.0
+Stable tag: 1.3.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,9 @@ You should enable the curl extension in php.ini.
 6. Recordings in a front end page.
 
 == Changelog ==
+= 1.3.10 =
+* Updated. Tested on WP 4.0 and updated tag.
+
 = 1.3.9 =
 * Fixed issue. The password form in the widget was not rendered correctly.
 
