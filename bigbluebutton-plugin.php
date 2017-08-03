@@ -1,9 +1,10 @@
 <?php
 /*
 Plugin Name: BigBlueButton
-Plugin URI: http://blindsidenetworks.com/integration
-Description: BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meetings rooms to interact with their readers. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit http://bigbluebutton.org/support
-Version: 1.3.7
+Plugin URI: http://blindsidenetworks.com/integrations/wordpress
+Description: BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meeting rooms to interact with their readers. It was developed and is maintained by <a href="http://blindsidenetworks.com/" target="_blank">Blindside Networks</a>. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit <a href= "http://bigbluebutton.org/support" target="_blank">BigBlueButton support</a>.
+
+Version: 1.3.8
 Author: Blindside Networks
 Author URI: http://blindsidenetworks.com/
 License: GPLv2 or later
@@ -29,6 +30,9 @@ define('BIGBLUEBUTTON_PLUGIN_URL', plugin_dir_url( __FILE__ ));
 //constant message definition
 define('BIGBLUEBUTTON_STRING_WELCOME', '<br>Welcome to <b>%%CONFNAME%%</b>!<br><br>To understand how BigBlueButton works see our <a href="event:http://www.bigbluebutton.org/content/videos"><u>tutorial videos</u></a>.<br><br>To join the audio bridge click the headset icon (upper-left hand corner). <b>Please use a headset to avoid causing noise for others.</b>');
 define('BIGBLUEBUTTON_STRING_MEETING_RECORDED', '<br><br>This session is being recorded.');
+
+//constant internal definition
+define("BIGBLUEBUTTON_FORM_IN_WIDGET", TRUE );
 
 //================================================================================
 //------------------Required Libraries and Global Variables-----------------------
@@ -384,13 +388,13 @@ function bigbluebutton_sidebar($args) {
 
     echo $before_widget;
     echo $before_title.'BigBlueButton'.$after_title;
-    echo bigbluebutton_form($args);
+    echo bigbluebutton_form($args, BIGBLUEBUTTON_FORM_IN_WIDGET);
     echo $after_widget;
 }
 
 //================================================================================
 //Create the form called by the Shortcode and Widget functions
-function bigbluebutton_form($args) {
+function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
     global $wpdb, $wp_version, $current_site, $current_user, $wp_roles;
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
@@ -533,7 +537,7 @@ function bigbluebutton_form($args) {
 
         if ( bigbluebutton_can_participate($role) ){
             $out .= '
-            <form id="bbb-join-form" class="bbb-join" name="form1" method="post" action="">';
+            <form id="bbb-join-form'.($bigbluebutton_form_in_widget?'-widget': '').'" class="bbb-join" name="form1" method="post" action="">';
 
             if(sizeof($listOfMeetings) > 1 && !$token ){
                 $out .= '
@@ -742,9 +746,9 @@ function bigbluebutton_general_settings() {
 
     $out .= '
     <form name="form1" method="post" action="">
-    <p>URL of BigBlueButton server:<input type="text" name="bigbluebutton_url" value="'.$url_val.'" size="60"> eg. \'http://test-install.blindsidenetworks.com/bigbluebutton/\'
+    <p>URL of BigBlueButton server:<input type="text" name="bigbluebutton_url" value="'.$url_val.'" size="60"><br> eg. \'http://test-install.blindsidenetworks.com/bigbluebutton/\'
     </p>
-    <p>Salt of BigBlueButton server:<input type="text" name="bigbluebutton_salt" value="'.$salt_val.'" size="40"> It can be found in /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties. eg. \'8cd8ef52e8e101574e400365b55e11a6\'.
+    <p>Salt of BigBlueButton server:<input type="text" name="bigbluebutton_salt" value="'.$salt_val.'" size="40"><br> It can be found in /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties.<br>eg. \'8cd8ef52e8e101574e400365b55e11a6\'.
     </p>
 
     <p class="submit">
