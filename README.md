@@ -75,6 +75,10 @@ You should enable the curl extension in php.ini.
 
 == Changelog ==
 
+== 2.0.0 ==
+* Added Custom Post Type and taxonomies to create and join rooms. *
+* Added custom parameters of type, title, token and join in the shortcode [bigbluebutton]. *
+
 = 1.4.3 =
 * Updated. Tested on WP 4.8.1 and updated version tag.
 
