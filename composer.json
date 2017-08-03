@@ -1,0 +1,45 @@
+{
+  "name": "blindsidenetworks/bigbluebutton",
+  "type": "plugin",
+  "description": "BigBlueButton Plugin for Wordpress",
+  "keywords": [
+    "bigbluebutton",
+    "bbb"
+  ],
+  "homepage": "http://bigbluebutton.org/",
+  "license": "GNU Lesser General Public License",
+  "authors": [
+    {
+      "name": "Steve Puddick",
+      "email": "steve.puddick@gmail.com",
+      "role": "Developer"
+    },
+    {
+      "name": "Jesus Federico",
+      "email": "federico.jesus@gmail.com",
+      "role": "Developer"
+    },
+    {
+      "name": "Supriya Gadigone",
+      "email": "supriyagadigone@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "repositories": {
+    "packagist": {
+      "url": "https://packagist.org",
+      "type": "composer"
+    }
+  },
+  "require": {
+    "php": ">=5.4"
+  },
+  "require-dev": {
+    "composer/composer": "1.0.*@dev",
+    "phpunit/phpunit": "4.1.*",
+    "fzaninotto/faker": "~1.5.0",
+    "friendsofphp/php-cs-fixer": "~1.10",
+    "squizlabs/php_codesniffer": "2.*",
+    "satooshi/php-coveralls": "1.*"
+  }
+}

@@ -1,0 +1,124 @@
+
+table.bbb-shortcode th,
+table.bbb-shortcode td {
+	vertical-align:top;
+	text-align:left;
+	padding-bottom:5px;
+}
+
+table.bbb-shortcode td select {
+	width:300px;
+	height:200px !important;
+}
+
+table.bbb-shortcode th {
+	max-width:110px;
+}
+
+table.bbb-shortcode p {
+	margin:0;
+	padding:0;
+}
+
+table.bbb-shortcode small {
+	color:#666;
+	font-size:0.9em;
+}
+
+table.bbb-shortcode p#shortcode {
+	background-color:#F9F954;
+}
+
+textarea[name="bbb_room_welcome_msg"] {
+    width:230px;
+    height:100px;
+}
+
+table.custom-admin-table th,
+table.custom-admin-table td{
+    text-align:left;
+    padding-right:10px;
+}
+
+
+table.custom-admin-table p{
+    margin-top:0;
+}
+
+table.custom-admin-table th,
+table.custom-admin-table td{
+   padding-bottom:10px;
+   vertical-align: top;
+}
+
+.bbb-recordings table.stats th,
+.bbb-recordings table.stats td,
+.bbb-recordings table.stats p
+{
+    text-align:center;
+    padding-right:10px;
+}
+
+table.stats td.hed
+{background-color: #666;
+color: #fff;
+padding: 4px;
+text-align: center;
+border-bottom: 2px #fff solid;
+font-size: 12px;
+font-weight: bold;}
+
+table.stats td.hedextra
+{background-color: #666;
+color: #fff;
+padding: 4px;
+text-align: center;
+border-bottom: 2px #fff solid;
+font-size: 12px;
+font-weight: bold;
+width:250px;}
+
+#room {
+	background-color: #f6f6f6;
+	border-radius: 5px;
+	border: 1px solid #ccc;
+	padding:20px 30px 30px 30px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+	border-radius: 5px;
+	width: 300px;
+}
+
+#recording {
+	background-color: #f6f6f6;
+	border: 1px solid #ccc;
+	padding:20px 20px 5px 20px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+	border-radius: 10px;
+	width: 550px;
+}
+
+#roompw{
+	color: #777;
+	margin: 5px 0px 10px 0;
+	padding-left:10px;
+	width: 100%;
+	height: 50px;
+	border: 1px solid #c7d0d2;
+	border-radius: 2px;
+}
+
+#displayname{
+	color: #777;
+	margin: 5px 0px 10px 0;
+	padding-left:10px;
+	width: 100%;
+	height: 50px;
+	border: 1px solid #c7d0d2;
+	border-radius: 2px;
+}
+
+#bbb-error-container{
+	color:red;
+	text-align: center;
+	font-weight: bold;
+}
