@@ -113,9 +113,11 @@ Try chnaging the Permalinks structure through the Dashboard from Settings > Perm
 
 == Changelog ==
 
-== 2.0.0 ==
-* Added Custom Post Type and taxonomies to create and join rooms. *
-* Added custom parameters of type, title, token and join in the shortcode [bigbluebutton]. *
+= 2.0.0 =
+* Added feature. Custom Post Type and taxonomies to create and join rooms. *
+* Added feature. Custom parameters of type, title, token and join in the shortcode [bigbluebutton]. *
+* Added feature. Support of wordpress permissions for assigning roles in BigBlueButton. *
+* Updated. Simplified UI for configuring the plugin. *
 
 = 1.4.3 =
 * Updated. Tested on WP 4.8.1 and updated version tag.
@@ -211,6 +213,9 @@ Try chnaging the Permalinks structure through the Dashboard from Settings > Perm
 * Added the initial files.
 
 == Upgrade Notice ==
+
+= 2.0.0 =
+This version is a major shift from the original approach pursued in version 1.x. Although it is fully backward compatible, we recommend to have more grasp on how to take advantage of the new features and capabilities before upgrading.
 
 = 1.3.4 =
 This version fixes some presentation issues. Style and javascript functions can added using classes and ids included on html elements.

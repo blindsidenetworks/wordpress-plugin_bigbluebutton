@@ -96,6 +96,8 @@ add_action('admin_notices', 'bigbluebutton_admin_notices');
 add_action('admin_notices', 'bigbluebutton_error_notice');
 add_action('widgets_init', 'bigbluebutton_widget_init');
 add_action('before_delete_post', 'before_bbb_delete');
+add_action('in_plugin_update_message-bigbluebutton/bigbluebutton-plugin.php',
+  array( $this, 'bigbluebutton_show_upgrade_notification'), 10, 2);
 
 //shortcode definitions
 add_shortcode('bigbluebutton', 'bigbluebutton_shortcode');
@@ -1282,7 +1284,6 @@ function bigbluebutton_normalize_meeting_id($meetingid)
     return (strlen($meetingid) == 12) ? sha1(home_url().$meetingid) : $meetingid;
 }
 
-
 /*
  * Returns current plugin version.
  */
@@ -1296,4 +1297,14 @@ function bigbluebutton_get_version()
 
     return $pluginfolder[$pluginfile]['Version'];
 }
-?>
+
+/*
+ * Show Upgrade Notification in Plugin List for an available new Version.
+ */
+function bigbluebutton_show_upgrade_notification($currentPluginMetadata, $newPluginMetadata){
+    // check "upgrade_notice"
+    if (isset($newPluginMetadata->upgrade_notice) && strlen(trim($newPluginMetadata->upgrade_notice)) > 0) {
+         echo '<p style="background-color: #d54e21; padding: 10px; color: #f9f9f9; margin-top: 10px"><strong>Important Upgrade Notice:</strong> ';
+         echo esc_html($newPluginMetadata->upgrade_notice), '</p>';
+    }
+}
