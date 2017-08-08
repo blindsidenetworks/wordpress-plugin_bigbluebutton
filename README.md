@@ -75,6 +75,9 @@ You should enable the curl extension in php.ini.
 
 == Changelog ==
 
+= 1.4.4 =
+* Fixed issue. Date format in recording was updated.
+
 = 1.4.3 =
 * Updated. Tested on WP 4.8.1 and updated version tag.
 
@@ -168,6 +171,9 @@ You should enable the curl extension in php.ini.
 * Added the initial files.
 
 == Upgrade Notice ==
+
+= 1.4.4 =
+This version includes a fix for recording dates shown in UTC. They are now displayed in the local timezone.
 
 = 1.3.4 =
 This version fixes some presentation issues. Style and javascript functions can added using classes and ids included on html elements.

@@ -4,7 +4,7 @@ Plugin Name: BigBlueButton
 Plugin URI: http://blindsidenetworks.com/integrations/wordpress
 Description: BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meeting rooms to interact with their readers. It was developed and is maintained by <a href="http://blindsidenetworks.com/" target="_blank">Blindside Networks</a>. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit <a href= "http://bigbluebutton.org/support" target="_blank">BigBlueButton support</a>.
 
-Version: 1.4.3
+Version: 1.4.4
 Author: Blindside Networks
 Author URI: http://blindsidenetworks.com/
 License: GPLv2 or later
@@ -1335,8 +1335,7 @@ function bigbluebutton_list_recordings($title=null) {
             }
 
             //Format the date
-            //$formatedStartDate = gmdate("M d Y H:i:s", $recording['startTime']);
-            $formatedStartDate = date_i18n( "M d Y H:i:s", $recording['startTime'], false );
+            $formatedStartDate = date_i18n( "M d Y H:i:s T", $recording['startTime'] + (get_option('gmt_offset') * 60 * 60) , false, true );
 
             //Print detail
             $out .= '
