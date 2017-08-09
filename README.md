@@ -75,6 +75,9 @@ You should enable the curl extension in php.ini.
 
 == Changelog ==
 
+= 1.4.5 =
+* Updated. Implemented notification message for critical upgrades.
+
 = 1.4.4 =
 * Fixed issue. Date format in recording was updated.
 
@@ -171,6 +174,9 @@ You should enable the curl extension in php.ini.
 * Added the initial files.
 
 == Upgrade Notice ==
+
+= 1.4.5 =
+There is major change coming up in version 2.0.0. From now on a message will be shown on updates when something critical is been included.
 
 = 1.4.4 =
 This version includes a fix for recording dates shown in UTC. They are now displayed in the local timezone.
