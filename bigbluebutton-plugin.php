@@ -906,7 +906,7 @@ function bigbluebutton_formatted_startdate($recording){
   } else {
       $recording['startTime'] = ($recording['startTime'] - $recording['startTime'] % 1000) / 1000;
   }
-  return date_i18n('M d Y H:i:s', $recording['startTime'], false);
+  return date_i18n('M d Y H:i:s T', $recording['startTime'] + (get_option('gmt_offset') * 60 * 60) , false, true );
 }
 
 
