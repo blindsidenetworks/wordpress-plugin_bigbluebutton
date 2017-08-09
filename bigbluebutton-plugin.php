@@ -73,8 +73,9 @@ add_action('admin_menu', 'bigbluebutton_add_pages', 1);
 add_action('admin_init', 'bigbluebutton_admin_init', 1);
 add_action('plugins_loaded', 'bigbluebutton_update' );
 add_action('plugins_loaded', 'bigbluebutton_widget_init' );
-set_error_handler("bigbluebutton_warning_handler", E_WARNING);
+add_action('in_plugin_update_message-bigbluebutton/bigbluebutton-plugin.php', 'bigbluebutton_show_upgrade_notification');
 
+set_error_handler("bigbluebutton_warning_handler", E_WARNING);
 
 //================================================================================
 //------------------------------ Main Functions ----------------------------------
@@ -353,6 +354,29 @@ function bigbluebutton_get_version() {
     return $plugin_folder[$plugin_file]['Version'];
 }
 
+//Upgrade notice.
+function bigbluebutton_show_upgrade_notification($currentPluginMetadata, $newPluginMetadata)
+{
+    if (!$newPluginMetadata) {
+        $newPluginMetadata = bigbluebutton_update_metadata($currentPluginMetadata['slug']);
+    }
+    // check "upgrade_notice"
+    if (isset($newPluginMetadata->upgrade_notice) && strlen(trim($newPluginMetadata->upgrade_notice)) > 0) {
+        //echo '<br><br><p style="background-color: #d54e21; padding: 10px; color: #f9f9f9; margin-top: 10px">Hello</p>';
+        echo '<div style="background-color: #d54e21; padding: 10px; color: #f9f9f9; margin-top: 10px"><strong>Important Upgrade Notice:</strong> ';
+        echo esc_html(strip_tags($newPluginMetadata->upgrade_notice)), '</div>';
+    }
+}
+
+function bigbluebutton_update_metadata($pluginslug)
+{
+    $plugin_updates = get_plugin_updates();
+    foreach($plugin_updates as $update) {
+        if ($update->update->slug === $pluginslug) {
+            return $update->update;
+        }
+    }
+}
 
 //================================================================================
 //------------------------------Error Handler-------------------------------------
