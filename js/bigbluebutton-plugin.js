@@ -14,7 +14,7 @@ jQuery(function($){
 			bigbluebutton_set_meeting_slug(this);
 	});
 
-	bigbluebutton_set_meeting_slug('input#hiddenInputSingle');
+	bigbluebutton_set_meeting_slug('input#hiddenInput');
 
   //sets the slug
 	function bigbluebutton_set_meeting_slug(hiddeninput){
@@ -32,39 +32,20 @@ jQuery(function($){
 * @param  passwordrequired
 * @param  page
 */
-function bigbluebutton_join_meeting(join, usersignedin, passwordrequired, page){
+function bigbluebutton_join_meeting(join, usersignedin, passwordrequired){
 		var name = '';
 		var password = '';
 
-		//clean this up
-		if(page == "true")
-		{
-			if(usersignedin == "false"){
-				name = prompt("Please enter your name: ", "Enter name here");
-				if (name === null) { //hit cancel
-        	return;
-    		}
-			}
+		if(usersignedin == "false"){
+			jQuery(function($) {
+					name = $('input#displayname').val();
+			});
+		}
 
-			if(passwordrequired == "true"){
-				password = prompt("Please enter the password of the meeting: ", "Enter password here");
-				if (password === null) { //hit cancel
-        	return;
-    		}
-			}
-
-		}else{
-			if(usersignedin == "false"){
-				jQuery(function($) {
-						name = $('input#displayname').val();
-				});
-			}
-
-			if(passwordrequired == "true"){
-				jQuery(function($) {
-					password = $('input#roompw').val();
-				});
-			}
+		if(passwordrequired == "true"){
+			jQuery(function($) {
+				password = $('input#roompw').val();
+			});
 		}
 
 		meetingdetails = '&slug=' + slug + '&join=' + join + '&password=' + password + '&name=' + name;
@@ -149,16 +130,16 @@ function bigbluebutton_action_call(action, recordingid) {
 			if (actionbarpublish) {
 				var actionbarimg ;
 				jQuery(function($) {
- 						actionbarimg = $('img#actionbar-publish-img-'+ recordingid);
+ 						actionbarimg = $('span#actionbar-publish-img-'+ recordingid);
  				});
-				if (actionbarpublish.attr('title') == 'Hide' ) {
+				if (actionbarpublish.attr('title') == 'Show' ) {
 						action = 'unpublish';
-						actionbarpublish.attr('title', 'Show') ;
-						actionbarimg.attr('src', pluginbaseurl + '/img/show.gif') ;
+						actionbarpublish.attr('title', 'Hide');
+						actionbarimg.attr('class', 'dashicons dashicons-hidden');
 				} else {
 						action = 'publish';
-						actionbarpublish.attr('title', 'Hide') ;
-					  actionbarimg.attr('src', pluginbaseurl + '/img/hide.gif') ;
+						actionbarpublish.attr('title', 'Show');
+					  actionbarimg.attr('class', 'dashicons dashicons-visibility');
 				}
 			}
 		} else {
