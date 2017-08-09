@@ -119,6 +119,9 @@ Try chnaging the Permalinks structure through the Dashboard from Settings > Perm
 * Added feature. Support of wordpress permissions for assigning roles in BigBlueButton. *
 * Updated. Simplified UI for configuring the plugin. *
 
+= 1.4.4 =
+* Fixed issue. Date format in recording was updated.
+
 = 1.4.3 =
 * Updated. Tested on WP 4.8.1 and updated version tag.
 
@@ -216,6 +219,12 @@ Try chnaging the Permalinks structure through the Dashboard from Settings > Perm
 
 = 2.0.0 =
 This version is a major shift from the original approach pursued in version 1.x. Although it is fully backward compatible, we recommend to have more grasp on how to take advantage of the new features and capabilities before upgrading.
+
+= 1.4.4 =
+This version includes a fix for recording dates shown in UTC. They are now displayed in the local timezone.
+
+= 1.4.3 =
+Tested on WP 4.8.1 and updated version tag.
 
 = 1.3.4 =
 This version fixes some presentation issues. Style and javascript functions can added using classes and ids included on html elements.
