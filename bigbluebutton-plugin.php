@@ -22,71 +22,13 @@ require_once 'includes/bbb_api.php';
 define('BIGBLUEBUTTON_PLUGIN_VERSION', bigbluebutton_get_version());
 
 //================================================================================
-//--------------------------------Plugin Activation--------------------------------------
-//================================================================================
-
-register_activation_hook(__FILE__, 'bigbluebutton_plugin_activate');
-
-/**
-* On activation functionality that needs to be added
-*/
-function bigbluebutton_plugin_activate($network_wide) {
-  if (is_multisite() && $network_wide) {
-      global $wpdb;
-      $multisiteblogs = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
-      foreach ($multisiteblogs as $blogid) {
-          switch_to_blog($blogid);
-          bigbluebutton_install();
-          restore_current_blog();
-      }
-  } else {
-      bigbluebutton_install();
-  }
-}
-
-
-/**
-* BigBlueButton Install
-*/
-function bigbluebutton_install()
-{
-  $bbbsettings = array();
-  $urlval = get_option('bigbluebutton_url');//old plugins endpoint value
-  $saltval = get_option('bigbluebutton_salt');//old plugins secret value
-  if((strcmp("1.4.2",  bigbluebutton_get_version()) <= 0) && $urlval && $saltval){
-    $bbbsettings = array(
-      'endpoint' => $urlval,
-      'secret' => $saltval
-    );
-    add_option('bigbluebutton_settings',$bbbsettings);
-    delete_option('bigbluebutton_url');
-    delete_option('bigbluebutton_salt');
-    bigbluebutton_migrate_old_plugin_data();
-  }else{
-   $bbbsettings = get_option('bigbluebutton_settings');
-   if (!isset($bbbsettings)) {
-      $bbbsettings['endpoint'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
-      $bbbsettings['secret'] = '8cd8ef52e8e101574e400365b55e11a6';
-    } else {
-      if (!isset($bbbsettings['endpoint'])) {
-          $bbbsettings['endpoint'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
-      }
-      if (!isset($bbbsettings['secret'])) {
-          $bbbsettings['secret'] = '8cd8ef52e8e101574e400365b55e11a6';
-      }
-   }
-   bigbluebutton_default_roles();
- }
- update_option('bigbluebutton_settings', $bbbsettings);
- bigbluebutton_session_setup($bbbsettings['endpoint'],$bbbsettings['secret']);
-}
-
-
-//================================================================================
 //--------------------------------Hooks----------------------------------------
 //================================================================================
 
-//action definitions
+// Activation definitions.
+register_activation_hook(__FILE__, 'bigbluebutton_plugin_activate');
+
+// Action definitions.
 add_action('init', 'bigbluebutton_init');
 add_action('admin_menu', 'bigbluebutton_register_settings_page', 1);
 add_action('add_meta_boxes', 'bigbluebutton_meta_boxes');
@@ -96,18 +38,105 @@ add_action('admin_notices', 'bigbluebutton_admin_notices');
 add_action('admin_notices', 'bigbluebutton_error_notice');
 add_action('widgets_init', 'bigbluebutton_widget_init');
 add_action('before_delete_post', 'before_bbb_delete');
-add_action('in_plugin_update_message-bigbluebutton/bigbluebutton-plugin.php',
-  array( $this, 'bigbluebutton_show_upgrade_notification'), 10, 2);
+add_action('in_plugin_update_message-bigbluebutton/bigbluebutton-plugin.php', 'bigbluebutton_show_upgrade_notification');
 
-//shortcode definitions
+// Shortcode definitions
 add_shortcode('bigbluebutton', 'bigbluebutton_shortcode');
 add_shortcode('bigbluebutton_recordings', 'bigbluebutton_shortcode');
 add_shortcode('bigbluebuttonrooms', 'bigbluebutton_shortcode');
 
-//filter definitions
+// Filter definitions
 add_filter('map_meta_cap', 'bigbluebutton_map_meta_cap', 10, 4);
 add_filter('the_content', 'bigbluebutton_filter');
 
+
+//================================================================================
+//--------------------------------Plugin Activation-------------------------------
+//================================================================================
+
+/**
+* On activation functionality that needs to be added
+*/
+function bigbluebutton_plugin_activate($network_wide) {
+    global $wpdb;
+    if (is_multisite() && $network_wide) {
+        $multisiteblogs = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
+        foreach ($multisiteblogs as $blogid) {
+            switch_to_blog($blogid);
+            bigbluebutton_install();
+            restore_current_blog();
+        }
+    } else {
+        bigbluebutton_install();
+    }
+}
+
+
+/**
+* BigBlueButton Install
+*/
+function bigbluebutton_install()
+{
+    $bbbsettings = array();
+    $urlval = get_option('bigbluebutton_url');//old plugins endpoint value
+    $saltval = get_option('bigbluebutton_salt');//old plugins secret value
+    if ((strcmp("1.4.2",  bigbluebutton_get_version()) <= 0) && $urlval && $saltval) {
+        $bbbsettings = array(
+            'endpoint' => $urlval,
+            'secret' => $saltval
+        );
+        add_option('bigbluebutton_settings',$bbbsettings);
+        delete_option('bigbluebutton_url');
+        delete_option('bigbluebutton_salt');
+        bigbluebutton_migrate_old_plugin_data();
+    } else {
+        $bbbsettings = get_option('bigbluebutton_settings');
+        if (!isset($bbbsettings)) {
+            $bbbsettings['endpoint'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
+            $bbbsettings['secret'] = '8cd8ef52e8e101574e400365b55e11a6';
+        } else {
+            if (!isset($bbbsettings['endpoint'])) {
+                $bbbsettings['endpoint'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
+            }
+            if (!isset($bbbsettings['secret'])) {
+                $bbbsettings['secret'] = '8cd8ef52e8e101574e400365b55e11a6';
+            }
+        }
+        bigbluebutton_default_roles();
+    }
+    update_option('bigbluebutton_settings', $bbbsettings);
+    bigbluebutton_session_setup($bbbsettings['endpoint'],$bbbsettings['secret']);
+}
+
+
+//================================================================================
+//---------------------------------Upgrade----------------------------------------
+//================================================================================
+
+/*
+ * Show Upgrade Notification in Plugin List for an available new Version.
+ */
+function bigbluebutton_show_upgrade_notification($currentPluginMetadata, $newPluginMetadata)
+{
+    if (!$newPluginMetadata) {
+        $newPluginMetadata = bigbluebutton_update_metadata($currentPluginMetadata['slug']);
+    }
+    // check "upgrade_notice"
+    if (isset($newPluginMetadata->upgrade_notice) && strlen(trim($newPluginMetadata->upgrade_notice)) > 0) {
+        echo '<div style="background-color: #d54e21; padding: 10px; color: #f9f9f9; margin-top: 10px"><strong>Important Upgrade Notice:</strong> ';
+        echo esc_html(strip_tags($newPluginMetadata->upgrade_notice)), '</div>';
+    }
+}
+
+function bigbluebutton_update_metadata($pluginslug)
+{
+    $plugin_updates = get_plugin_updates();
+    foreach($plugin_updates as $update) {
+        if ($update->update->slug === $pluginslug) {
+            return $update->update;
+        }
+    }
+}
 
 //================================================================================
 //--------------------------------Migration----------------------------------------
@@ -1296,15 +1325,4 @@ function bigbluebutton_get_version()
     $pluginfile = basename((__FILE__));
 
     return $pluginfolder[$pluginfile]['Version'];
-}
-
-/*
- * Show Upgrade Notification in Plugin List for an available new Version.
- */
-function bigbluebutton_show_upgrade_notification($currentPluginMetadata, $newPluginMetadata){
-    // check "upgrade_notice"
-    if (isset($newPluginMetadata->upgrade_notice) && strlen(trim($newPluginMetadata->upgrade_notice)) > 0) {
-         echo '<p style="background-color: #d54e21; padding: 10px; color: #f9f9f9; margin-top: 10px"><strong>Important Upgrade Notice:</strong> ';
-         echo esc_html($newPluginMetadata->upgrade_notice), '</p>';
-    }
 }
