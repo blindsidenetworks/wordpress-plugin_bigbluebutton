@@ -82,11 +82,8 @@ function bigbluebutton_install()
     $urlval = get_option('bigbluebutton_url');//old plugins endpoint value
     $saltval = get_option('bigbluebutton_salt');//old plugins secret value
     $bbbsettings = get_option('bigbluebutton_settings');
-    if((post_exists("Demo meeting") == 0)||($bbbsettings['install'] == false)){
-      bigbluebutton_insert_post(1,"Demo meeting",bigbluebutton_generate_token(),'ap','mp',0,0);
-    }
-    if((post_exists("Demo meeting (recorded)") == 0)||($bbbsettings['install'] == false)){
-      bigbluebutton_insert_post(2,"Demo meeting (recorded)",bigbluebutton_generate_token(),'ap','mp',0,1);
+    if($bbbsettings['install'] == false){
+      bigbluebutton_insert_default_rooms();
     }
     if ((strcmp("1.4.2", bigbluebutton_get_version()) <= 0) && ($bbbsettings['install'] == false)) {
         $bbbsettings = array(
@@ -113,6 +110,15 @@ function bigbluebutton_install()
     }
     update_option('bigbluebutton_settings', $bbbsettings);
     bigbluebutton_session_setup($bbbsettings['endpoint'], $bbbsettings['secret']);
+}
+
+function bigbluebutton_insert_default_rooms(){
+    if(post_exists("Demo meeting") == 0){
+      bigbluebutton_insert_post(1,"Demo meeting",bigbluebutton_generate_token(),'ap','mp',0,0);
+    }
+    if(post_exists("Demo meeting (recorded)") == 0){
+      bigbluebutton_insert_post(2,"Demo meeting (recorded)",bigbluebutton_generate_token(),'ap','mp',0,1);
+    }
 }
 
 
@@ -169,7 +175,12 @@ function bigbluebutton_meetings_data_old_plugin()
 
     if (count($listofmeetings) != 0) {
       foreach ($listofmeetings as $meeting) {
-        bigbluebutton_insert_post($meeting->id,$meeting->meetingName,$meeting->meetingID,$meeting->attendeePW,$meeting->moderatorPW,$meeting->waitForModerator,$meeting->recorded);
+        if (($meeting->meetingName == "Demo meeting")||($meeting->meetingName == "Demo meeting (recorded)")) {
+          bigbluebutton_insert_default_rooms();
+        }
+        else {
+          bigbluebutton_insert_post($meeting->id,$meeting->meetingName,$meeting->meetingID,$meeting->attendeePW,$meeting->moderatorPW,$meeting->waitForModerator,$meeting->recorded);
+        }
       }
     }
 }
