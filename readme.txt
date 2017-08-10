@@ -108,8 +108,10 @@ Try chnaging the Permalinks structure through the Dashboard from Settings > Perm
 2. Login form for registered users.
 3. General settings.
 4. Create a meeting room.
-5. Recordings in a front end page.
-6. Setting up meeting room details.
+5. Setting up meeting room details(1).
+6. Setting up meeting room details(2).
+7. Recordings in a front end page.
+
 
 == Changelog ==
 
