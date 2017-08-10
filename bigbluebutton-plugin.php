@@ -882,6 +882,7 @@ function bigbluebutton_print_recordings_data($listofrecordings, $currentuser)
                  $action = 'Hide';
                  $class = 'dashicons dashicons-hidden';
                }
+               $actionbar = '';
                $actionbar .= '<a id="actionbar-publish-a-'.$recording['recordID'].'" title="'.$action.'" href="#"><span id="actionbar-publish-img-'.$recording['recordID'].'"  class="'.$class.'" onclick="bigbluebutton_action_call(\'publish\', \''.$recording['recordID'].'\'); return false;" /></span></a>';
                $actionbar .= '<a id="actionbar-delete-a-'.$recording['recordID'].'" title="Delete" href="#"><span id="actionbar-delete-img-'.$recording['recordID'].'" class="dashicons dashicons-trash" onclick="bigbluebutton_action_call(\'delete\', \''.$recording['recordID'].'\'); return false;" /></span></a>';
                $outputstring  .= '<td>'.$actionbar.'</td>';
