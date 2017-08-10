@@ -1050,7 +1050,9 @@ function bigbluebutton_room_details_metabox($post)
      $endpointvalue = $bbbsettings['endpoint'];
      $secretvalue = $bbbsettings['secret'];
      bigbluebutton_session_setup($endpointvalue, $secretvalue);
-     echo bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue);
+     if(get_post_status($post->ID) == "publish"){
+       echo bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue);
+     }
  }
 
  /**
