@@ -1229,12 +1229,11 @@ function bigbluebutton_admin_notices()
 function bigbluebutton_error_notice()
 {
     $screen = get_current_screen();
-    if ($screen->id == 'bbb-room') {
-        ?>
-    <div class="notice notice-warning is-dismissible">
-  	<p><strong>To change the default capabilities for each user, please install the "Members" plugin.</strong></p>
-    </div>
-    <?php
+    if ($screen->id == 'edit-bbb-room') {
+        error_log('It is edit-bbb-room');
+        echo '<div class="notice notice-warning is-dismissible">';
+        echo '<p><strong>It is recommended to use the <a href="https://wordpress.org/plugins/members/" target="_blank">Members</a> plugin for changing the default capabilities for each user.</strong></p>';
+        echo '</div>';
     }
 }
 
