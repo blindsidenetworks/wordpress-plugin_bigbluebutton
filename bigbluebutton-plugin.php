@@ -82,8 +82,8 @@ function bigbluebutton_install()
     $urlval = get_option('bigbluebutton_url');//old plugins endpoint value
     $saltval = get_option('bigbluebutton_salt');//old plugins secret value
     $bbbsettings = get_option('bigbluebutton_settings');
-    if($bbbsettings['install'] == false){
-      bigbluebutton_insert_default_rooms();
+    if ($bbbsettings['install'] == false) {
+        bigbluebutton_insert_default_rooms();
     }
     if ((strcmp("1.4.2", bigbluebutton_get_version()) <= 0) && ($bbbsettings['install'] == false)) {
         $bbbsettings = array(
@@ -112,11 +112,11 @@ function bigbluebutton_install()
     bigbluebutton_session_setup($bbbsettings['endpoint'], $bbbsettings['secret']);
 }
 
-function bigbluebutton_insert_default_rooms(){
-    if(post_exists("Demo meeting") == 0){
+function bigbluebutton_insert_default_rooms() {
+    if (post_exists("Demo meeting") == 0) {
       bigbluebutton_insert_post(1,"Demo meeting",bigbluebutton_generate_token(),'ap','mp',0,0);
     }
-    if(post_exists("Demo meeting (recorded)") == 0){
+    if (post_exists("Demo meeting (recorded)") == 0) {
       bigbluebutton_insert_post(2,"Demo meeting (recorded)",bigbluebutton_generate_token(),'ap','mp',0,1);
     }
 }
@@ -1062,8 +1062,8 @@ function bigbluebutton_room_details_metabox($post)
      $endpointvalue = $bbbsettings['endpoint'];
      $secretvalue = $bbbsettings['secret'];
      bigbluebutton_session_setup($endpointvalue, $secretvalue);
-     if(get_post_status($post->ID) == "publish"){
-       echo bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue);
+     if (get_post_status($post->ID) == "publish") {
+        echo bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue);
      }
  }
 
