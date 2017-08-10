@@ -96,7 +96,7 @@ if (!isset($_SESSION[$secretname]) || !isset($_SESSION[$endpointname])) {
                 $moderatorpassword = get_post_meta($post->ID, '_bbb_moderator_password', true);
                 $attendeepassword = get_post_meta($post->ID, '_bbb_attendee_password', true);
                 $isrecorded = get_post_meta($post->ID, '_bbb_is_recorded', true);
-                $logouturl = (is_ssl() ? 'https://' : 'http://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+                $logouturl = "javascript:window.close()"; 
                 $waitforadminstart = get_post_meta($post->ID, '_bbb_must_wait_for_admin_start', true);
                 $metadata = array(
                  'meta_origin' => 'WordPress',
