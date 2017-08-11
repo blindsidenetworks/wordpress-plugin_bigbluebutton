@@ -38,13 +38,14 @@ The easiest way to install is to watch this [installation video](http://www.yout
 == Frequently Asked Questions ==
 
 **How do I create meetings?**
-After activating the BligBlueButton plugin, click on "Rooms" when "Add New" and give the meeting a title and fill out the room details.
+
+After activating the BigBlueButton plugin, click on "Rooms" then "Add New" and give the meeting room a title and fill out the room details.
 
 **How do users join the meetings?**
 
 Users join meetings using a joining form. This form can be shown in a site as a sidebar element or as a page/post.
 
-For setting up in the sidebar, add the bigbluebutton widget, as you do with any other, dragging the box to the position you want to.
+For setting up in the sidebar, add the bigbluebutton widget(s), as you do with any other, dragging the box to the position you want to.
 
 For setting the joining form up as a page/post, add the shortcode [bigbluebutton] right where you want the form to appear in the page/post. If there are pre-created meetings in wordpress, their names should appear in a listbox from which users can select. If there is only one pre-created meeting the listbox will not be shown and one button with the name of the meeting will appear instead.
 
@@ -52,12 +53,12 @@ For setting the joining form up as a page/post, add the shortcode [bigbluebutton
 
 Since version 1.4.2 it is possible to add parameters for the shortcode which are: type, title, token and join.
 
-Type(default rooms): "rooms" or "recordings", this will show the shortcode chossen to be displayed
-Title(default Rooms): Any title as per administrators setup.
-Token: add the meeting rooms token that you want to see in the joining form, but if left empty, all the meetings that were created will show up
-Join(default true): if true, the useres can directly join the meeting session, if false, the users View a webpage where there is an potion to join the meeting.
+Type(default value is rooms): "rooms" or "recordings", this parameter will show the shortcode to be displayed
+Title(default value is Rooms): Any title as per administrators setup.
+Token: add the meeting rooms token that you want to see in the joining form, but if left empty, all the meetings that were created will show up.
+Join(default value is true): if true, the users can directly join the meeting session, if false, the users View a webpage where there is an option to join the meeting.
 
-An example of adding a joining form with two meetings and a title of "Rooms" is:
+An example of adding a joining form with a title of "Rooms" that consist on two meeting rooms:
 [bigbluebutton type="rooms" title="Rooms" token="93410c6104b7, a79cb08c9fc9" join="true"]
 
 **Why sometimes the Name and Password are required, some others only the Name and others only the Password?**
@@ -72,7 +73,7 @@ For anonymous users the Name will be always required, but again the Password req
 
 **How can I change permissions of the users?**
 
-You should install and activate the "Members" plugin by Justin Tadlock and in the Dasboard under the "Users" > "Roles", update the permissions.
+You should install and activate the "Members" plugin by Justin Tadlock. Under the "Users" > "Roles", update the permissions.
 
 **Is there any way users can go directly into a meeting?**
 
@@ -97,13 +98,15 @@ So as an example:
 * Wrong - "http://example.com/"
 * Correct - "http://example.com/bigbluebutton/"
 
+
+**When I click "Preview Changes" through a meeting room, what do I get if I get the error "Oops, This Page Could Not Be Found!"?
+
+Try changing the Permalinks structure through the Dashboard from Settings > Permalinks > Choose any permalink > Save Changes.
+
 **How can I improve security?**
 
 You should enable the curl extension in php.ini.
 
-**When click "Preview Changes" through a meeting room, what do I get if I get the error "Oops, This Page Could Not Be Found!"?
-
-Try chnaging the Permalinks structure through the Dashboard from Settings > Permalinks > Choose any other permalink > Save Changes.
 
 == Screenshots ==
 
