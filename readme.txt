@@ -22,15 +22,18 @@ For more information on setting up your own BigBlueButton server or for using an
 The easiest way to install is to watch this [installation video](http://www.youtube.com/watch?v=8Tle9BEKfFo "installation video") on YouTube. Here's an overview of the installation.
 
    1. Log in as an admin and click on the Plugins menu on the sidebar.
-   1. Click Add new.
-   1. In the search bar enter "bigbluebutton" and click search plugins.
-   1. When you find the plugin called BigBlueButton by Blindside Networks click the install now link.
-   1. Activate the Plugin.
-   1. Click on widgets under the Appearance menu.
-   1. Find the BigBlueButton Widget. Then click and drag it to either the right, content, or footer windows on the right of the screen depending on where you wish the BigBlueButton widget to appear.
-   1. Click on BigBlueButton under the settings menu.
-   1. Fill out the URL of where the BigBlueButton server is running (be sure to add /bigbluebutton/ to the end of the URL) and its salt. Then click on save changes.
-   1. You are ready to begin creating meetings, and holding conferences.
+   2. Click Add new.
+   3. In the search bar enter "bigbluebutton" and click search plugins.
+   4. When you find the plugin called BigBlueButton by Blindside Networks click the install now link.
+   5. Activate the Plugin.
+   6. Click on widgets under the Appearance menu.
+   7. Find the BigBlueButton or BigBlueButoon Rooms Widget. Then click and drag it to either the sidebar or footer windows on the right of the screen depending on where you wish the BigBlueButton widget(s) to appear.
+   8. Click on BigBlueButton under the settings menu.
+   9. Fill out the endpoint URL of where the BigBlueButton server is running (be sure to add /bigbluebutton/ to the end of the URL) and its shared secret (salt). Then click on save changes.
+   10. To create meetings, click on "Rooms" under the Dashboard section and Add New rooms to create meeting session.
+   11. Add the title and room details.
+   12. You are ready to begin and hold conferences.
+   
 
 == Frequently Asked Questions ==
 
