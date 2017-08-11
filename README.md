@@ -27,12 +27,12 @@ The easiest way to install is to watch this [installation video](http://www.yout
    4. When you find the plugin called BigBlueButton by Blindside Networks click the install now link.
    5. Activate the Plugin.
    6. Click on widgets under the Appearance menu.
-   7. Find the BigBlueButton or BigBlueButoon Rooms Widget. Then click and drag it to either the sidebar or footer windows on the right of the screen depending on where you wish the BigBlueButton widget(s) to appear.
+   7. Find the BigBlueButton or BigBlueButton Rooms Widget. Then click and drag it to either the sidebar or footer windows on the right of the screen depending on where you wish the BigBlueButton widget(s) to appear.
    8. Click on BigBlueButton under the settings menu.
    9. Fill out the endpoint URL of where the BigBlueButton server is running (be sure to add /bigbluebutton/ to the end of the URL) and its shared secret (salt). Then click on save changes.
-   10. To create meetings, click on "Rooms" under the Dashboard section and Add New rooms to create meeting session.
-   11. Add the title and room details.
-   12. You are ready to begin and hold conferences.
+   10. To create meetings, click on "Rooms" in the top-level of the admin page and add new rooms to create meeting sessions.
+   11. Add the title and room details as per wish.
+   12. You are ready to hold conferences.
    
 
 == Frequently Asked Questions ==
