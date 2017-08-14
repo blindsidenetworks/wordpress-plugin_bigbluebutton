@@ -19,7 +19,7 @@ For more information on setting up your own BigBlueButton server or for using an
 
 == Installation ==
 
-The easiest way to install is to watch this [installation video](http://www.youtube.com/watch?v=8Tle9BEKfFo "installation video") on YouTube. Here's an overview of the installation.
+Here's an overview of the installation.
 
    1. Log in as an admin and click on the Plugins menu on the sidebar.
    2. Click Add new.
@@ -30,10 +30,18 @@ The easiest way to install is to watch this [installation video](http://www.yout
    7. Find the BigBlueButton or BigBlueButton Rooms Widget. Then click and drag it to either the sidebar or footer windows on the right of the screen depending on where you wish the BigBlueButton widget(s) to appear.
    8. Click on BigBlueButton under the settings menu.
    9. Fill out the endpoint URL of where the BigBlueButton server is running (be sure to add /bigbluebutton/ to the end of the URL) and its shared secret (salt). Then click on save changes.
-   10. To create meetings, click on "Rooms" in the top-level of the admin page and add new rooms to create meeting sessions.
-   11. Add the title and room details as per wish.
+   10. To create meetings, click on "Rooms" in the top-level of the admin page and add new rooms to create meeting sessions. 
+   11. Add the title and room details as per wish then click publish.
    12. You are ready to hold conferences.
-   
+
+
+**How To Use**
+   - Blindside Networks offers free hosting for BigBlueButton. A server setup is required for working with this plugin.For more information on setting up your own BigBlueButton server or for using an external hosting provider visit [http://bigbluebutton.org/support](http://bigbluebutton.org/support "http://bigbluebutton.org/support").
+   - In any Post/Page the BigBlueButton widgets can be added to JOin a meeting session or to view a webpage relating to the mettign session. Ways to add this widgest is to add the shortcode [bigbluebuttonrooms], [bigbluebutton_recordings] or [bigbluebutton]. The [bigbluebutton] shortcode can be customized to be used as a rooms or recordings widget by adding the paramenter type="rooms" or recordings, in the same way title, token and join parameters have been added to this shortcode. An example of adding a joining form with a title of "Rooms" that consist on two meeting rooms:
+[bigbluebutton type="rooms" title="Rooms" token="93410c6104b7, a79cb08c9fc9" join="true"]
+   - It is recommended to use the <a href="https://wordpress.org/plugins/members/" target="_blank">Members</a> plugin for changing the default capabilities for each user.
+   - To get a detailed view of how to use this plgin pleasew refere to <add link here>.
+
 
 == Frequently Asked Questions ==
 
@@ -65,7 +73,7 @@ An example of adding a joining form with a title of "Rooms" that consist on two 
 
 The plugin gatters the much information it cans from Wordpress, but what will be taken depends of the configuration.
 
-For registered users their registered name or username will be taken as Name. The BigBlueButton role (moderator/attendee) can be assigned automatically depending of the permission settings. This way a registered user in a role which permissions has been previously set would not be required nether for Name nor Password.
+For registered users their registered name or username will be taken as Name. The BigBlueButton role (moderator/attendee) can be assigned automatically depending of the permission settings. This way a registered user in a role which permissions has been previously set would not be required neither for Name nor Password.
 
 For registered users whose role has ben set for requiring always a password, only the Password will be required.
 
@@ -122,7 +130,7 @@ You should enable the curl extension in php.ini.
 == Changelog ==
 
 = 2.0.0 =
-* Added feature. Custom Post Type and taxonomies to create and join rooms. *
+* Added feature. Added the section "Rooms" in the top-level of the admin page to create and join rooms. *
 * Added feature. Custom parameters of type, title, token and join in the shortcode [bigbluebutton]. *
 * Added feature. Support of wordpress permissions for assigning roles in BigBlueButton. *
 * Updated. Simplified UI for configuring the plugin. *
@@ -253,4 +261,4 @@ This version provides better performance, and the wait for moderator option is n
 This version provides better performance, and includes some bug fixes.
 
 = 1.0.0 =
-This version is the official release of the bigbluebutton plugin.
+This version is the official release of the bigbluebutton plugin.er

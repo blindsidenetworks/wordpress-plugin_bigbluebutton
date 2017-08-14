@@ -91,7 +91,6 @@ function bigbluebutton_install()
             'secret' => $saltval,
             'install' => true
         );
-        add_option('bigbluebutton_settings', $bbbsettings);
         bigbluebutton_migrate_old_plugin_data();
     } else {
         if (!isset($bbbsettings)) {
@@ -108,6 +107,7 @@ function bigbluebutton_install()
         $bbbsettings['install'] = true;
         bigbluebutton_default_roles();
     }
+    add_option('bigbluebutton_settings', $bbbsettings);
     update_option('bigbluebutton_settings', $bbbsettings);
     bigbluebutton_session_setup($bbbsettings['endpoint'], $bbbsettings['secret']);
 }
@@ -1010,7 +1010,6 @@ function bigbluebutton_room_details_metabox($post)
         <tr>
             <th>Wait for Admin to start meeting?</th>
             <td>
-               	<?php // echo $bbbwaitadminstart;?>
                	<input type="radio" name='bbb_must_wait_for_admin_start' id="bbb_must_wait_for_admin_start_yes" value="1" <?php if (!$bbbwaitadminstart || $bbbwaitadminstart == '1') {
         echo "checked='checked'";
     } ?> /><label for="bbb_must_wait_for_admin_start_yes" >Yes</label>
