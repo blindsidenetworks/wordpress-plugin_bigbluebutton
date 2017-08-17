@@ -273,6 +273,7 @@ function bigbluebutton_init()
     bigbluebutton_css_enqueue();
     bigbluebutton_frontend_css_enqueue();
     bigbluebutton_scripts();
+    bigbluebutton_update_postmeta();
 }
 
 /**
@@ -420,6 +421,14 @@ function bigbluebutton_scripts()
     ));
 }
 
+function bigbluebutton_update_postmeta()
+{
+    $posts = get_posts(array('post_type' => 'bbb-room'));
+    foreach ($posts as $post) {
+        $roomtoken = get_post_meta($post->ID, '_bbb_room_token', true);
+        add_post_meta($post->ID, 'post_token', $roomtoken, true);
+    }
+}
 //===============================================================================================
 //------------------------------  BigBlueButton Settings page -----------------------------------
 //===============================================================================================
@@ -730,8 +739,14 @@ function bigbluebutton_shortcode_output_form($bbbposts, $atts, $currentuser)
 function bigbluebutton_shortcode_output_form_single($bbbposts, $atts, $currentuser, $joinorview)
 {
     $outputstring = '';
-    $slug = $bbbposts->post->post_name;
-    $title = $bbbposts->post->post_title;
+    foreach ($bbbposts->posts as $post) {
+        $title = $bbbposts->post->post_title;
+        $posttoken = get_post_meta($post->ID, "post_token");
+        if ($posttoken[0] == $atts["token"]) {
+            $slug = $post->post_name;
+            $title = $post->post_title;
+        }
+    }
     $outputstring .= bigbluebutton_form_setup($currentuser, $atts);
     $outputstring .= '<input type="hidden" name="hiddenInput" id="hiddenInput" value="'.$slug.'" />';
     $usercapabilitiesarray = bigbluebutton_assign_capabilities_array($currentuser);
