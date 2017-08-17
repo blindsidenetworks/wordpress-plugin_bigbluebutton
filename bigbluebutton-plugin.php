@@ -745,6 +745,7 @@ function bigbluebutton_shortcode_output_form_single($bbbposts, $atts, $currentus
         if ($posttoken[0] == $atts["token"]) {
             $slug = $post->post_name;
             $title = $post->post_title;
+            break;
         }
     }
     $outputstring .= bigbluebutton_form_setup($currentuser, $atts);
