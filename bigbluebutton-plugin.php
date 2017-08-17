@@ -875,7 +875,7 @@ function bigbluebutton_print_recordings_table_headers($currentuser)
   <table  class="stats" cellspacing="5">
     <tr>
       <th class="hed" colspan="1">Recording</th>
-      <th class="hed" colspan="1">Meeting Room Name</th>
+      <th class="hed" colspan="1">Recording Name</th>
       <th class="hed" colspan="1">Date</th>
       <th class="hed" colspan="1">Duration</th>';
     if ($currentuser->allcaps["manage_recordings_bbb-room"] == true) {
