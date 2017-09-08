@@ -32,6 +32,7 @@ while ($query->have_posts()) {
 wp_reset_postdata();
 
 // Remove options
+delete_option('bigbluebutton_version');
 delete_option('bigbluebutton_endpoint');
 delete_option('bigbluebutton_secret');
 

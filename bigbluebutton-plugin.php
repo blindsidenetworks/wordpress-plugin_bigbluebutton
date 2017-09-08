@@ -81,7 +81,6 @@ function bigbluebutton_activate()
 {
     if (get_option('bigbluebutton_version') == BIGBLUEBUTTON_PLUGIN_VERSION) {
         // Simple activation.
-        error_log("Simple activation");
         bigbluebutton_session_setup(get_option('bigbluebutton_endpoint'), get_option('bigbluebutton_secret'));
 	      return;
     }
@@ -91,7 +90,6 @@ function bigbluebutton_activate()
     $bbbsalt = get_option('bigbluebutton_salt');
     if ($bbburl || $bbbsalt) {
         // Activation for update.
-        error_log("Update...");
         delete_option('bigbluebutton_url');
         delete_option('bigbluebutton_salt');
         bigbluebutton_migrate_old_plugin_meetings();
@@ -102,7 +100,6 @@ function bigbluebutton_activate()
         return;
     }
     // Activation for installation.
-    error_log("Installation...");
 	  bigbluebutton_add_default_rooms();
     bigbluebutton_set_default_roles();
     add_option('bigbluebutton_endpoint', BIGBLUEBUTTON_DEFAULT_ENDPOINT);
@@ -112,13 +109,10 @@ function bigbluebutton_activate()
 
 function bigbluebutton_add_default_rooms()
 {
-		error_log("Adding default rooms...");
     if (post_exists("Demo meeting") == 0) {
-        error_log("Adding Demo meeting...");
         bigbluebutton_insert_post(1, "Demo meeting", bigbluebutton_generate_token(), 'ap', 'mp', 0, 0);
     }
     if (post_exists("Demo meeting (recorded)") == 0) {
-        error_log("Adding Demo meeting (recorded)...");
         bigbluebutton_insert_post(2, "Demo meeting (recorded)", bigbluebutton_generate_token(), 'ap', 'mp', 0, 1);
     }
 }
