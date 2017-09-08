@@ -20,7 +20,8 @@ if (version_compare($wp_version, '2.5', '<')) {
 require_once 'includes/bbb_api.php';
 
 define('BIGBLUEBUTTON_PLUGIN_VERSION', bigbluebutton_get_version());
-
+define('BIGBLUEBUTTON_DEFAULT_ENDPOINT', 'http://test-install.blindsidenetworks.com/bigbluebutton/');
+define('BIGBLUEBUTTON_DEFAULT_SECRET', '8cd8ef52e8e101574e400365b55e11a6');
 //================================================================================
 //--------------------------------Hooks----------------------------------------
 //================================================================================
@@ -55,7 +56,7 @@ add_filter('the_content', 'bigbluebutton_filter');
 //================================================================================
 
 /**
-* On activation functionality that needs to be added
+* On activation script
 */
 function bigbluebutton_plugin_activate($network_wide)
 {
@@ -64,55 +65,43 @@ function bigbluebutton_plugin_activate($network_wide)
         $multisiteblogs = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
         foreach ($multisiteblogs as $blogid) {
             switch_to_blog($blogid);
-            bigbluebutton_install();
-            restore_current_blog();
+            bigbluebutton_activate();
         }
+        restore_current_blog();
     } else {
-        bigbluebutton_install();
+        bigbluebutton_activate();
     }
 }
 
 
 /**
-* BigBlueButton Install
+* BigBlueButton activate
 */
-function bigbluebutton_install()
+function bigbluebutton_activate()
 {
-    $bbbsettings = array();
-    $urlval = get_option('bigbluebutton_url');//old plugins endpoint value
-    $saltval = get_option('bigbluebutton_salt');//old plugins secret value
-    $bbbsettings = get_option('bigbluebutton_settings');
-    if ($bbbsettings['install'] == false) {
-        bigbluebutton_insert_default_rooms();
-    }
-    if ((strcmp("1.4.2", bigbluebutton_get_version()) <= 0) && ($bbbsettings['install'] == false)) {
-        $bbbsettings = array(
-            'endpoint' => $urlval,
-            'secret' => $saltval,
-            'install' => true
-        );
-        add_option('bigbluebutton_settings', $bbbsettings);
-        bigbluebutton_migrate_old_plugin_data();
-    } else {
-        if (!isset($bbbsettings)) {
-            $bbbsettings['endpoint'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
-            $bbbsettings['secret'] = '8cd8ef52e8e101574e400365b55e11a6';
-        } else {
-            if (!isset($bbbsettings['endpoint'])) {
-                $bbbsettings['endpoint'] = 'http://test-install.blindsidenetworks.com/bigbluebutton/';
-            }
-            if (!isset($bbbsettings['secret'])) {
-                $bbbsettings['secret'] = '8cd8ef52e8e101574e400365b55e11a6';
-            }
-        }
-        $bbbsettings['install'] = true;
-        bigbluebutton_default_roles();
-    }
-    update_option('bigbluebutton_settings', $bbbsettings);
-    bigbluebutton_session_setup($bbbsettings['endpoint'], $bbbsettings['secret']);
+    $endpoint = get_option('bigbluebutton_endpoint');
+    $secret = get_option('bigbluebutton_secret');
+    if (!$endpoint || !$secret) {
+        if (strcmp("1.4.2", bigbluebutton_get_version()) <= 0) {
+	          $endpoint = get_option('bigbluebutton_url');
+	          $secret = get_option('bigbluebutton_salt');
+            delete_option('bigbluebutton_url');
+            delete_option('bigbluebutton_salt');
+            bigbluebutton_migrate_old_plugin_meetings();
+            bigbluebutton_migrate_old_plugin_roles();
+	      } else {
+	          $endpoint = BIGBLUEBUTTON_DEFAULT_ENDPOINT;
+	          $secret = BIGBLUEBUTTON_DEFAULT_SECRET;
+	          bigbluebutton_add_default_rooms();
+            bigbluebutton_set_default_roles();
+	      }
+        add_option('bigbluebutton_endpoint', $endpoint);
+        add_option('bigbluebutton_secret', $secret);
+	  }
+    bigbluebutton_session_setup($endpoint, $secret);
 }
 
-function bigbluebutton_insert_default_rooms()
+function bigbluebutton_add_default_rooms()
 {
     if (post_exists("Demo meeting") == 0) {
         bigbluebutton_insert_post(1, "Demo meeting", bigbluebutton_generate_token(), 'ap', 'mp', 0, 0);
@@ -157,18 +146,9 @@ function bigbluebutton_update_metadata($pluginslug)
 //================================================================================
 
 /**
-* Previous plugin's information to be transfered in the new plugin
-**/
-function bigbluebutton_migrate_old_plugin_data()
-{
-    bigbluebutton_meetings_data_old_plugin();
-    bigbluebutton_default_roles_old_plugin();
-}
-
-/**
 * Previous meeting's rooms information assigned to new plugins data strucure
 **/
-function bigbluebutton_meetings_data_old_plugin()
+function bigbluebutton_migrate_old_plugin_meetings()
 {
     global $wpdb;
     $tablename = $wpdb->prefix . "bigbluebutton";
@@ -177,7 +157,7 @@ function bigbluebutton_meetings_data_old_plugin()
     if (count($listofmeetings) != 0) {
         foreach ($listofmeetings as $meeting) {
             if (($meeting->meetingName == "Demo meeting")||($meeting->meetingName == "Demo meeting (recorded)")) {
-                bigbluebutton_insert_default_rooms();
+                bigbluebutton_add_default_rooms();
             } else {
                 bigbluebutton_insert_post($meeting->id, $meeting->meetingName, $meeting->meetingID, $meeting->attendeePW, $meeting->moderatorPW, $meeting->waitForModerator, $meeting->recorded);
             }
@@ -188,7 +168,7 @@ function bigbluebutton_meetings_data_old_plugin()
 /**
 * Previous capabilities assigned to new plugins capabilities
 **/
-function bigbluebutton_default_roles_old_plugin()
+function bigbluebutton_migrate_old_plugin_roles()
 {
     $permissions = get_option('bigbluebutton_permissions');
 
@@ -1185,10 +1165,7 @@ function bigbluebutton_filter($content)
         $post = get_post($postid);
         $slug = $post->post_name;
         $meetingname = get_the_title($post->ID);
-        $bigbluebuttonsettings = get_option('bigbluebutton_settings');
-        $endpointvalue = $bigbluebuttonsettings['endpoint'];
-        $secretvalue = $bigbluebuttonsettings['secret'];
-        bigbluebutton_session_setup($endpointvalue, $secretvalue);
+        bigbluebutton_session_setup(get_option('bigbluebutton_endpoint'), get_option('bigbluebutton_secret'));
         $currentuser = wp_get_current_user();
         $usercapabilitiesarray = bigbluebutton_assign_capabilities_array($currentuser);
         $outputstring .= '<div id="bbb-join-container"></div>';
@@ -1253,7 +1230,7 @@ function before_bbb_delete()
 /**
  * Adding default roles.
  */
-function bigbluebutton_default_roles()
+function bigbluebutton_set_default_roles()
 {
     $adminrole = get_role('administrator');
     $adminrole->add_cap('join_as_attendee_bbb-room', false);
