@@ -160,14 +160,8 @@ function bigbluebutton_migrate_old_plugin_meetings()
     $tablename = $wpdb->prefix . "bigbluebutton";
     $listofmeetings = $wpdb->get_results("SELECT * FROM ".$tablename." ORDER BY id");
 
-    if (count($listofmeetings) != 0) {
-        foreach ($listofmeetings as $meeting) {
-            if (($meeting->meetingName == "Demo meeting")||($meeting->meetingName == "Demo meeting (recorded)")) {
-                bigbluebutton_add_default_rooms();
-            } else {
-                bigbluebutton_insert_post($meeting->id, $meeting->meetingName, $meeting->meetingID, $meeting->attendeePW, $meeting->moderatorPW, $meeting->waitForModerator, $meeting->recorded);
-            }
-        }
+    foreach ($listofmeetings as $meeting) {
+        bigbluebutton_insert_post($meeting->id, $meeting->meetingName, $meeting->meetingID, $meeting->attendeePW, $meeting->moderatorPW, $meeting->waitForModerator, $meeting->recorded);
     }
 }
 
