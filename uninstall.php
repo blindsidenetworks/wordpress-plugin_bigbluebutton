@@ -4,7 +4,6 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit();
 }
 
-error_log("Uninstalling");
 // Uninstall code goes here
 global $wpdb;
 

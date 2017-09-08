@@ -79,34 +79,46 @@ function bigbluebutton_plugin_activate($network_wide)
 */
 function bigbluebutton_activate()
 {
-    $endpoint = get_option('bigbluebutton_endpoint');
-    $secret = get_option('bigbluebutton_secret');
-    if (!$endpoint || !$secret) {
-        if (strcmp("1.4.2", bigbluebutton_get_version()) <= 0) {
-	          $endpoint = get_option('bigbluebutton_url');
-	          $secret = get_option('bigbluebutton_salt');
-            delete_option('bigbluebutton_url');
-            delete_option('bigbluebutton_salt');
-            bigbluebutton_migrate_old_plugin_meetings();
-            bigbluebutton_migrate_old_plugin_roles();
-	      } else {
-	          $endpoint = BIGBLUEBUTTON_DEFAULT_ENDPOINT;
-	          $secret = BIGBLUEBUTTON_DEFAULT_SECRET;
-	          bigbluebutton_add_default_rooms();
-            bigbluebutton_set_default_roles();
-	      }
-        add_option('bigbluebutton_endpoint', $endpoint);
-        add_option('bigbluebutton_secret', $secret);
-	  }
-    bigbluebutton_session_setup($endpoint, $secret);
+    if (get_option('bigbluebutton_version') == BIGBLUEBUTTON_PLUGIN_VERSION) {
+        // Simple activation.
+        error_log("Simple activation");
+        bigbluebutton_session_setup(get_option('bigbluebutton_endpoint'), get_option('bigbluebutton_secret'));
+	      return;
+    }
+    // Activation either for update or installation.
+    add_option('bigbluebutton_version', BIGBLUEBUTTON_PLUGIN_VERSION);
+    $bbburl = get_option('bigbluebutton_url');
+    $bbbsalt = get_option('bigbluebutton_salt');
+    if ($bbburl || $bbbsalt) {
+        // Activation for update.
+        error_log("Update...");
+        delete_option('bigbluebutton_url');
+        delete_option('bigbluebutton_salt');
+        bigbluebutton_migrate_old_plugin_meetings();
+        bigbluebutton_migrate_old_plugin_roles();
+        add_option('bigbluebutton_endpoint', $bbburl);
+        add_option('bigbluebutton_secret', $bbbsalt);
+        bigbluebutton_session_setup($bbburl, $bbbsalt);
+        return;
+    }
+    // Activation for installation.
+    error_log("Installation...");
+	  bigbluebutton_add_default_rooms();
+    bigbluebutton_set_default_roles();
+    add_option('bigbluebutton_endpoint', BIGBLUEBUTTON_DEFAULT_ENDPOINT);
+    add_option('bigbluebutton_secret', BIGBLUEBUTTON_DEFAULT_SECRET);
+    bigbluebutton_session_setup(BIGBLUEBUTTON_DEFAULT_ENDPOINT, BIGBLUEBUTTON_DEFAULT_SECRET);
 }
 
 function bigbluebutton_add_default_rooms()
 {
+		error_log("Adding default rooms...");
     if (post_exists("Demo meeting") == 0) {
+        error_log("Adding Demo meeting...");
         bigbluebutton_insert_post(1, "Demo meeting", bigbluebutton_generate_token(), 'ap', 'mp', 0, 0);
     }
     if (post_exists("Demo meeting (recorded)") == 0) {
+        error_log("Adding Demo meeting (recorded)...");
         bigbluebutton_insert_post(2, "Demo meeting (recorded)", bigbluebutton_generate_token(), 'ap', 'mp', 0, 1);
     }
 }
