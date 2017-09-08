@@ -29,6 +29,9 @@ define('BIGBLUEBUTTON_DEFAULT_SECRET', '8cd8ef52e8e101574e400365b55e11a6');
 // Activation definitions.
 register_activation_hook(__FILE__, 'bigbluebutton_plugin_activate');
 
+// Deinstallation definitions.
+register_uninstall_hook(__FILE__, 'bigbluebutton_plugin_uninstall' );
+
 // Action definitions.
 add_action('init', 'bigbluebutton_init');
 add_action('admin_menu', 'bigbluebutton_register_settings_page', 1);
@@ -117,6 +120,53 @@ function bigbluebutton_add_default_rooms()
     }
 }
 
+//================================================================================
+//--------------------------------Plugin Deinstallation-------------------------------
+//================================================================================
+
+function bigbluebutton_plugin_uninstall () {
+    global $wpdb;
+
+    // In case is deactivateing an overwritten super old version
+    if( get_option('bbb_db_version') ) {
+        $table_name_old = $wpdb->prefix . "bbb_meetingRooms";
+        $wpdb->query("DROP TABLE IF EXISTS $table_name_old");
+        delete_option('bbb_db_version');
+        delete_option('mt_bbb_url');
+        delete_option('mt_salt');
+    }
+
+    // Remove old tables if exist
+    $tables = array('bigbluebutton', 'bigbluebutton_logs');
+    foreach ($tables as $table) {
+        $sql = "DROP TABLE IF EXISTS " . $wpdb->prefix . $table;
+        $wpdb->query($sql);
+    }
+
+    // Remove old options if exist
+    delete_option('bigbluebutton_plugin_version');
+    delete_option('bigbluebutton_url');
+    delete_option('bigbluebutton_salt');
+    delete_option('bigbluebutton_permissions');
+
+    // Remove current meeting rooms
+    $args = array (
+        'post_type' => 'room',
+        'nopaging' => true
+    );
+    $query = new WP_Query($args);
+    while ($query->have_posts()) {
+        $query->the_post();
+        $id = get_the_ID();
+        wp_delete_post($id, true);
+    }
+    wp_reset_postdata();
+
+    // Remove current options
+    delete_option('bigbluebutton_version');
+    delete_option('bigbluebutton_endpoint');
+    delete_option('bigbluebutton_secret');
+}
 
 //================================================================================
 //---------------------------------Upgrade----------------------------------------
