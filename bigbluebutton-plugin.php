@@ -66,8 +66,8 @@ function bigbluebutton_plugin_activate($network_wide)
         foreach ($multisiteblogs as $blogid) {
             switch_to_blog($blogid);
             bigbluebutton_activate();
+            restore_current_blog();
         }
-        restore_current_blog();
     } else {
         bigbluebutton_activate();
     }

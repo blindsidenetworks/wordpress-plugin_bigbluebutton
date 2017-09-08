@@ -10,7 +10,7 @@ global $wpdb;
 
 $tables = array('bigbluebutton', 'bigbluebutton_log');
 foreach ($tables as $table) {
-    $sql = "DROP TABLE IF EXISTS " $wpdb->prefix . $table;
+    $sql = "DROP TABLE IF EXISTS " . $wpdb->prefix . $table;
     $wpdb->query($sql);
 }
 
