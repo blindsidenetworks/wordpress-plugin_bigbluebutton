@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2012 Blindside Networks
+Copyright 2012 onwards Blindside Networks
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -12,9 +12,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-Versions:
-   1.0  --  Updated by Jesus Federico
-                    (email : federico DOT jesus [a t ] g m ail DOT com)
 */
 ///================================================================================
 //------------------Required Libraries and Global Variables-----------------------
@@ -86,7 +83,7 @@ if (!isset($_SESSION[$secretname]) || !isset($_SESSION[$endpointname])) {
             }else if((!isset($_POST[$join]))){
                 header('HTTP/1.0 400 Bad Request. [join] parameter was not included in this query.');
             }else{
-              $post = get_page_by_path($_POST[$slugname], OBJECT, 'bbb-room');
+              $post = get_page_by_path($_POST[$slugname], OBJECT, 'room');
               if($_POST[$join] === "true"){
                 $username = bigbluebutton_set_user_name();
                 $meetingid = bigbluebutton_set_meeting_id($_POST[$slugname]);
@@ -147,7 +144,7 @@ if (!isset($_SESSION[$secretname]) || !isset($_SESSION[$endpointname])) {
 * Sets the password of the meeting
 **/
 function bigbluebutton_set_password_broker($slug){
-  $post = get_page_by_path($slug, OBJECT, 'bbb-room');
+  $post = get_page_by_path($slug, OBJECT, 'room');
   $currentuser = wp_get_current_user();
   $password='';
   $moderatorpassword = get_post_meta($post->ID, '_bbb_moderator_password', true);
@@ -161,8 +158,8 @@ function bigbluebutton_set_password_broker($slug){
     $usercaparray = $anonymousRole->capabilities;
   }
 
-  if($usercaparray["join_with_password_bbb-room"] == true ) {
-      if($usercaparray["join_as_moderator_bbb-room"] == true) {
+  if($usercaparray["join_with_password_room"] == true ) {
+      if($usercaparray["join_as_moderator_room"] == true) {
         if(strcmp($moderatorpassword,$_POST['password']) === 0) {
             $password = $moderatorpassword;
         }
@@ -172,7 +169,7 @@ function bigbluebutton_set_password_broker($slug){
         }
       }
   }else {
-      if($usercaparray["join_as_moderator_bbb-room"] === true) {
+      if($usercaparray["join_as_moderator_room"] === true) {
         $password = $moderatorpassword;
       }else {
         $password = $attendeepassword;
@@ -198,7 +195,7 @@ function bigbluebutton_set_user_name(){
 **/
 function bigbluebutton_set_meeting_id($slug)
 {
-  $post = get_page_by_path($slug, OBJECT, 'bbb-room');
+  $post = get_page_by_path($slug, OBJECT, 'room');
   $roomtoken = get_post_meta($post->ID, '_bbb_room_token', true);
   $meetingid = $roomtoken;
   if(strlen($meetingid) == 12){

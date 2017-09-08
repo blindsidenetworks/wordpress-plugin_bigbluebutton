@@ -20,7 +20,7 @@ delete_option('bigbluebutton_salt');
 
 // Remove rooms
 $args = array (
-    'post_type' => 'bbb-room',
+    'post_type' => 'room',
     'nopaging' => true
 );
 $query = new WP_Query($args);

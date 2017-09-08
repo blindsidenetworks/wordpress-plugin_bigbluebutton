@@ -1,0 +1,2 @@
+# Copyright (C) 2017 BigBlueButton
+# This file is distributed under the same license as the BigBlueButton package.
