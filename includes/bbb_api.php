@@ -43,11 +43,9 @@ function bbb_wrap_simplexml_load_file($url)
 
         if ($data) {
             return new SimpleXMLElement($data);
-        } else {
-            return false;
         }
+        return false;
     }
-
     return simplexml_load_file($url);
 }
 
@@ -102,7 +100,6 @@ class BigBlueButton
     {
         $url_join = $endpointvalue.'api/join?';
         $params = 'meetingID='.urlencode($meetingid).'&fullName='.urlencode($username).'&password='.urlencode($password);
-
         return $url_join.$params.'&checksum='.sha1('join'.$params.$secretvalue);
     }
 
@@ -126,25 +123,20 @@ class BigBlueButton
         if ($voicebridge == 0) {
             $voicebridge = 70000 + rand(0, 9999);
         }
-
         $meta = '';
         if ($metadata != '') {
             foreach ($metadata as $key => $value) {
                 $meta = $meta.'&'.$key.'='.urlencode($value);
             }
         }
-
         $params = 'name='.urlencode($name).'&meetingID='.urlencode($meetingid).'&attendeePW='.urlencode($attendeepassword).'&moderatorPW='.urlencode($moderatorpassword).'&voiceBridge='.$voicebridge.'&logoutURL='.urlencode($logouturl).'&record='.$record.$meta;
-
         $duration = intval($duration);
         if ($duration > 0) {
             $params .= '&duration='.$duration;
         }
-
         if (trim($welcome)) {
             $params .= '&welcome='.urlencode($welcome);
         }
-
         return  $url_create.$params.'&checksum='.sha1('create'.$params.$secretvalue);
     }
 
@@ -161,11 +153,8 @@ class BigBlueButton
     {
         $base_url = $endpointvalue.'api/isMeetingRunning?';
         $params = 'meetingID='.urlencode($meetingid);
-
         return $base_url.$params.'&checksum='.sha1('isMeetingRunning'.$params.$secretvalue);
     }
-
-
 
     /**
      *This method returns the url to end the specified meeting.
@@ -181,7 +170,6 @@ class BigBlueButton
     {
         $base_url = $endpointvalue.'api/'.$typeurl.'?';
         $params = 'meetingID='.urlencode($meetingid).'&password='.urlencode($moderatorpassword);
-
         return  $base_url.$params.'&checksum='.sha1($typeurl.$params.$secretvalue);
     }
 
@@ -197,17 +185,13 @@ class BigBlueButton
     {
         $base_url = $endpointvalue.'api/getMeetings?';
         $params = 'random='.(rand() * 1000);
-
         return  $base_url.$params.'&checksum='.sha1('getMeetings'.$params.$secretvalue);
     }
-
-
 
     public function getRecordingsURL($meetingid, $endpointvalue, $secretvalue)
     {
         $baseurlrecord = $endpointvalue.'api/getRecordings?';
         $params = 'meetingID='.urlencode($meetingid);
-
         return $baseurlrecord.$params.'&checksum='.sha1('getRecordings'.$params.$secretvalue);
     }
 
@@ -215,7 +199,6 @@ class BigBlueButton
     {
         $url_delete = $endpointvalue.'api/deleteRecordings?';
         $params = 'recordID='.urlencode($recordid);
-
         return $url_delete.$params.'&checksum='.sha1('deleteRecordings'.$params.$secretvalue);
     }
 
@@ -223,7 +206,6 @@ class BigBlueButton
     {
         $url_delete = $endpointvalue.'api/publishRecordings?';
         $params = 'recordID='.$recordid.'&publish='.$set;
-
         return $url_delete.$params.'&checksum='.sha1('publishRecordings'.$params.$secretvalue);
     }
 
@@ -245,14 +227,13 @@ class BigBlueButton
     public function createMeetingAndGetJoinURL($username, $meetingid, $meetingname, $welcomestring, $moderatorpassword, $attendeepassword, $secretvalue, $endpointvalue, $logouturl, $record = 'false', $duration = 0, $voicebridge = 0, $metadata = array())
     {
         $xml = bbb_wrap_simplexml_load_file(self::getCreateMeetingURL($meetingname, $meetingid, $attendeepassword, $moderatorpassword, $welcomestring, $logouturl, $secretvalue, $endpointvalue, $record, $duration, $voicebridge, $metadata));
-
         if ($xml && $xml->returncode == 'SUCCESS') {
             return  self::getJoinURL($meetingid, $username, $moderatorpassword, $secretvalue, $endpointvalue);
-        } elseif ($xml) {
-            return  (string) $xml->messageKey.' : '.(string) $xml->message;
-        } else {
-            return 'Unable to fetch URL '.$url_create.$params.'&checksum='.sha1('create'.$params.$secretvalue);
         }
+        if ($xml) {
+            return  (string) $xml->messageKey.' : '.(string) $xml->message;
+        }
+        return 'Unable to fetch URL '.$url_create.$params.'&checksum='.sha1('create'.$params.$secretvalue);
     }
 
     /**
@@ -275,16 +256,14 @@ class BigBlueButton
     public function createMeetingArray($meetingid, $meetingname, $welcomestring, $moderatorpassword, $attendeepassword, $secretvalue, $endpointvalue, $logouturl, $record = 'false', $duration = 0, $voicebridge = 0, $metadata = array())
     {
         $xml = bbb_wrap_simplexml_load_file(self::getCreateMeetingURL($meetingname, $meetingid, $attendeepassword, $moderatorpassword, $welcomestring, $logouturl, $secretvalue, $endpointvalue, $record, $duration, $voicebridge, $metadata));
-
         if ($xml) {
             if ($xml->meetingID) {
                 return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey, 'meetingID' => (string) $xml->meetingID, 'attendeePW' => (string) $xml->attendeePW, 'moderatorPW' => (string) $xml->moderatorPW, 'hasBeenForciblyEnded' => (string) $xml->hasBeenForciblyEnded);
             } else {
                 return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
             }
-        } else {
-            return null;
         }
+        return false;
     }
 
     //-------------------------------------------getMeetingInfo---------------------------------------------------
@@ -306,7 +285,6 @@ class BigBlueButton
         if ($xml) {
             return  str_replace('</response>', '', str_replace("<?xml version=\"1.0\"?>\n<response>", '', $xml->asXML()));
         }
-
         return false;
     }
 
@@ -326,20 +304,21 @@ class BigBlueButton
     public function getMeetingInfoArray($meetingid, $moderatorpassword, $endpointvalue, $secretvalue)
     {
         $xml = bbb_wrap_simplexml_load_file(self::getMeetingURL($meetingid, $moderatorpassword, $endpointvalue, $secretvalue, 'getMeetingInfo'));
-
-        if ($xml && $xml->returncode == 'SUCCESS') { //If there were meetings already created
+        if ($xml && $xml->returncode == 'SUCCESS') { // If there were meetings already created.
             return array('returncode' => (string) $xml->returncode, 'meetingID' => (string) $xml->meetingID, 'moderatorPW' => (string) $xml->moderatorPW, 'attendeePW' => (string) $xml->attendeePW, 'hasBeenForciblyEnded' => (string) $xml->hasBeenForciblyEnded, 'running' => (string) $xml->running, 'startTime' => (string) $xml->startTime, 'endTime' => (string) $xml->endTime, 'participantCount' => (string) $xml->participantCount, 'moderatorCount' => (string) $xml->moderatorCount, 'attendees' => (string) $xml->attendees);
         }
-        checkXMLFaliure($xml);
+        self::checkXMLFaliure($xml);
     }
 
-function checkXMLFaliure($xml){
-  if (($xml && $xml->returncode == 'FAILED') || $xml) { //If the xml packet returned failure it displays the message to the user
-      return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
-  } else { //If the server is unreachable, then prompts the user of the necessary action
-      return null;
-  }
-}
+    public function checkXMLFaliure($xml)
+    {
+        if (($xml && $xml->returncode == 'FAILED') || $xml) { //If the xml packet returned failure it displays the message to the user
+            return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
+        }
+        //If the server is unreachable, then prompts the user of the necessary action
+        return null;
+    }
+
     //-----------------------------------------------getMeetings------------------------------------------------------
     /**
     *This method calls getMeetings on the bigbluebutton server, then calls getMeetingInfo for each meeting and concatenates the result.
@@ -368,11 +347,9 @@ function checkXMLFaliure($xml){
                 }
             }
             echo '</meetings>';
-
             return ob_get_clean();
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -393,8 +370,8 @@ function checkXMLFaliure($xml){
         if ($xml && $xml->returncode == 'SUCCESS' && $xml->messageKey) {
             //The meetings were returned
             return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
-        } elseif ($xml && $xml->returncode == 'SUCCESS') { //If there were meetings already created
-
+        }
+        if ($xml && $xml->returncode == 'SUCCESS') { // If there were meetings already created.
             foreach ($xml->meetings->meeting as $meeting) {
                 $meetings = array();
                 $meetings[] = array('meetingID' => $meeting->meetingID, 'moderatorPW' => $meeting->moderatorPW, 'attendeePW' => $meeting->attendeePW, 'hasBeenForciblyEnded' => $meeting->hasBeenForciblyEnded, 'running' => $meeting->running);
@@ -402,7 +379,7 @@ function checkXMLFaliure($xml){
 
             return $meetings;
         }
-        checkXMLFaliure($xml);
+        self::checkXMLFaliure($xml);
     }
 
     public function getRecordingsArray($meetingid, $endpointvalue, $secretvalue)
@@ -411,7 +388,8 @@ function checkXMLFaliure($xml){
         if ($xml && $xml->returncode == 'SUCCESS' && $xml->messageKey) {
             //The meetings were returned
             return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
-        } elseif ($xml && $xml->returncode == 'SUCCESS') { //If there were meetings already created
+        }
+        if ($xml && $xml->returncode == 'SUCCESS') { // If there were meetings already created.
             $recordings = array();
 
             foreach ($xml->recordings->recording as $recording) {
@@ -437,18 +415,18 @@ function checkXMLFaliure($xml){
 
             return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey, 'recordings' => $recordings);
         }
-        checkXMLFaliure($xml);
+        self::checkXMLFaliure($xml);
     }
 
     private function recordingBuildSorter($a, $b)
     {
         if ($a['startTime'] < $b['startTime']) {
             return -1;
-        } elseif ($a['startTime'] == $b['startTime']) {
-            return 0;
-        } else {
-            return 1;
         }
+        if ($a['startTime'] == $b['startTime']) {
+            return 0;
+        }
+        return 1;
     }
 
     //----------------------------------------------getUsers---------------------------------------
@@ -477,11 +455,9 @@ function checkXMLFaliure($xml){
                     }
                 }
             }
-
             return ob_end_flush();
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -502,17 +478,17 @@ function checkXMLFaliure($xml){
         $xml = bbb_wrap_simplexml_load_file(self::getMeetingURL($meetingid, $moderatorpassword, $endpointvalue, $secretvalue, 'getMeetingInfo'));
 
         if ($xml && $xml->returncode == 'SUCCESS' && $xml->messageKey == null) {
-            //The meetings were returned
+            // The meetings were returned.
             return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
-        } elseif ($xml && $xml->returncode == 'SUCCESS') { //If there were meetings already created
+        }
+        if ($xml && $xml->returncode == 'SUCCESS') { // If there were meetings already created.
             foreach ($xml->attendees->attendee as $attendee) {
                 $users = array();
                 $users[] = array('userID' => $attendee->userID, 'fullName' => $attendee->fullName, 'role' => $attendee->role);
             }
-
             return $users;
         }
-        checkXMLFaliure($xml);
+        self::checkXMLFaliure($xml);
     }
 
     //------------------------------------------------Other Methods------------------------------------
@@ -534,9 +510,9 @@ function checkXMLFaliure($xml){
 
         if ($xml) { //If the xml packet returned failure it displays the message to the user
             return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey);
-        } else { //If the server is unreachable, then prompts the user of the necessary action
-            return null;
         }
+        // If the server is unreachable, then prompts the user of the necessary action.
+        return null;
     }
 
     public function doDeleteRecordings($recordids, $endpointvalue, $secretvalue)
@@ -548,7 +524,6 @@ function checkXMLFaliure($xml){
                 return false;
             }
         }
-
         return true;
     }
 
@@ -561,7 +536,6 @@ function checkXMLFaliure($xml){
                 return false;
             }
         }
-
         return true;
     }
 
@@ -572,9 +546,8 @@ function checkXMLFaliure($xml){
         $xml = bbb_wrap_simplexml_load_file($baseurlrecord);
         if ($xml && $xml->returncode == 'SUCCESS') {
             return $xml->version;
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -591,9 +564,8 @@ function checkXMLFaliure($xml){
         $xml = bbb_wrap_simplexml_load_file(self::getIsMeetingRunningURL($meetingid, $endpointvalue, $secretvalue));
         if ($xml && $xml->returncode == 'SUCCESS') {
             return  ((string) $xml->running == 'true') ? true : false;
-        } else {
-            return  false;
         }
+        return  false;
     }
 
     /**
@@ -612,8 +584,7 @@ function checkXMLFaliure($xml){
         $xml = bbb_wrap_simplexml_load_file(self::getIsMeetingRunningURL($meetingid, $endpointvalue, $secretvalue));
         if ($xml && $xml->returncode == 'SUCCESS') {
             return  str_replace('</response>', '', str_replace("<?xml version=\"1.0\"?>\n<response>", '', $xml->asXML()));
-        } else {
-            return 'false';
         }
+        return 'false';
     }
 }
