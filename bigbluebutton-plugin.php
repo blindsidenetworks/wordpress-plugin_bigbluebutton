@@ -604,7 +604,8 @@ function bigbluebutton_widget_init()
 */
 function bigbluebutton_shortcode($atts, $content, $tag)
 {
-    bigbluebutton_shortcode_defaults($atts, $tag);
+    error_log(json_encode($atts));
+	  bigbluebutton_shortcode_defaults($atts, $tag);
     $pairs = array('bbb_categories' => '0',
                    'bbb_posts' => '');
     extract(shortcode_atts($pairs, $atts));
@@ -635,6 +636,18 @@ function bigbluebutton_shortcode_defaults(&$atts, $tag)
     }
     if (!array_key_exists('enclosed', $atts)) {
         $atts['enclosed'] = 'true';
+    }
+    if (!array_key_exists('style', $atts)) {
+        $atts['style'] = 'primary';
+    }
+    if (!array_key_exists('size', $atts)) {
+        $atts['size'] = 'normal';
+    }
+    if (!array_key_exists('target', $atts)) {
+        $atts['target'] = '_self';
+    }
+    if (!array_key_exists('display', $atts)) {
+        $atts['display'] = 'inline';
     }
 }
 
@@ -776,10 +789,14 @@ function bigbluebutton_shortcode_output_form_single($bbbposts, $atts, $currentus
     $outputstring = '';
     $slug = $bbbposts->post->post_name;
     $title = $bbbposts->post->post_title;
+	  $text = $joinorview.' '.$title;
+	  if (array_key_exists('text', $atts)) {
+	      $text = $atts['text'];
+	  }
     $outputstring .= bigbluebutton_form_setup($currentuser, $atts);
     $outputstring .= '<input type="hidden" name="hiddenInput" id="hiddenInput" value="'.$slug.'" />';
     $usercapabilitiesarray = bigbluebutton_assign_capabilities_array($currentuser);
-    $outputstring .= '<input class="bbb-shortcode-selector" type="button" onClick="bigbluebutton_join_meeting(\''.$atts['join'].'\',\''.json_encode(is_user_logged_in()).'\',\''.json_encode($usercapabilitiesarray["join_with_password_room"]).'\')" value="'.$joinorview.'  '.$title.'"/>'."\n";
+    $outputstring .= '<a href="#" class="btn btn-'.$atts['style'].' btn-'.$atts['size'].' btn-'.$atts['display'].' bbb-shortcode-selector" onClick="bigbluebutton_join_meeting(\''.$atts['join'].'\',\''.json_encode(is_user_logged_in()).'\',\''.json_encode($usercapabilitiesarray["join_with_password_room"]).'\')" >'.$text.'</a>'."\n";
     return $outputstring;
 }
 
@@ -808,7 +825,7 @@ function bigbluebutton_shortcode_output_form_multiple($bbbposts, $atts, $current
     $outputstring .= bigbluebutton_form_setup($currentuser, $atts);
     $outputstring .= '<input type="hidden" name="hiddenInput" id="hiddenInput" value="'.$slug.'" />';
     $usercapabilitiesarray = bigbluebutton_assign_capabilities_array($currentuser);
-    $outputstring .= '<input class="bbb-shortcode-selector" type="button" onClick="bigbluebutton_join_meeting(\''.$atts['join'].'\',\''.json_encode(is_user_logged_in()).'\',\''.json_encode($usercapabilitiesarray["join_with_password_room"]).'\')" value="'.$joinorview.'"/>'."\n";
+    $outputstring .= '<a href="#" class="btn btn-'.$atts['style'].' btn-'.$atts['size'].' btn-'.$atts['display'].' bbb-shortcode-selector" onClick="bigbluebutton_join_meeting(\''.$atts['join'].'\',\''.json_encode(is_user_logged_in()).'\',\''.json_encode($usercapabilitiesarray["join_with_password_room"]).'\')" >'.$joinorview.'</a>'."\n";
     return $outputstring;
 }
 

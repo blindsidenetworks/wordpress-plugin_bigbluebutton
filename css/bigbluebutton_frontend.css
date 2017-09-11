@@ -11,12 +11,6 @@ a.bbb:hover {
     background-color:#D2E1F7;
 }
 
-input.bbb-shortcode-selector {
-  border-radius: 2px;
-  width: 100%;
-  margin-top: 20px;
-}
-
 form.bbb-shortcode {
   background-color: #f6f6f6;
   border: 1px solid #ccc;

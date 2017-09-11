@@ -35,48 +35,49 @@ textarea[name="bbb_room_welcome_msg"] {
 }
 
 table.custom-admin-table th,
-table.custom-admin-table td{
+table.custom-admin-table td {
     text-align:left;
     padding-right:10px;
 }
 
 
-table.custom-admin-table p{
+table.custom-admin-table p {
     margin-top:0;
 }
 
 table.custom-admin-table th,
-table.custom-admin-table td{
+table.custom-admin-table td {
    padding-bottom:10px;
    vertical-align: top;
 }
 
 .bbb-recordings table.stats th,
 .bbb-recordings table.stats td,
-.bbb-recordings table.stats p
-{
+.bbb-recordings table.stats p {
     text-align:center;
     padding-right:10px;
 }
 
-table.stats td.hed
-{background-color: #666;
-color: #fff;
-padding: 4px;
-text-align: center;
-border-bottom: 2px #fff solid;
-font-size: 12px;
-font-weight: bold;}
+table.stats td.hed {
+  background-color: #666;
+  color: #fff;
+  padding: 4px;
+  text-align: center;
+  border-bottom: 2px #fff solid;
+  font-size: 12px;
+  font-weight: bold;
+}
 
-table.stats td.hedextra
-{background-color: #666;
-color: #fff;
-padding: 4px;
-text-align: center;
-border-bottom: 2px #fff solid;
-font-size: 12px;
-font-weight: bold;
-width:250px;}
+table.stats td.hedextra {
+  background-color: #666;
+  color: #fff;
+  padding: 4px;
+  text-align: center;
+  border-bottom: 2px #fff solid;
+  font-size: 12px;
+  font-weight: bold;
+  width:250px;
+}
 
 #room {
 	background-color: #f6f6f6;
@@ -97,7 +98,7 @@ width:250px;}
 	width: 550px;
 }
 
-#roompw{
+#roompw {
 	color: #777;
 	margin: 5px 0px 10px 0;
 	padding-left:10px;
@@ -107,7 +108,7 @@ width:250px;}
 	border-radius: 2px;
 }
 
-#displayname{
+#displayname {
 	color: #777;
 	margin: 5px 0px 10px 0;
 	padding-left:10px;
@@ -117,7 +118,7 @@ width:250px;}
 	border-radius: 2px;
 }
 
-#bbb-error-container{
+#bbb-error-container {
 	color:red;
 	text-align: center;
 	font-weight: bold;
