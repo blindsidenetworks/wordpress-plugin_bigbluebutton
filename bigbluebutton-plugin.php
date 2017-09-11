@@ -47,7 +47,6 @@ add_action('in_plugin_update_message-bigbluebutton/bigbluebutton-plugin.php', 'b
 // Shortcode definitions
 add_shortcode('bigbluebutton', 'bigbluebutton_shortcode');
 add_shortcode('bigbluebutton_recordings', 'bigbluebutton_shortcode');
-add_shortcode('bigbluebuttonrooms', 'bigbluebutton_shortcode');
 
 // Filter definitions
 add_filter('map_meta_cap', 'bigbluebutton_map_meta_cap', 10, 4);
@@ -519,7 +518,7 @@ function bigbluebutton_options_page_callback()
                 </td>
             </tr>
         </table>
-        <p>Note that the values included by default are for bigbluebutton_settings this plugin using a FREE BigBlueButton server provided by Blindside Networks. They have to be replaced with the parameters obtained from a server better suited for production.</p>
+        <p>The default values included as part of this settings are for using a FREE BigBlueButton server provided by Blindside Networks for testing purposes. They must be replaced with the parameters obtained from a BigBlueButton server better suited for production.</p>
         <p class="submit">
             <input type="submit" name="submit" id="submit" class="button button-primary" value="Save Settings">
         </p>
@@ -629,12 +628,14 @@ function bigbluebutton_shortcode_defaults(&$atts, $tag)
         $atts['type'] = bigbluebutton_shortcode_type_default($tag);
     }
     if (!array_key_exists('title', $atts)) {
-        $atts['title'] = bigbluebutton_shortcode_title_default($atts['type']);//no user, name and password
+        $atts['title'] = bigbluebutton_shortcode_title_default($atts['type']);
     }
     if (!array_key_exists('join', $atts)) {
-        $atts['join'] = 'true';
+        $atts['join'] = bigbluebutton_shortcode_join_default($atts['type']);
     }
-    $atts['bigbluebutton_settings'] = 'bigbluebutton_settings-install';
+    if (!array_key_exists('enclosed', $atts)) {
+        $atts['enclosed'] = 'true';
+    }
 }
 
 
@@ -649,7 +650,7 @@ function bigbluebutton_shortcode_type_default($tag)
     if ($tag == 'bigbluebutton_recordings') {
         return 'recordings';
     }
-    return 'rooms';
+    return 'meetings';
 }
 
 /**
@@ -663,7 +664,24 @@ function bigbluebutton_shortcode_title_default($type)
     if ($type == 'recordings') {
         return 'Recordings';
     }
-    return 'Rooms';
+    if ($type == 'rooms') {
+        return 'Rooms';
+    }
+    return 'Meetings';
+}
+
+/**
+ * Returns the default join for a form based on the shortcode type.
+ *
+ * @param  string $type  The shortcode type.
+ * @return string
+ */
+function bigbluebutton_shortcode_join_default($type)
+{
+    if ($type == 'recordings' || $type == 'rooms') {
+        return 'false';
+    }
+    return 'true';
 }
 
 // BigBlueButton shortcodes.
@@ -719,24 +737,28 @@ function bigbluebutton_shortcode_output($bbbposts, $atts)
 */
 function bigbluebutton_shortcode_output_form($bbbposts, $atts, $currentuser)
 {
-    $joinorview = "Join";
     if (!$bbbposts->have_posts()) {
         return '<p> No rooms have been created. </p>';
     }
+    $joinorview = "Join";
     if ($atts['join'] === "false") {
         $joinorview = "View";
     }
-    $outputstring = '<div id="bbb-join-container"></div>';
-    $outputstring .= '<div id="bbb-error-container"></div>';
-    $outputstring .= '<form id="room" class="bbb-shortcode">'."\n".
-                     '  <label>'.$atts['title'].'</label>'."\n";
+    if ($atts['enclosed'] === "true") {
+        $outputstring  = '<form id="room" class="bbb-shortcode">'."\n";
+        $outputstring .= '  <div id="bbb-join-container"></div>'."\n";
+        $outputstring .= '  <div id="bbb-error-container"></div>'."\n";
+        $outputstring .= '  <label>'.$atts['title'].'</label>'."\n";
+		}
     $posts = $bbbposts->get_posts();
     if ((count($posts) == 1)||strlen($atts['token']) == 12) {
         $outputstring .= bigbluebutton_shortcode_output_form_single($bbbposts, $atts, $currentuser, $joinorview);
     } else {
         $outputstring .= bigbluebutton_shortcode_output_form_multiple($bbbposts, $atts, $currentuser, $joinorview);
     }
-    $outputstring .= '</form>'."\n";
+    if ($atts['enclosed'] === "true") {
+        $outputstring .= '</form>'."\n";
+	  }
     return $outputstring;
 }
 
@@ -822,8 +844,6 @@ function bigbluebutton_form_setup($currentuser, $atts)
 
     return $outputstring;
 }
-
-
 
  /**
 *   Shortcode output form for the recordings tag.

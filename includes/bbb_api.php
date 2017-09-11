@@ -307,7 +307,6 @@ class BigBlueButton
         if ($xml && $xml->returncode == 'SUCCESS') { // If there were meetings already created.
             return array('returncode' => (string) $xml->returncode, 'meetingID' => (string) $xml->meetingID, 'moderatorPW' => (string) $xml->moderatorPW, 'attendeePW' => (string) $xml->attendeePW, 'hasBeenForciblyEnded' => (string) $xml->hasBeenForciblyEnded, 'running' => (string) $xml->running, 'startTime' => (string) $xml->startTime, 'endTime' => (string) $xml->endTime, 'participantCount' => (string) $xml->participantCount, 'moderatorCount' => (string) $xml->moderatorCount, 'attendees' => (string) $xml->attendees);
         }
-        self::checkXMLFaliure($xml);
     }
 
     public function checkXMLFaliure($xml)
@@ -379,7 +378,6 @@ class BigBlueButton
 
             return $meetings;
         }
-        self::checkXMLFaliure($xml);
     }
 
     public function getRecordingsArray($meetingid, $endpointvalue, $secretvalue)
@@ -415,7 +413,6 @@ class BigBlueButton
 
             return array('returncode' => (string) $xml->returncode, 'message' => (string) $xml->message, 'messageKey' => (string) $xml->messageKey, 'recordings' => $recordings);
         }
-        self::checkXMLFaliure($xml);
     }
 
     private function recordingBuildSorter($a, $b)
@@ -488,7 +485,6 @@ class BigBlueButton
             }
             return $users;
         }
-        self::checkXMLFaliure($xml);
     }
 
     //------------------------------------------------Other Methods------------------------------------
