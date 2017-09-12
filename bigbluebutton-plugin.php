@@ -496,35 +496,36 @@ function bigbluebutton_update_notice_no_change()
  */
 function bigbluebutton_options_page_callback()
 {
-    $bbbsettings = get_option('bigbluebutton_settings'); ?>
-    <div class="wrap">
-    <div id="icon-options-general" class="icon32"><br /></div><h2>BigBlueButton Settings</h2>
-    <form  action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="post" name="site_options_page" >
-        <h2 class="title">Server</h2>
-        <p>The settings listed below determine the BigBlueButton server that will be used for the live sessions.</p>
-        <table class="form-table">
-            <tr>
-                <th scope="row">Endpoint</th>
-                <td>
-                    <input type="text" size="56" name="endpoint" value="<?php echo trim($bbbsettings['endpoint']); ?>" />
-                    <p>Example: http://test-install.blindsidenetworks.com/bigbluebutton/</p>
-                </td>
-            </tr>
-            <tr>
-                <th>Shared Secret</th>
-                <td>
-                    <input type="text" size="56" name="secret" value="<?php echo trim($bbbsettings['secret']); ?>" />
-                    <p>Example: 8cd8ef52e8e101574e400365b55e11a6</p>
-                </td>
-            </tr>
-        </table>
-        <p>The default values included as part of this settings are for using a FREE BigBlueButton server provided by Blindside Networks for testing purposes. They must be replaced with the parameters obtained from a BigBlueButton server better suited for production.</p>
-        <p class="submit">
-            <input type="submit" name="submit" id="submit" class="button button-primary" value="Save Settings">
-        </p>
-    </form>
-    </div>
-<?php
+	  $outputstring = '';
+    $bbbsettings = get_option('bigbluebutton_settings');
+	  $outputstring .= '<div class="wrap">'."\n";
+	  $outputstring .= '<div id="icon-options-general" class="icon32"><br /></div><h2>BigBlueButton Settings</h2>'."\n";
+	  $outputstring .= '    <form  action="'.$_SERVER['REQUEST_URI'].'" method="post" name="site_options_page" >'."\n";
+	  $outputstring .= '        <h2 class="title">Server</h2>'."\n";
+	  $outputstring .= '        <p>The settings listed below determine the BigBlueButton server that will be used for the live sessions.</p>'."\n";
+	  $outputstring .= '        <table class="form-table">'."\n";
+	  $outputstring .= '            <tr>'."\n";
+	  $outputstring .= '                <th scope="row">Endpoint</th>'."\n";
+	  $outputstring .= '                <td>'."\n";
+	  $outputstring .= '                    <input type="text" size="56" name="endpoint" value="'.trim($bbbsettings['endpoint']).'" />'."\n";
+	  $outputstring .= '                    <p>Example: http://test-install.blindsidenetworks.com/bigbluebutton/</p>'."\n";
+	  $outputstring .= '                </td>'."\n";
+	  $outputstring .= '            </tr>'."\n";
+	  $outputstring .= '            <tr>'."\n";
+	  $outputstring .= '                <th>Shared Secret</th>'."\n";
+	  $outputstring .= '                <td>'."\n";
+	  $outputstring .= '                    <input type="text" size="56" name="secret" value="'.trim($bbbsettings['secret']).'" />'."\n";
+	  $outputstring .= '                    <p>Example: 8cd8ef52e8e101574e400365b55e11a6</p>'."\n";
+	  $outputstring .= '                </td>'."\n";
+	  $outputstring .= '            </tr>'."\n";
+	  $outputstring .= '        </table>'."\n";
+	  $outputstring .= '        <p>The default values included as part of this settings are for using a FREE BigBlueButton server provided by Blindside Networks for testing purposes. They must be replaced with the parameters obtained from a BigBlueButton server better suited for production.</p>'."\n";
+	  $outputstring .= '        <p class="submit">'."\n";
+	  $outputstring .= '            <input type="submit" name="submit" id="submit" class="button button-primary" value="Save Settings">'."\n";
+	  $outputstring .= '        </p>'."\n";
+	  $outputstring .= '    </form>'."\n";
+	  $outputstring .= '    </div>'."\n";
+	  echo $outputstring;
 }
 
 if (is_admin() && (isset($_POST['endpoint']) || isset($_POST['secret']))) {
@@ -736,7 +737,7 @@ function bigbluebutton_shortcode_output($bbbposts, $atts)
     $secretvalue = $bbbsettings['secret'];
     bigbluebutton_session_setup($endpointvalue, $secretvalue);
     if ($atts['type'] == 'recordings') {
-        return '<form id="recording">'.bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue).'</form>';
+        return bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue);
     }
     return bigbluebutton_shortcode_output_form($bbbposts, $atts, $currentuser);
 }
@@ -840,25 +841,20 @@ function bigbluebutton_form_setup($currentuser, $atts)
 {
     $outputstring = '';
     $userArray = array();
-
     if ((is_user_logged_in() == true)) {
         $userArray = $currentuser->allcaps;
     } else {
         $anonymousrole = get_role('anonymous');
         $userArray = $anonymousrole->capabilities;
         if ($atts['join'] === "true") {
-            $outputstring .= '
-      &nbsp<label>Name:</label>
-      <input type="text" name="displayname" id="displayname" >';
+            $outputstring .= '<label>Name:</label>'."\n";
+            $outputstring .= '<input type="text" name="displayname" id="displayname" >'."\n";
         }
     }
-
     if (($userArray["join_with_password_room"] == true) && ($atts['join'] === "true")) {
-        $outputstring .= '
-      &nbsp<label>Password:</label>
-      <input type="password" name="roompw" id="roompw">';
+        $outputstring .= '<label>Password:</label>'."\n";
+        $outputstring .= '<input type="password" name="roompw" id="roompw" >'."\n";
     }
-
     return $outputstring;
 }
 
@@ -875,10 +871,14 @@ function bigbluebutton_form_setup($currentuser, $atts)
 function bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue)
 {
     $outputstring = '';
+    if ($atts['enclosed'] === "true") {
+        $outputstring .= '<form id="recording">'."\n";
+        $outputstring .= '  <label>'.$atts['title'].'</label>'."\n";
+        $outputstring .= '  <div id="bbb-recordings-div" class="bbb-recordings">'."\n";
+    }
     $listofallrecordings = array();
-    $outputstring .= '  <label>'.$atts['title'].'</label>'."\n";
-    $outputstring .= bigbluebutton_print_recordings_table_headers($currentuser).'
-     </tr>';
+    $outputstring .= '    <table  class="stats" cellspacing="5">'."\n";
+	  $outputstring .= bigbluebutton_print_recordings_table_headers($currentuser);
     while ($bbbposts->have_posts()) {
         $bbbposts->the_post();
         $roomtoken = get_post_meta($bbbposts->post->ID, '_bbb_room_token', true);
@@ -896,12 +896,14 @@ function bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuse
         }
     }
     wp_reset_postdata();
-    $outputstring .= '
-     </tr>
-   </table></div>';
-    if ((count($listofallrecordings) == 0)) {
-        return '<p><strong>There are no recordings available.</strong></p>';
+    $outputstring .= '    </table>'."\n";
+    if ($atts['enclosed'] === "true") {
+        $outputstring .= '  </div>'."\n";
+        $outputstring .= '</form>'."\n";
     }
+    if ((count($listofallrecordings) == 0)) {
+        $outputstring = '<p><strong>There are no recordings available.</strong></p>';
+		}
     return $outputstring;
 }
 
@@ -913,18 +915,16 @@ function bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuse
 */
 function bigbluebutton_print_recordings_table_headers($currentuser)
 {
-    $outputstring = '
-  <div id="bbb-recordings-div" class="bbb-recordings">
-  <table  class="stats" cellspacing="5">
-    <tr>
-      <th class="hed" colspan="1">Recording</th>
-      <th class="hed" colspan="1">Meeting Room Name</th>
-      <th class="hed" colspan="1">Date</th>
-      <th class="hed" colspan="1">Duration</th>';
+    $outputstring = '';
+    $outputstring .= '    <tr>'."\n";
+    $outputstring .= '      <th class="hed" colspan="1">Recording</th>'."\n";
+    $outputstring .= '      <th class="hed" colspan="1">Meeting Room Name</th>'."\n";
+    $outputstring .= '      <th class="hed" colspan="1">Date</th>'."\n";
+    $outputstring .= '      <th class="hed" colspan="1">Duration</th>'."\n";
     if ($currentuser->allcaps["manage_recordings_room"] == true) {
-        $outputstring  .= '
-      <th class="hedextra" colspan="1">Toolbar</th>';
+        $outputstring  .= '      <th class="hedextra" colspan="1">Toolbar</th>'."\n";
     }
+    $outputstring .= '    </tr>'."\n";
     return $outputstring;
 }
 
@@ -1052,62 +1052,56 @@ function bigbluebutton_room_details_metabox($post)
     $bbbwaitadminstart = get_post_meta($post->ID, '_bbb_must_wait_for_admin_start', true);
     $isrecorded = get_post_meta($post->ID, '_bbb_is_recorded', true);
     $roomtoken = get_post_meta($post->ID, '_bbb_room_token', true);
-    $roomwelcomemessage = get_post_meta($post->ID, '_bbb_room_welcome_msg', true); ?>
-    <table class='custom-admin-table'>
-        <tr>
-            <th>Attendee Password</th>
-            <td>
-                <input type="text" name='bbb_attendee_password' id="bbb_attendee_password" class='' value='<?php echo $attendeepassword; ?>' />
-            </td>
-        </tr>
-        <tr>
-            <th>Moderator Password</th>
-            <td>
-                <input type="text" name='bbb_moderator_password'  class='' value='<?php echo $moderatorpassword; ?>' />
-            </td>
-        </tr>
-        <tr>
-            <th>Wait for Admin to start meeting?</th>
-            <td>
-               	<?php // echo $bbbwaitadminstart;?>
-               	<input type="radio" name='bbb_must_wait_for_admin_start' id="bbb_must_wait_for_admin_start_yes" value="1" <?php if (!$bbbwaitadminstart || $bbbwaitadminstart == '1') {
-        echo "checked='checked'";
-    } ?> /><label for="bbb_must_wait_for_admin_start_yes" >Yes</label>
-		<input type="radio" name='bbb_must_wait_for_admin_start' id="bbb_must_wait_for_admin_start_no" value="0" <?php if ($bbbwaitadminstart == '0') {
-        echo "checked='checked'";
-    } ?> /><label for="bbb_must_wait_for_admin_start_no" >No</label>
-            </td>
-        </tr>
-        <tr>
-            <th>Record meeting?</th>
-            <td>
-		<input type="radio" name='bbb_is_recorded' id="bbb_is_recorded_yes" value="1" <?php if (!$isrecorded || $isrecorded == '1') {
-        echo "checked='checked'";
-    } ?> /><label for="bbb_is_recorded_yes" >Yes</label>
-                <input type="radio" name='bbb_is_recorded' id="bbb_is_recorded_no" value="0" <?php if ($isrecorded == '0') {
-        echo "checked='checked'";
-    } ?> /><label for="bbb_is_recorded_no" >No</label>
-            </td>
-        </tr>
-        <tr>
-            <th>Room Token</th>
-            <td>
-                <p>The room token is set when the post is saved. This is not editable.</p>
-                <input type="hidden" name="bbb_room_token" value="<?php echo $roomtoken ? $roomtoken : 'Token Not Set'; ?>">
-                <p>Room Token: <strong><?php echo $roomtoken ? $roomtoken : 'Token Not Set'; ?></strong></p>
-            </td>
-        </tr>
-        <tr>
-            <th>Room Welcome Msg</th>
-            <td>
-                <textarea name='bbb_room_welcome_msg' ><?php echo $roomwelcomemessage; ?></textarea>
-
-            </td>
-        </tr>
-	</table>
-	<input type="hidden" name="bbb-noncename" id="bbb-noncename" value="<?php echo wp_create_nonce('bbb'); ?>" />
-
-	<?php
+    $roomwelcomemessage = get_post_meta($post->ID, '_bbb_room_welcome_msg', true);
+    $outputstring = '';
+    $outputstring .= '    <table class="custom-admin-table">'."\n";
+    $outputstring .= '        <tr>'."\n";
+    $outputstring .= '            <th>Attendee Password</th>'."\n";
+    $outputstring .= '            <td>'."\n";
+    $outputstring .= '                <input type="text" name="bbb_attendee_password" id="bbb_attendee_password" value="'.$attendeepassword.'" />'."\n";
+    $outputstring .= '            </td>'."\n";
+    $outputstring .= '        </tr>'."\n";
+    $outputstring .= '        <tr>'."\n";
+    $outputstring .= '            <th>Moderator Password</th>'."\n";
+    $outputstring .= '            <td>'."\n";
+    $outputstring .= '                <input type="text" name="bbb_moderator_password"  value="'.$moderatorpassword.'" />'."\n";
+    $outputstring .= '            </td>'."\n";
+    $outputstring .= '        </tr>'."\n";
+    $outputstring .= '        <tr>'."\n";
+    $outputstring .= '            <th>Wait for Admin to start meeting?</th>'."\n";
+    $outputstring .= '            <td>'."\n";
+    $outputstring .= '               	<input type="radio" name="bbb_must_wait_for_admin_start" id="bbb_must_wait_for_admin_start_yes" value="1"'.(!$bbbwaitadminstart || $bbbwaitadminstart == '1' ? 'checked="checked"' : '').' />'."\n";
+    $outputstring .= '                <label for="bbb_must_wait_for_admin_start_yes" >Yes</label>'."\n";
+    $outputstring .= '               	<input type="radio" name="bbb_must_wait_for_admin_start" id="bbb_must_wait_for_admin_start_no" value="0"'.($bbbwaitadminstart == '0' ? 'checked="checked"' : '').' />'."\n";
+    $outputstring .= '                <label for="bbb_must_wait_for_admin_start_no" >No</label>'."\n";
+    $outputstring .= '            </td>'."\n";
+    $outputstring .= '        </tr>'."\n";
+    $outputstring .= '        <tr>'."\n";
+    $outputstring .= '            <th>Record meeting?</th>'."\n";
+    $outputstring .= '            <td>'."\n";
+    $outputstring .= '                <input type="radio" name="bbb_is_recorded" id="bbb_is_recorded_yes" value="1"'.(!$isrecorded || $isrecorded == '1' ? 'checked="checked"' : '').'/>'."\n";
+    $outputstring .= '                <label for="bbb_is_recorded_yes" >Yes</label>'."\n";
+    $outputstring .= '                <input type="radio" name="bbb_is_recorded" id="bbb_is_recorded_no" value="0"'.($isrecorded == '0' ? 'checked="checked"' : '').' />'."\n";
+    $outputstring .= '                <label for="bbb_is_recorded_no" >No</label>'."\n";
+    $outputstring .= '            </td>'."\n";
+    $outputstring .= '        </tr>'."\n";
+    $outputstring .= '        <tr>'."\n";
+    $outputstring .= '            <th>Room Token</th>'."\n";
+    $outputstring .= '            <td>'."\n";
+    $outputstring .= '                <p>The room token is set when the post is saved. This is not editable.</p>'."\n";
+    $outputstring .= '                <input type="hidden" name="bbb_room_token" value="'.($roomtoken ? $roomtoken : 'Token Not Set').'" />'."\n";
+    $outputstring .= '                <p>Room Token: <strong>'.($roomtoken ? $roomtoken : 'Token Not Set').'</strong></p>'."\n";
+    $outputstring .= '            </td>'."\n";
+    $outputstring .= '        </tr>'."\n";
+    $outputstring .= '        <tr>'."\n";
+    $outputstring .= '            <th>Room Welcome Msg</th>'."\n";
+    $outputstring .= '            <td>'."\n";
+    $outputstring .= '                <textarea name="bbb_room_welcome_msg">'.$roomwelcomemessage.'</textarea>'."\n";
+    $outputstring .= '            </td>'."\n";
+    $outputstring .= '        </tr>'."\n";
+    $outputstring .= '	  </table>'."\n";
+    $outputstring .= '	  <input type="hidden" name="bbb-noncename" id="bbb-noncename" value="'.wp_create_nonce('bbb').'" />'."\n";
+    echo $outputstring;
 }
 
 
