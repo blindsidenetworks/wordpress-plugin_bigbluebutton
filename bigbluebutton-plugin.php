@@ -915,15 +915,15 @@ function bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuse
 function bigbluebutton_print_recordings_table_headers($currentuser)
 {
     $outputstring = '';
-    $outputstring .= '    <tr>'."\n";
-    $outputstring .= '      <th class="hed" colspan="1">Recording</th>'."\n";
-    $outputstring .= '      <th class="hed" colspan="1">Meeting Room Name</th>'."\n";
-    $outputstring .= '      <th class="hed" colspan="1">Date</th>'."\n";
-    $outputstring .= '      <th class="hed" colspan="1">Duration</th>'."\n";
+    $outputstring .= '      <tr>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">Recording</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">Meeting Room Name</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">Date</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">Duration</th>'."\n";
     if ($currentuser->allcaps["manage_recordings_room"] == true) {
-        $outputstring  .= '      <th class="hedextra" colspan="1">Toolbar</th>'."\n";
+        $outputstring  .= '        <th class="hedextra" colspan="1">Toolbar</th>'."\n";
     }
-    $outputstring .= '    </tr>'."\n";
+    $outputstring .= '      </tr>'."\n";
     return $outputstring;
 }
 
@@ -943,12 +943,12 @@ function bigbluebutton_print_recordings_data($listofrecordings, $currentuser)
         $duration = bigbluebutton_meeting_duration($recording);
         $formatedstartdate = bigbluebutton_formatted_startdate($recording);
         if ($recording['published'] == 'true' || $currentuser->allcaps["manage_recordings_room"] == true) {
-            $outputstring .='
-         <tr id="actionbar-tr-'.$recording['recordID'].'">
-           <td>'.$type.'</td>
-           <td>'.$recording['meetingName'].'</td>
-           <td>'.$formatedstartdate.'</td>
-           <td>'.$duration.' min</td>';
+            $outputstring  = '';
+            $outputstring .= '      <tr id="actionbar-tr-'.$recording['recordID'].'">'."\n";
+            $outputstring .= '        <td>'.$type.'</td>'."\n";
+            $outputstring .= '        <td>'.$recording['meetingName'].'</td>'."\n";
+            $outputstring .= '        <td>'.$formatedstartdate.'</td>'."\n";
+            $outputstring .= '        <td>'.$duration.' min</td>'."\n";
 
             if ($currentuser->allcaps["manage_recordings_room"] == true) {
                 $action = '';
@@ -960,12 +960,12 @@ function bigbluebutton_print_recordings_data($listofrecordings, $currentuser)
                     $action = 'Hide';
                     $class = 'dashicons dashicons-hidden';
                 }
-                $actionbar = '';
-                $actionbar .= '<a id="actionbar-publish-a-'.$recording['recordID'].'" title="'.$action.'" href="#"><span id="actionbar-publish-img-'.$recording['recordID'].'"  class="'.$class.'" onclick="bigbluebutton_action_call(\'publish\', \''.$recording['recordID'].'\'); return false;" /></span></a>';
-                $actionbar .= '<a id="actionbar-delete-a-'.$recording['recordID'].'" title="Delete" href="#"><span id="actionbar-delete-img-'.$recording['recordID'].'" class="dashicons dashicons-trash" onclick="bigbluebutton_action_call(\'delete\', \''.$recording['recordID'].'\'); return false;" /></span></a>';
-                $outputstring  .= '<td>'.$actionbar.'</td>';
+                $outputstring .= '        <td>'."\n";
+                $outputstring .= '          <a id="actionbar-publish-a-'.$recording['recordID'].'" title="'.$action.'" href="#"><span id="actionbar-publish-img-'.$recording['recordID'].'"  class="'.$class.'" onclick="bigbluebutton_action_call(\'publish\', \''.$recording['recordID'].'\'); return false;" /></span></a>'."\n";
+                $outputstring .= '          <a id="actionbar-delete-a-'.$recording['recordID'].'" title="Delete" href="#"><span id="actionbar-delete-img-'.$recording['recordID'].'" class="dashicons dashicons-trash" onclick="bigbluebutton_action_call(\'delete\', \''.$recording['recordID'].'\'); return false;" /></span></a>'."\n";
+                $outputstring .= '        </td>'."\n";
             }
-            $outputstring .= '</tr>';
+            $outputstring .= '      </tr>'."\n";
         }
     }
     return $outputstring;
