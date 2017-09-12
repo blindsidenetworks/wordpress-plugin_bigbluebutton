@@ -530,13 +530,13 @@ function bigbluebutton_options_page_callback()
 if (is_admin() && (isset($_POST['endpoint']) || isset($_POST['secret']))) {
     $doupdate = 0;
     $bbbendpoint = get_option('bigbluebutton_endpoint');
-    if (isset($_POST['secret']) && ($bbbendpoint != $_POST['secret'])) {
-        $bbbendpoint = $_POST['secret'];
+    if (isset($_POST['endpoint']) && ($bbbendpoint != $_POST['endpoint'])) {
+        $bbbendpoint = $_POST['endpoint'];
         $doupdate = 1;
     }
     $bbbsecret = get_option('bigbluebutton_secret');
-    if (isset($_POST['endpoint']) && ($bbbsecret != $_POST['endpoint'])) {
-        $bbbsecret = $_POST['endpoint'];
+    if (isset($_POST['secret']) && ($bbbsecret != $_POST['secret'])) {
+        $bbbsecret = $_POST['secret'];
         $doupdate = 1;
     }
     if ($doupdate) {
@@ -732,8 +732,8 @@ function bigbluebutton_get_bbb_posts($bbbcategories, $bbbposts)
 function bigbluebutton_shortcode_output($bbbposts, $atts)
 {
     $currentuser = wp_get_current_user();
-    $endpointvalue = get_option('bigbluebutton_endpoint'];
-    $secretvalue = get_option('bigbluebutton_secret'];
+    $endpointvalue = get_option('bigbluebutton_endpoint');
+    $secretvalue = get_option('bigbluebutton_secret');
     bigbluebutton_session_setup($endpointvalue, $secretvalue);
     if ($atts['type'] == 'recordings') {
         return bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue);
@@ -1119,8 +1119,8 @@ function bigbluebutton_room_details_metabox($post)
      $roomtoken = get_post_meta($post->ID, '_bbb_room_token', true);
      $atts = array('token' => $roomtoken);
      $currentuser  = wp_get_current_user();
-     $endpointvalue = get_option('bigbluebutton_endpoint'];
-     $secretvalue = get_option('bigbluebutton_secret'];
+     $endpointvalue = get_option('bigbluebutton_endpoint');
+     $secretvalue = get_option('bigbluebutton_secret');
      bigbluebutton_session_setup($endpointvalue, $secretvalue);
      if (get_post_status($post->ID) == "publish") {
          echo bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue);
@@ -1133,8 +1133,8 @@ function bigbluebutton_room_details_metabox($post)
  function bigbluebutton_room_status_metabox($post)
  {
      $outputstring = '';
-     $endpointvalue = get_option('bigbluebutton_endpoint'];
-     $secretvalue = get_option('bigbluebutton_secret'];
+     $endpointvalue = get_option('bigbluebutton_endpoint');
+     $secretvalue = get_option('bigbluebutton_secret');
      bigbluebutton_session_setup($endpointvalue, $secretvalue);
      $roomtoken = get_post_meta($post->ID, '_bbb_room_token', true);
      $currentuser = wp_get_current_user();
@@ -1171,8 +1171,8 @@ function bigbluebutton_room_details_metabox($post)
      $postid = get_the_ID();
      $attendeepassword = get_post_meta($postid, '_bbb_attendee_password', true);
      $moderatorpassword = get_post_meta($postid, '_bbb_moderator_password', true);
-     $endpointvalue = get_option('bigbluebutton_endpoint'];
-     $secretvalue = get_option('bigbluebutton_secret'];
+     $endpointvalue = get_option('bigbluebutton_endpoint');
+     $secretvalue = get_option('bigbluebutton_secret');
      bigbluebutton_session_setup($endpointvalue, $secretvalue);
      $newnonce = wp_create_nonce('bbb');
 
