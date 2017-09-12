@@ -220,10 +220,15 @@ function bigbluebutton_migrate_old_plugin_meetings()
 function bigbluebutton_migrate_old_plugin_roles()
 {
     $permissions = get_option('bigbluebutton_permissions');
-
+    //'custom_create_meeting' => 'Create Meetings',
+    //'custom_join_meeting_moderator' => 'Join Meetings as Moderator',
+    //'custom_join_meeting_attendee' => 'Join Meetings as Attendee',
+    //'custom_join_meeting_password' => 'Join Meetings with password',
+    //'custom_manage_recordings' => 'Manage Recordings',
+    //'custom_manage_others_recordings' => 'Manage Others\'Recordings',
     $adminrole = get_role('administrator');
     bigbluebutton_assign_role($adminrole, 'administrator', $permissions);
-    $adminrole->add_cap('join_with_password_room', false);
+    $adminrole->add_cap('custom_join_meeting_moderator', false);
     $adminrole->add_cap('manage_recordings_room', $permissions["administrator"]["manageRecordings"]);
 
     $authorrole = get_role('author');
@@ -385,18 +390,28 @@ function bigbluebutton_init_custom_post_type()
         'rewrite' => array('slug' => 'room', 'with_front' => false),
         'capability_type' => 'room',
         'capabilities' => array(
-          'edit_posts' => 'edit_rooms_own_room',
-          'joinat' => 'join_as_attendee_room',
-          'joinmd' => 'join_as_moderator_room',
-          'joinpw' => 'join_with_password_room',
-          'managerecordings' => 'manage_recordings_room',
-          'edit_others_posts' => 'edit_rooms_all_room',
-          'delete_posts' => 'delete_rooms_own_room',
-          'delete_others_posts' => 'delete_rooms_all_room',
-          'read_private_posts' => 'read_rooms_room',
-          'publish_posts' => 'publish_recordings_all_room',
-          'publish_post' => 'publish_recordings_own_room',
-          'create_rooms' => 'edit_plugins_room',
+          'edit_posts' => 'Edit Rooms',
+          'edit_others_posts' => 'Edit Others\'Rooms',
+          'publish_posts' => 'Publish Rooms',
+          'read_private_posts' => 'Read Private Rooms',
+          'delete_posts' => 'Delete Rooms',
+          'delete_private_posts' => 'Delete Private Rooms',
+          'delete_published_posts' => 'Delete Published Rooms',
+          'delete_others_posts' => 'Delete Others\'Rooms',
+          'edit_private_posts' => 'Edit Private Rooms',
+          'edit_published_posts' => 'Edit Published Rooms',
+          'custom_create_meeting' => 'Create Meetings',
+          'custom_join_meeting_moderator' => 'Join Meetings as Moderator',
+          'custom_join_meeting_attendee' => 'Join Meetings as Attendee',
+          'custom_join_meeting_password' => 'Join Meetings with password',
+          'custom_manage_recordings' => 'Manage Recordings',
+          'custom_manage_others_recordings' => 'Manage Others\'Recordings',
+          //'joinat' => 'join_as_attendee_room',
+          //'joinmd' => 'join_as_moderator_room',
+          //'joinpw' => 'join_with_password_room',
+          //'managerecordings' => 'manage_recordings_room',
+          //'publish_post' => 'publish_recordings_own_room',
+          //'create_rooms' => 'edit_plugins_room',
         ),
         'map_meta_cap' => true,
         'has_archive' => true,
