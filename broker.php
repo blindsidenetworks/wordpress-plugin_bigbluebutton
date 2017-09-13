@@ -93,7 +93,7 @@ if (!isset($_SESSION[$secretname]) || !isset($_SESSION[$endpointname])) {
                 $moderatorpassword = get_post_meta($post->ID, '_bbb_moderator_password', true);
                 $attendeepassword = get_post_meta($post->ID, '_bbb_attendee_password', true);
                 $isrecorded = get_post_meta($post->ID, '_bbb_is_recorded', true);
-                $logouturl = "javascript:window.close()"; 
+                $logouturl = "javascript:window.close()";
                 $waitforadminstart = get_post_meta($post->ID, '_bbb_must_wait_for_admin_start', true);
                 $metadata = array(
                  'meta_origin' => 'WordPress',
@@ -144,38 +144,29 @@ if (!isset($_SESSION[$secretname]) || !isset($_SESSION[$endpointname])) {
 * Sets the password of the meeting
 **/
 function bigbluebutton_set_password_broker($slug){
-  $post = get_page_by_path($slug, OBJECT, 'room');
-  $currentuser = wp_get_current_user();
-  $password='';
-  $moderatorpassword = get_post_meta($post->ID, '_bbb_moderator_password', true);
-  $attendeepassword = get_post_meta($post->ID, '_bbb_attendee_password', true);
-
-  if(is_user_logged_in() == true) {
-    $usercaparray = $currentuser->allcaps;
-
-  }else {
-    $anonymousRole = get_role('anonymous');
-    $usercaparray = $anonymousRole->capabilities;
-  }
-
-  if($usercaparray["join_with_password_room"] == true ) {
-      if($usercaparray["join_as_moderator_room"] == true) {
-        if(strcmp($moderatorpassword,$_POST['password']) === 0) {
-            $password = $moderatorpassword;
-        }
-      }else {
-        if(strcmp($attendeepassword,$_POST['password']) === 0) {
-            $password = $attendeepassword;
-        }
-      }
-  }else {
-      if($usercaparray["join_as_moderator_room"] === true) {
-        $password = $moderatorpassword;
-      }else {
-        $password = $attendeepassword;
-      }
-  }
-  return $password;
+    $post = get_page_by_path($slug, OBJECT, 'room');
+    $currentuser = wp_get_current_user();
+    $moderatorpassword = get_post_meta($post->ID, '_bbb_moderator_password', true);
+    $attendeepassword = get_post_meta($post->ID, '_bbb_attendee_password', true);
+    if (is_user_logged_in() == true) {
+      $usercaparray = $currentuser->allcaps;
+    } else {
+      // TODO: What if anonynousROle doesnt exist?
+      $anonymousRole = get_role('anonymous');
+      $usercaparray = $anonymousRole->capabilities;
+    }
+    if ($usercaparray["custom_join_meeting_moderator"]) {
+        return $moderatorpassword;
+    }
+    if ($usercaparray["custom_join_meeting_attendee"]) {
+        return $attendeepassword;
+    }
+    if (strcmp($moderatorpassword, $_POST['password']) === 0) {
+        return $moderatorpassword;
+    }
+    if (strcmp($attendeepassword, $_POST['password']) === 0) {
+        return $attendeepassword;
+    }
 }
 
 /**
