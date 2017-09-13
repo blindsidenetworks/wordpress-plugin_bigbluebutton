@@ -22,6 +22,27 @@ require_once 'includes/bbb_api.php';
 define('BIGBLUEBUTTON_PLUGIN_VERSION', bigbluebutton_get_version());
 define('BIGBLUEBUTTON_DEFAULT_ENDPOINT', 'http://test-install.blindsidenetworks.com/bigbluebutton/');
 define('BIGBLUEBUTTON_DEFAULT_SECRET', '8cd8ef52e8e101574e400365b55e11a6');
+
+const ROOM_CAPABILITIES = array(
+    'edit_rooms',
+    'edit_others_rooms',
+    'publish_rooms',
+    'read_private_rooms',
+    'read_rooms',
+    'delete_rooms',
+    'delete_private_rooms',
+    'delete_published_rooms',
+    'delete_others_rooms',
+    'edit_private_rooms',
+    'edit_published_rooms',
+    'custom_create_meeting',
+    'custom_join_meeting_moderator',
+    'custom_join_meeting_attendee',
+    'custom_join_meeting_password',
+    'custom_manage_recordings',
+    'custom_manage_others_recordings',
+);
+
 //================================================================================
 //--------------------------------Hooks----------------------------------------
 //================================================================================
@@ -52,7 +73,6 @@ add_shortcode('bigbluebutton_recordings', 'bigbluebutton_shortcode');
 add_filter('map_meta_cap', 'bigbluebutton_map_meta_cap', 10, 4);
 add_filter('the_content', 'bigbluebutton_filter');
 
-
 //================================================================================
 //--------------------------------Plugin Activation-------------------------------
 //================================================================================
@@ -75,7 +95,6 @@ function bigbluebutton_plugin_activate($network_wide)
     }
 }
 
-
 /**
 * BigBlueButton activate
 */
@@ -83,7 +102,6 @@ function bigbluebutton_activate()
 {
     if (get_option('bigbluebutton_version') == BIGBLUEBUTTON_PLUGIN_VERSION) {
         // Simple activation.
-        bigbluebutton_set_default_roles();
         bigbluebutton_session_setup(get_option('bigbluebutton_endpoint'), get_option('bigbluebutton_secret'));
 	      return;
     }
@@ -106,11 +124,16 @@ function bigbluebutton_activate()
     }
     // Activation for installation.
 	  bigbluebutton_add_default_rooms();
-    bigbluebutton_set_default_roles();
+    bigbluebutton_add_default_roles();
     add_option('bigbluebutton_endpoint', BIGBLUEBUTTON_DEFAULT_ENDPOINT);
     add_option('bigbluebutton_secret', BIGBLUEBUTTON_DEFAULT_SECRET);
     bigbluebutton_session_setup(BIGBLUEBUTTON_DEFAULT_ENDPOINT, BIGBLUEBUTTON_DEFAULT_SECRET);
 }
+
+
+//==============================================================================
+//---------------------------------Defaults-------------------------------------
+//==============================================================================
 
 function bigbluebutton_add_default_rooms()
 {
@@ -120,6 +143,190 @@ function bigbluebutton_add_default_rooms()
     if (post_exists("Demo meeting (recorded)") == 0) {
         bigbluebutton_insert_post(2, "Demo meeting (recorded)", bigbluebutton_generate_token(), 'ap', 'mp', 0, 1);
     }
+}
+
+
+/**
+ * Getting default roles.
+ */
+function bigbluebutton_get_wp_roles()
+{
+    global $wp_roles;
+    if (!array_key_exists('anonymous', $wp_roles->roles )) {
+        add_role('anonymous', 'Anonymous', array());
+    }
+    return $wp_roles;
+}
+
+/**
+ * Adding default roles.
+ */
+function bigbluebutton_add_default_roles()
+{
+    $wp_roles = bigbluebutton_get_wp_roles();
+    foreach ($wp_roles->roles as $rolename => $role) {
+        bigbluebutton_assign_default_roles($rolename);
+    }
+}
+
+function bigbluebutton_assign_default_roles($rolename)
+{
+    $role = get_role($rolename);
+    // For administrators or privileged users.
+    if ($rolename === 'administrator' || $rolename === 'editor') {
+        bigbluebutton_assign_default_roles_base_capabilities($role, true);
+        return;
+    }
+    if ($rolename === 'author' || $rolename === 'contributor') {
+        bigbluebutton_assign_default_roles_base_capabilities($role, true);
+        $role->add_cap('edit_others_rooms', false);
+        $role->add_cap('read_private_rooms', false);
+        $role->add_cap('delete_private_rooms', false);
+        $role->add_cap('delete_others_rooms', false);
+        $role->add_cap('edit_private_rooms', false);
+        $role->add_cap('custom_manage_others_recordings', false);
+        return;
+    }
+    bigbluebutton_assign_default_roles_base_capabilities($role, false);
+    $role->add_cap('read_rooms', true);
+    $role->add_cap('custom_create_meeting', true);
+    // For users wihout an account.
+    if ($rolename === 'anonymous') {
+        $role->add_cap('custom_join_meeting_password', true);
+        return;
+    }
+    // For subscriber and all other custom roles.
+    $role->add_cap('custom_join_meeting_attendee', true);
+}
+
+function bigbluebutton_assign_default_roles_base_capabilities($role, $value)
+{
+    foreach (ROOM_CAPABILITIES as $capability) {
+        $role->add_cap($capability, $value);
+    }
+}
+
+//==============================================================================
+//--------------------------------Migration-------------------------------------
+//==============================================================================
+
+/**
+* Previous meeting's rooms information assigned to new plugins data strucure
+**/
+function bigbluebutton_migrate_old_plugin_meetings()
+{
+    global $wpdb;
+    $tablename = $wpdb->prefix . "bigbluebutton";
+    $listofmeetings = $wpdb->get_results("SELECT * FROM ".$tablename." ORDER BY id");
+
+    foreach ($listofmeetings as $meeting) {
+        bigbluebutton_insert_post($meeting->id, $meeting->meetingName, $meeting->meetingID, $meeting->attendeePW, $meeting->moderatorPW, $meeting->waitForModerator, $meeting->recorded);
+    }
+}
+
+/**
+* Previous capabilities assigned to new plugins capabilities
+**/
+function bigbluebutton_migrate_old_plugin_roles()
+{
+
+    $wp_roles = bigbluebutton_get_wp_roles();
+    foreach ($wp_roles->roles as $rolename => $role) {
+        bigbluebutton_assign_old_plugin_roles($rolename);
+    }
+}
+    $permissions = get_option('bigbluebutton_permissions');
+    foreach($permissions as $rolename => $permission) {
+        $role = get_role($rolename);
+        if (!$role) {
+            add_role($rolecode, ucfirst($rolecode), array());
+            $role = get_role($rolecode);
+	      }
+        if ($permission['defaultRole'] == 'moderator') {
+            $role->add_cap('custom_join_meeting_moderator', true);
+            $role->add_cap('custom_join_meeting_attendee', false);
+            $adminrole->add_cap('custom_join_meeting_password', false);
+	      } elseif ($permission['defaultRole'] == 'attendee') {
+            $adminrole->add_cap('custom_join_meeting_moderator', false);
+            $adminrole->add_cap('custom_join_meeting_attendee', true);
+            $adminrole->add_cap('custom_join_meeting_password', false);
+        } else {
+            $adminrole->add_cap('custom_join_meeting_moderator', false);
+            $adminrole->add_cap('custom_join_meeting_attendee', false);
+            $adminrole->add_cap('custom_join_meeting_password', true);
+        }
+    }
+
+    //'custom_create_meeting' => 'Create Meetings',
+    //'custom_join_meeting_moderator' => 'Join Meetings as Moderator',
+    //'custom_join_meeting_attendee' => 'Join Meetings as Attendee',
+    //'custom_join_meeting_password' => 'Join Meetings with password',
+    //'custom_manage_recordings' => 'Manage Recordings',
+    //'custom_manage_others_recordings' => 'Manage Others\'Recordings',
+    $adminrole = get_role('administrator');
+    bigbluebutton_assign_role($adminrole, 'administrator', $permissions);
+    $adminrole->add_cap('custom_join_meeting_moderator', false);
+    $adminrole->add_cap('manage_recordings_room', $permissions["administrator"]["manageRecordings"]);
+
+    $authorrole = get_role('author');
+    bigbluebutton_assign_role($authorrole, 'author', $permissions);
+    $authorrole->add_cap('custom_join_meeting_password', false);
+    $authorrole->add_cap('manage_recordings_room', $permissions["author"]["manageRecordings"]);
+
+    $contributorrole = get_role('contributor');
+    bigbluebutton_assign_role($contributorrole, 'contributor', $permissions);
+    $contributorrole->add_cap('custom_join_meeting_password', false);
+    $contributorrole->add_cap('manage_recordings_room', $permissions["contributor"]["manageRecordings"]);
+
+    $editorrole = get_role('editor');
+    bigbluebutton_assign_role($editorrole, 'editor', $permissions);
+    $editorrole->add_cap('custom_join_meeting_password', false);
+    $editorrole->add_cap('manage_recordings_room', $permissions["editor"]["manageRecordings"]);
+
+    $subscriberrole = get_role('subscriber');
+    bigbluebutton_assign_role($subscriberrole, 'subscriber', $permissions);
+    $subscriberrole->add_cap('custom_join_meeting_password', false);
+    $subscriberrole->add_cap('manage_recordings_room', $permissions["subscriber"]["manageRecordings"]);
+
+    add_role('anonymous', 'Anonymous', array());
+    $anonymousrole = get_role('anonymous');
+    bigbluebutton_assign_role($anonymousrole, 'anonymous', $permissions);
+    $anonymousrole->add_cap('custom_join_meeting_password', true);
+    $anonymousrole->add_cap('manage_recordings_room', $permissions["anonymous"]["manageRecordings"]);
+}
+
+/**
+* Assign roles
+* @param  array  $role The role that needs to be assigned the role.
+* @param  string  $rolename  String format of the role name.
+* @param  array $permissions  Permissions array.
+* @return
+**/
+function bigbluebutton_assign_role($role, $rolename, $permissions)
+{
+    if ($permissions[$rolename]["defaultRole"] == "moderator") {
+        $role->add_cap('custom_join_meeting_moderator', true);
+        $role->add_cap('custom_join_meeting_attendee', false);
+    } else {
+        $role->add_cap('custom_join_meeting_moderator', false);
+        $role->add_cap('custom_join_meeting_attendee', true);
+    }
+}
+
+function bigbluebutton_insert_post($meetingid, $meetingname, $meetingtoken, $attendeepassword, $moderatorpassword, $waitformoderator, $recorded)
+{
+    $postarray = array(
+      'import_id' => $meetingid,
+      'post_title' => $meetingname,
+      'post_type' => 'room',
+      'post_status' => 'publish',
+    );
+    $postid = wp_insert_post($postarray);
+    update_post_meta($postid, '_bbb_room_token', $meetingtoken);
+    update_post_meta($postid, '_bbb_attendee_password', $attendeepassword);
+    update_post_meta($postid, '_bbb_moderator_password', $moderatorpassword);
+    update_post_meta($postid, '_bbb_must_wait_for_admin_start', $waitformoderator);
+    update_post_meta($postid, '_bbb_is_recorded', $recorded);
 }
 
 //================================================================================
@@ -199,124 +406,6 @@ function bigbluebutton_update_metadata($pluginslug)
     }
 }
 
-//================================================================================
-//--------------------------------Migration----------------------------------------
-//================================================================================
-
-/**
-* Previous meeting's rooms information assigned to new plugins data strucure
-**/
-function bigbluebutton_migrate_old_plugin_meetings()
-{
-    global $wpdb;
-    $tablename = $wpdb->prefix . "bigbluebutton";
-    $listofmeetings = $wpdb->get_results("SELECT * FROM ".$tablename." ORDER BY id");
-
-    foreach ($listofmeetings as $meeting) {
-        bigbluebutton_insert_post($meeting->id, $meeting->meetingName, $meeting->meetingID, $meeting->attendeePW, $meeting->moderatorPW, $meeting->waitForModerator, $meeting->recorded);
-    }
-}
-
-/**
-* Previous capabilities assigned to new plugins capabilities
-**/
-function bigbluebutton_migrate_old_plugin_roles()
-{
-/*
-	  $permissions = get_option('bigbluebutton_permissions');
-    foreach($permissions as $rolecode => $permission) {
-        $role = get_role($rolecode);
-        if (!$role) {
-            add_role($rolecode, ucfirst($rolecode), array());
-            $role = get_role($rolecode);
-	      }
-        if ($permission['defaultRole'] == 'moderator') {
-            $role->add_cap('custom_join_meeting_moderator', true);
-            $role->add_cap('custom_join_meeting_attendee', false);
-            $adminrole->add_cap('custom_join_meeting_password', false);
-	      } elseif ($permission['defaultRole'] == 'attendee') {
-            $adminrole->add_cap('custom_join_meeting_moderator', false);
-            $adminrole->add_cap('custom_join_meeting_attendee', true);
-            $adminrole->add_cap('custom_join_meeting_password', false);
-        } else {
-            $adminrole->add_cap('custom_join_meeting_moderator', false);
-            $adminrole->add_cap('custom_join_meeting_attendee', false);
-            $adminrole->add_cap('custom_join_meeting_password', true);
-        }
-    }
-*/
-
-    //'custom_create_meeting' => 'Create Meetings',
-    //'custom_join_meeting_moderator' => 'Join Meetings as Moderator',
-    //'custom_join_meeting_attendee' => 'Join Meetings as Attendee',
-    //'custom_join_meeting_password' => 'Join Meetings with password',
-    //'custom_manage_recordings' => 'Manage Recordings',
-    //'custom_manage_others_recordings' => 'Manage Others\'Recordings',
-    $adminrole = get_role('administrator');
-    bigbluebutton_assign_role($adminrole, 'administrator', $permissions);
-    $adminrole->add_cap('custom_join_meeting_moderator', false);
-    $adminrole->add_cap('manage_recordings_room', $permissions["administrator"]["manageRecordings"]);
-
-    $authorrole = get_role('author');
-    bigbluebutton_assign_role($authorrole, 'author', $permissions);
-    $authorrole->add_cap('custom_join_meeting_password', false);
-    $authorrole->add_cap('manage_recordings_room', $permissions["author"]["manageRecordings"]);
-
-    $contributorrole = get_role('contributor');
-    bigbluebutton_assign_role($contributorrole, 'contributor', $permissions);
-    $contributorrole->add_cap('custom_join_meeting_password', false);
-    $contributorrole->add_cap('manage_recordings_room', $permissions["contributor"]["manageRecordings"]);
-
-    $editorrole = get_role('editor');
-    bigbluebutton_assign_role($editorrole, 'editor', $permissions);
-    $editorrole->add_cap('custom_join_meeting_password', false);
-    $editorrole->add_cap('manage_recordings_room', $permissions["editor"]["manageRecordings"]);
-
-    $subscriberrole = get_role('subscriber');
-    bigbluebutton_assign_role($subscriberrole, 'subscriber', $permissions);
-    $subscriberrole->add_cap('custom_join_meeting_password', false);
-    $subscriberrole->add_cap('manage_recordings_room', $permissions["subscriber"]["manageRecordings"]);
-
-    add_role('anonymous', 'Anonymous', array());
-    $anonymousrole = get_role('anonymous');
-    bigbluebutton_assign_role($anonymousrole, 'anonymous', $permissions);
-    $anonymousrole->add_cap('custom_join_meeting_password', true);
-    $anonymousrole->add_cap('manage_recordings_room', $permissions["anonymous"]["manageRecordings"]);
-}
-
-/**
-* Assign roles
-* @param  array  $role The role that needs to be assigned the role.
-* @param  string  $rolename  String format of the role name.
-* @param  array $permissions  Permissions array.
-* @return
-**/
-function bigbluebutton_assign_role($role, $rolename, $permissions)
-{
-    if ($permissions[$rolename]["defaultRole"] == "moderator") {
-        $role->add_cap('custom_join_meeting_moderator', true);
-        $role->add_cap('custom_join_meeting_attendee', false);
-    } else {
-        $role->add_cap('custom_join_meeting_moderator', false);
-        $role->add_cap('custom_join_meeting_attendee', true);
-    }
-}
-
-function bigbluebutton_insert_post($meetingid, $meetingname, $meetingtoken, $attendeepassword, $moderatorpassword, $waitformoderator, $recorded)
-{
-    $postarray = array(
-      'import_id' => $meetingid,
-      'post_title' => $meetingname,
-      'post_type' => 'room',
-      'post_status' => 'publish',
-    );
-    $postid = wp_insert_post($postarray);
-    update_post_meta($postid, '_bbb_room_token', $meetingtoken);
-    update_post_meta($postid, '_bbb_attendee_password', $attendeepassword);
-    update_post_meta($postid, '_bbb_moderator_password', $moderatorpassword);
-    update_post_meta($postid, '_bbb_must_wait_for_admin_start', $waitformoderator);
-    update_post_meta($postid, '_bbb_is_recorded', $recorded);
-}
 
 //================================================================================
 //------------------------------ Main ----------------------------------
@@ -414,29 +503,23 @@ function bigbluebutton_init_custom_post_type()
         'rewrite' => array('slug' => 'room', 'with_front' => false),
         'capability_type' => 'room',
         'capabilities' => array(
-          'edit_posts' => 'edit_rooms', //'Edit Rooms',
-          'edit_others_posts' => 'edit_others_rooms', //'Edit Others\'Rooms',
-          'publish_posts' => 'publish_rooms', //'Publish Rooms',
-          'read_private_posts' => 'read_private_rooms', //'Read Private Rooms',
-          'read' => 'read_rooms', //'Read Rooms',
-          'delete_posts' => 'delete_rooms', //'Delete Rooms',
-          'delete_private_posts' => 'delete_private_rooms', //'Delete Private Rooms',
-          'delete_published_posts' => 'delete_published_rooms', //'Delete Published Rooms',
-          'delete_others_posts' => 'delete_others_rooms', //'Delete Others\'Rooms',
-          'edit_private_posts' => 'edit_private_rooms', //'Edit Private Rooms',
-          'edit_published_posts' => 'edit_published_rooms', //'Edit Published Rooms',
-          'custom_create_meeting' => 'custom_create_meeting', //'Create Meetings',
-          'custom_join_meeting_moderator' => 'custom_join_meeting_moderator', //'Join Meetings as Moderator',
-          'custom_join_meeting_attendee' => 'custom_join_meeting_attendee', //'Join Meetings as Attendee',
-          'custom_join_meeting_password' => 'custom_join_meeting_password', //'Join Meetings with password',
-          'custom_manage_recordings' => 'custom_manage_recordings', //'Manage Recordings',
-          'custom_manage_others_recordings' => 'custom_manage_others_recordings', //'Manage Others\'Recordings',
-          //'joinat' => 'custom_join_meeting_attendee',
-          //'joinmd' => 'custom_join_meeting_moderator',
-          //'joinpw' => 'custom_join_meeting_password',
-          //'managerecordings' => 'manage_recordings_room',
-          //'publish_post' => 'publish_recordings_own_room',
-          //'create_rooms' => 'edit_plugins_room',
+            'edit_posts' => 'edit_rooms',
+            'edit_others_posts' => 'edit_others_rooms',
+            'publish_posts' => 'publish_rooms',
+            'read_private_posts' => 'read_private_rooms',
+            'read' => 'read_rooms',
+            'delete_posts' => 'delete_rooms',
+            'delete_private_posts' => 'delete_private_rooms',
+            'delete_published_posts' => 'delete_published_rooms',
+            'delete_others_posts' => 'delete_others_rooms',
+            'edit_private_posts' => 'edit_private_rooms',
+            'edit_published_posts' => 'edit_published_rooms',
+            'custom_create_meeting' => 'custom_create_meeting',
+            'custom_join_meeting_moderator' => 'custom_join_meeting_moderator',
+            'custom_join_meeting_attendee' => 'custom_join_meeting_attendee',
+            'custom_join_meeting_password' => 'custom_join_meeting_password',
+            'custom_manage_recordings' => 'custom_manage_recordings',
+            'custom_manage_others_recordings' => 'custom_manage_others_recordings',
         ),
         'map_meta_cap' => true,
         'has_archive' => true,
@@ -1341,86 +1424,6 @@ function before_bbb_delete()
     /*
      * NOTE: If we want to do anything when the BBB post in wordpress is deleted, we can hook into here.
      */
-}
-
-
-/**
- * Adding default roles.
- */
-function bigbluebutton_set_default_roles()
-{
-    global $wp_roles; // = wp_roles();
-    if (!array_key_exists('anonymous', $wp_roles->roles )) {
-        add_role('anonymous', 'Anonymous', array());
-    }
-    foreach ($wp_roles->roles as $rolename => $role) {
-        if ($rolename === 'administrator')
-        //error_log(json_encode($role['capabilities']));
-        bigbluebutton_assign_default_roles($rolename);
-    }
-}
-
-function bigbluebutton_assign_default_roles($rolename)
-{
-    $role = get_role($rolename);
-    bigbluebutton_assign_default_roles_base_capabilities($role, true);
-    // For administrators or privileged users.
-    if ($key === 'administrator' || $key === 'editor') {
-        $role->add_cap('custom_join_meeting_moderator', true);
-        $role->add_cap('custom_join_meeting_attendee', true);
-        $role->add_cap('custom_join_meeting_password', true);
-        return;
-    }
-    if ($key === 'author' || $key === 'contributor') {
-        $role->add_cap('edit_others_rooms', false);
-        $role->add_cap('read_private_rooms', false);
-        $role->add_cap('delete_private_rooms', false);
-        $role->add_cap('delete_others_rooms', false);
-        $role->add_cap('edit_private_rooms', false);
-        $role->add_cap('custom_manage_others_recordings', false);
-        $role->add_cap('custom_join_meeting_moderator', true);
-        $role->add_cap('custom_join_meeting_attendee', true);
-        $role->add_cap('custom_join_meeting_password', true);
-    }
-    bigbluebutton_assign_default_roles_base_capabilities($role, false);
-    // For users wihout an account.
-    if ($key === 'anonymous') {
-        $role->add_cap('custom_join_meeting_moderator', false);
-        $role->add_cap('custom_join_meeting_attendee', false);
-        $role->add_cap('custom_join_meeting_password', true);
-        return;
-    }
-    // For subscriber and all other custom roles.
-    $role->add_cap('custom_join_meeting_moderator', false);
-    $role->add_cap('custom_join_meeting_attendee', true);
-    $role->add_cap('custom_join_meeting_password', false);
-}
-
-function bigbluebutton_assign_default_roles_base_capabilities($role, $value)
-{
-    $capabilities = array(
-        'edit_rooms',
-        'edit_others_rooms',
-        'publish_rooms',
-        'read_private_rooms',
-        'read_rooms',
-        'delete_rooms',
-        'delete_private_rooms',
-        'delete_published_rooms',
-        'delete_others_rooms',
-        'edit_private_rooms',
-        'edit_published_rooms',
-        'custom_create_meeting',
-        //'custom_join_meeting_moderator',
-        //'custom_join_meeting_attendee',
-        //'custom_join_meeting_password',
-        'custom_manage_recordings',
-        'custom_manage_others_recordings',
-    );
-
-    foreach ($capabilities as $capability) {
-        $role->add_cap($capability, $value);
-    }
 }
 
 /*
