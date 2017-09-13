@@ -83,6 +83,7 @@ function bigbluebutton_activate()
 {
     if (get_option('bigbluebutton_version') == BIGBLUEBUTTON_PLUGIN_VERSION) {
         // Simple activation.
+        bigbluebutton_set_default_roles();
         bigbluebutton_session_setup(get_option('bigbluebutton_endpoint'), get_option('bigbluebutton_secret'));
 	      return;
     }
@@ -92,13 +93,15 @@ function bigbluebutton_activate()
     $bbbsalt = get_option('bigbluebutton_salt');
     if ($bbburl || $bbbsalt) {
         // Activation for update.
-        delete_option('bigbluebutton_url');
-        delete_option('bigbluebutton_salt');
         bigbluebutton_migrate_old_plugin_meetings();
         bigbluebutton_migrate_old_plugin_roles();
         add_option('bigbluebutton_endpoint', $bbburl);
         add_option('bigbluebutton_secret', $bbbsalt);
         bigbluebutton_session_setup($bbburl, $bbbsalt);
+        delete_option('bigbluebutton_plugin_version');
+        delete_option('bigbluebutton_url');
+        delete_option('bigbluebutton_salt');
+        delete_option('bigbluebutton_permissions');
         return;
     }
     // Activation for installation.
@@ -219,7 +222,30 @@ function bigbluebutton_migrate_old_plugin_meetings()
 **/
 function bigbluebutton_migrate_old_plugin_roles()
 {
-    $permissions = get_option('bigbluebutton_permissions');
+/*
+	  $permissions = get_option('bigbluebutton_permissions');
+    foreach($permissions as $rolecode => $permission) {
+        $role = get_role($rolecode);
+        if (!$role) {
+            add_role($rolecode, ucfirst($rolecode), array());
+            $role = get_role($rolecode);
+	      }
+        if ($permission['defaultRole'] == 'moderator') {
+            $role->add_cap('custom_join_meeting_moderator', true);
+            $role->add_cap('custom_join_meeting_attendee', false);
+            $adminrole->add_cap('custom_join_meeting_password', false);
+	      } elseif ($permission['defaultRole'] == 'attendee') {
+            $adminrole->add_cap('custom_join_meeting_moderator', false);
+            $adminrole->add_cap('custom_join_meeting_attendee', true);
+            $adminrole->add_cap('custom_join_meeting_password', false);
+        } else {
+            $adminrole->add_cap('custom_join_meeting_moderator', false);
+            $adminrole->add_cap('custom_join_meeting_attendee', false);
+            $adminrole->add_cap('custom_join_meeting_password', true);
+        }
+    }
+*/
+
     //'custom_create_meeting' => 'Create Meetings',
     //'custom_join_meeting_moderator' => 'Join Meetings as Moderator',
     //'custom_join_meeting_attendee' => 'Join Meetings as Attendee',
@@ -1324,6 +1350,16 @@ function before_bbb_delete()
  */
 function bigbluebutton_set_default_roles()
 {
+    global $wp_roles;
+    // Load roles if not set
+    if ( ! isset( $wp_roles ) ) {
+        $wp_roles = new WP_Roles();
+    }
+    foreach ($wp_roles as $key => $value) {
+	      if ($key === 'administrator') {
+        
+        }
+    }
     $adminrole = get_role('administrator');
     $adminrole->add_cap('join_as_attendee_room', false);
     $adminrole->add_cap('join_as_moderator_room', true);
@@ -1410,8 +1446,8 @@ function bigbluebutton_plugin_base_url()
  */
 function bigbluebutton_session_setup($endpointvalue, $secretvalue)
 {
-    $_SESSION['mt_bbb_endpoint'] = $endpointvalue;
-    $_SESSION['mt_bbb_secret'] = $secretvalue;
+    $_SESSION['bigbluebutton_endpoint'] = $endpointvalue;
+    $_SESSION['bigbluebutton_secret'] = $secretvalue;
 }
 
 /*

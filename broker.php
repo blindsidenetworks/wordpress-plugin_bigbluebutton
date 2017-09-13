@@ -20,8 +20,8 @@ require 'includes/bbb_api.php';
 $parse_uri = explode( 'wp-content', $_SERVER['SCRIPT_FILENAME'] );
 require_once( $parse_uri[0] . 'wp-load.php' );
 session_start();
-$endpointname = 'mt_bbb_endpoint';
-$secretname = 'mt_bbb_secret';
+$endpointname = 'bigbluebutton_endpoint';
+$secretname = 'bigbluebutton_secret';
 $actionname = 'action';
 $recordingidname = 'recordingID';
 $slugname = 'slug';
@@ -37,8 +37,8 @@ if (!isset($_SESSION[$secretname]) || !isset($_SESSION[$endpointname])) {
 } elseif (!isset($_GET[$actionname])) {
     header('HTTP/1.0 400 Bad Request. [action] parameter was not included in this query.');
 } else {
-    $secretvalue = $_SESSION[$secretname];
     $endpointvalue = $_SESSION[$endpointname];
+    $secretvalue = $_SESSION[$secretname];
     $action = $_GET[$actionname];
     switch ($action) {
         case 'publish'://join plublis/unpublish together
