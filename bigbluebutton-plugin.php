@@ -1430,10 +1430,24 @@ function bigbluebutton_admin_notices()
  */
 function bigbluebutton_error_notice()
 {
-    $screen = get_current_screen();
-    if ($screen->id == 'edit-room' && !function_exists('members_get_capabilities')) {
-        echo '<div class="notice notice-warning is-dismissible">';
-        echo '<p><strong>For changing the default capabilities for each user is recommended to use an additional plugin as <a href="https://wordpress.org/plugins/members/" target="_blank">Members</a>.</strong></p>';
+    //$screen = get_current_screen();
+    //if ($screen->id == 'edit-room' && !function_exists('members_get_capabilities')) {
+    if (!function_exists('members_get_capabilities')) {
+        $url = add_query_arg(
+          array(
+            'tab'       => 'plugin-information',
+            'plugin'    => 'members',
+            'TB_iframe' => 'true',
+            'width'     => '640',
+            'height'    => '500',
+          ),
+          admin_url( 'plugin-install.php' )
+        );
+        $pluginlink = '<a href="'.esc_url($url).'" class="thickbox" title="Members">Members</a>';
+        //$pluginresolvelink = '<a href="'.esc_url($url).'">Begin installing plugin</a>';
+        echo '<div class="notice notice-info is-dismissible">';
+        echo '<p><strong>For updating the default role capabilities is recommended to use an additional plugin as '.$pluginlink.'.</strong></p>';
+        //echo '<p><strong>'.$pluginresolvelink.'</strong></p>';
         echo '</div>';
     }
 }
