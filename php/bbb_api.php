@@ -408,47 +408,97 @@ class BigBlueButton {
 			return null;
 		}
 	}
+
+	public function getRecordingsArray($meetingids, $URL, $SALT) {
+		$meetingidsarray = $meetingids;
+		if (!is_array($meetingids)) {
+			$meetingidsarray = explode(',', $meetingids);
+		}
+		// If $meetingidsarray is empty there is no need to go further.
+		if (empty($meetingidsarray)) {
+			return array();
+		}
+		$recordingsarray = getRecordingsArrayFetch($meetingidsarray, $URL, $SALT);
+		// Sort recordings.
+		uasort($recordingsarray['recordings'], 'BigBlueButton::recordingBuildSorter');
+		return $recordingsarray;
+	}
+
+	private function getRecordingsArrayFetch($meetingidsarray, $URL, $SALT) {
+		$recordingsarray = array();
+		// Execute a paginated getRecordings request.
+		$pages = floor(count($meetingidsarray) / 25) + 1;
+		for ($page = 1; $page <= $pages; ++$page) {
+			$mids = array_slice($meetingidsarray, ($page - 1) * 25, 25);
+			$recordingfetchedpage = getRecordingsArrayFetchPage($mids, $URL, $SALT);
+			if (empty($recordingsarray)) {
+				$recordingsarray = $recordingfetchedpage;
+				continue;
+			}
+			if ($fetchedpage['returncode'] == 'SUCCESS' && !empty($fetchedpage['recordings'])) {
+				$recordingsarray['recordings'] += $fetchedpage['recordings'];
+			}
+		}
+		return $recordingsarray;
+	}
 	
-    public function getRecordingsArray($meetingID, $URL, $SALT ) {
-        $xml = bbb_wrap_simplexml_load_file( BigBlueButton::getRecordingsURL( $meetingID, $URL, $SALT ) );
-        if( $xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {//The meetings were returned
-            return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
-        } else if($xml && $xml->returncode == 'SUCCESS'){ //If there were meetings already created
-            $recordings = array();
+	private function getRecordingsArrayFetchPage($meetingidsarray, $URL, $SALT) {
+		$meetingID = ['meetingID' => implode(',', $mids)];
+		$xml = bbb_wrap_simplexml_load_file( BigBlueButton::getRecordingsURL( $meetingID, $URL, $SALT ) );
+		if ($xml && $xml->returncode == 'SUCCESS' && $xml->messageKey ) {
+			// The meetings were returned.
+			return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
+		}
+		if ($xml && $xml->returncode == 'SUCCESS') {
+			// If are recordings.
+			$recordings = array();
+			foreach ($xml->recordings->recording as $recording) {
+				$playbackArray = array();
+				foreach ( $recording->playback->format as $format ){
+					$playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url );
+				}
+				//Add the metadata to the recordings array
+				$metadataArray = array();
+				$metadata = get_object_vars($recording->metadata);
+				foreach ($metadata as $key => $value) {
+					if (is_object($value)) {
+						$value = '';
+					}
+					$metadataArray['meta_'.$key] = $value;
+				}
+				$recordings[] = array( 
+					'recordID' => (string) $recording->recordID,
+					'meetingID' => (string) $recording->meetingID,
+					'meetingName' => (string) $recording->name,
+					'published' => (string) $recording->published,
+					'startTime' => (string) $recording->startTime,
+					'endTime' => (string) $recording->endTime,
+					'playbacks' => $playbackArray ) + $metadataArray;
+			}
+			return array(
+				'returncode' => (string)$xml->returncode,
+				'message' => (string)$xml->message,
+				'messageKey' => (string)$xml->messageKey,
+				'recordings' => $recordings
+			);
+		}
+		if ($xml) {
+			// If the xml packet returned failure it displays the message to the user;
+			return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
+		}
+		// If the server is unreachable, then prompts the user of the necessary action
+		return array('returncode' => 'FAILED', 'messageKey' => 'Server is unreachable', 'messageKey' => 'unreachableServer');
+	}
 
-            foreach ($xml->recordings->recording as $recording) {
-                $playbackArray = array();
-                foreach ( $recording->playback->format as $format ){
-                    $playbackArray[(string) $format->type] = array( 'type' => (string) $format->type, 'url' => (string) $format->url );
-                }
-
-                //Add the metadata to the recordings array
-               $metadataArray = array();
-                $metadata = get_object_vars($recording->metadata);
-                foreach ($metadata as $key => $value) {
-                    if(is_object($value)) $value = '';
-                    $metadataArray['meta_'.$key] = $value;
-                }
-    
-                $recordings[] = array( 'recordID' => (string) $recording->recordID, 'meetingID' => (string) $recording->meetingID, 'meetingName' => (string) $recording->name, 'published' => (string) $recording->published, 'startTime' => (string) $recording->startTime, 'endTime' => (string) $recording->endTime, 'playbacks' => $playbackArray ) + $metadataArray;
-
-            }
-	
-            usort($recordings, 'BigBlueButton::recordingBuildSorter');
-            return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey, 'recordings' => $recordings);
-	
-        } else if( $xml ) { //If the xml packet returned failure it displays the message to the user
-            return array('returncode' => (string)$xml->returncode, 'message' => (string)$xml->message, 'messageKey' => (string)$xml->messageKey);
-        } else { //If the server is unreachable, then prompts the user of the necessary action
-            return NULL;
-        }
-    }
-
-    private function recordingBuildSorter($a, $b){
-    	if( $a['startTime'] < $b['startTime']) return -1;
-    	else if( $a['startTime'] == $b['startTime']) return 0;
-    	else return 1;
-    }
+	private function recordingBuildSorter($a, $b){
+		if ($a['startTime'] < $b['startTime']) {
+			return -1;
+		}
+		if ($a['startTime'] == $b['startTime']) {
+			return 0;
+		}
+		return 1;
+	}
     
 	//----------------------------------------------getUsers---------------------------------------
 	/**
