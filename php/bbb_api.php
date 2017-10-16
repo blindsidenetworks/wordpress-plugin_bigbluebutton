@@ -427,7 +427,7 @@ class BigBlueButton {
 	private function getRecordingsArrayFetch($meetingidsarray, $URL, $SALT) {
 		$recordingsarray = array();
 		// Execute a paginated getRecordings request.
-		$pagesize = 5;
+		$pagesize = 25;
 		$pages = floor(count($meetingidsarray) / $pagesize) + 1;
 		for ($page = 1; $page <= $pages; ++$page) {
 			$mids = array_slice($meetingidsarray, ($page - 1) * $pagesize, $pagesize);

@@ -75,6 +75,10 @@ You should enable the curl extension in php.ini.
 
 == Changelog ==
 
+= 1.4.6 =
+* Updated. Added option for filtering recordings by token when using the shortcode bigbluebutton_recordings.
+* Fixed issue. Recordings were not shown when the BigBlueButton server was holding a large number of them.
+
 = 1.4.5 =
 * Updated. Implemented notification message for critical upgrades.
 
