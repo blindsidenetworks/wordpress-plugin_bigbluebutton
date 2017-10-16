@@ -400,7 +400,7 @@ function bigbluebutton_shortcode($args) {
 function bigbluebutton_recordings_shortcode($args) {
     extract($args);
 
-    return bigbluebutton_list_recordings((isset($args['title']))? $args['title']: null);
+    return bigbluebutton_list_recordings($args);
 
 }
 
@@ -732,7 +732,7 @@ function bigbluebutton_general_options() {
 
         echo bigbluebutton_list_meetings();
 
-        echo bigbluebutton_list_recordings('List of Recordings');
+        echo bigbluebutton_list_recordings(array('title' => 'List of Recordings'));
 
     }
 
@@ -1214,8 +1214,17 @@ function bigbluebutton_list_meetings() {
 //---------------------------------List Recordings----------------------------------
 //================================================================================
 // Displays all the recordings available in the bigbluebutton server
-function bigbluebutton_list_recordings($title=null) {
+function bigbluebutton_list_recordings($args=[]) {
     global $wpdb, $wp_roles, $current_user;
+    $title = '';
+    if (array_key_exists('title', $args)) {
+        $title = $args['title'];
+    }
+    $token = '';
+    if (array_key_exists('token', $args)) {
+        $token = $args['token'];
+    }
+    $tokenarray = explode(',', $token);
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
 
@@ -1243,7 +1252,20 @@ function bigbluebutton_list_recordings($title=null) {
     $_SESSION['mt_salt'] = $salt_val;
 
     //Gets all the meetings from wordpress database
-    $listOfMeetings = $wpdb->get_results("SELECT DISTINCT meetingID FROM ".$table_logs_name." WHERE recorded = 1 ORDER BY timestamp;");
+    $sql = "SELECT DISTINCT meetingID FROM ".$table_logs_name." WHERE recorded = 1";
+    if (!empty($tokenarray)) {
+        $filter = "";
+        foreach ($tokenarray as $key => $value) {
+            if (!empty($filter)) {
+                $filter .= " OR ";
+            }
+            $filter .= "meetingID='".bigbluebutton_normalizeMeetingID($value)."'";
+        }
+        $sql .= " AND ( " .$filter. " )";
+    }
+    $sql .= " ORDER BY timestamp;";
+
+    $listOfMeetings = $wpdb->get_results($sql);
 
     $meetingIDs = '';
     $listOfRecordings = Array();
@@ -1262,15 +1284,16 @@ function bigbluebutton_list_recordings($title=null) {
         }
     }
 
-    //Checks to see if there are no meetings in the wordpress db and if so alerts the user
-    if(count($listOfRecordings) == 0) {
-        $out .= '<div class="updated"><p><strong>There are no recordings available.</strong></p></div>';
-        return $out;
+    //Displays the title of the page
+    if (!empty($title)) {
+        $out .= "<h2>".$title."</h2>";
     }
 
-    //Displays the title of the page
-    if($title)
-        $out .= "<h2>".$title."</h2>";
+    //Checks to see if there are no meetings in the wordpress db and if so alerts the user
+    if(empty($listOfRecordings)) {
+        $out .= '<div><p><strong>There are no recordings available.</strong></p></div>';
+        return $out;
+    }
 
     if ( bigbluebutton_can_manageRecordings($role) ) {
         $out .= '
