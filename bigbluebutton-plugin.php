@@ -1220,11 +1220,10 @@ function bigbluebutton_list_recordings($args=[]) {
     if (array_key_exists('title', $args)) {
         $title = $args['title'];
     }
-    $token = '';
+    $tokenarray = array();
     if (array_key_exists('token', $args)) {
-        $token = $args['token'];
+        $tokenarray = explode(',', trim($args['token']));
     }
-    $tokenarray = explode(',', $token);
     $table_name = $wpdb->prefix . "bigbluebutton";
     $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
 
