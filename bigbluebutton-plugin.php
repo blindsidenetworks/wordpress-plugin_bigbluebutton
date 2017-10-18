@@ -1,14 +1,14 @@
 <?php
 /*
-Plugin Name: BigBlueButton
-Plugin URI: http://blindsidenetworks.com/integrations/wordpress
-Description: BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meeting rooms to interact with their readers. It was developed and is maintained by <a href="http://blindsidenetworks.com/" target="_blank">Blindside Networks</a>. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit <a href= "http://bigbluebutton.org/support" target="_blank">BigBlueButton support</a>.
-
-Version: 1.4.6
-Author: Blindside Networks
-Author URI: http://blindsidenetworks.com/
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Plugin Name:  BigBlueButton
+Plugin URI:   https://wordpress.org/plugins/bigbluebutton/
+Description:  BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meeting rooms to interact with their readers. It was developed and is maintained by <a href="http://blindsidenetworks.com/" target="_blank">Blindside Networks</a>. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit <a href= "http://bigbluebutton.org/support" target="_blank">BigBlueButton support</a>.
+Version:      1.4.6
+Author:       Blindside Networks
+Author URI:   http://blindsidenetworks.com/
+License:      GPL2
+License URI:  https://www.gnu.org/licenses/gpl-2.0.html
+Copyright     2010 owards Blindside Networks Inc
 */
 
 //================================================================================
@@ -1084,9 +1084,6 @@ function bigbluebutton_list_meetings() {
             			$out .= '<div class="updated"><p><strong>'.$response['message'].'</strong></p></div>';
             		}
             	}
-
-
-
             }
             //---------------------------------------------------DELETE-------------------------------------------------
             else if($_POST['SubmitList'] == 'Delete' ) { //Obtains the meeting information of the meeting that is going to be delete
@@ -1114,7 +1111,6 @@ function bigbluebutton_list_meetings() {
 
             	    $out .= '<div class="updated"><p><strong>'.$found->meetingName.' meeting has been deleted.</strong></p></div>';
             	}
-
             }
         }
     }
@@ -1250,8 +1246,8 @@ function bigbluebutton_list_recordings($args=[]) {
     $_SESSION['mt_bbb_url'] = $url_val;
     $_SESSION['mt_salt'] = $salt_val;
 
-    //Gets all the meetings from wordpress database
-    $sql = "SELECT DISTINCT meetingID FROM ".$table_logs_name." WHERE recorded = 1";
+    // Get meetings from wordpress database.
+    $sql = "SELECT DISTINCT meetingID FROM " . $table_logs_name . " WHERE recorded = 1";
     if (!empty($tokenarray)) {
         $filter = "";
         foreach ($tokenarray as $key => $value) {
@@ -1263,34 +1259,29 @@ function bigbluebutton_list_recordings($args=[]) {
         $sql .= " AND ( " .$filter. " )";
     }
     $sql .= " ORDER BY timestamp;";
-
     $listOfMeetings = $wpdb->get_results($sql);
 
-    $meetingIDs = '';
-    $listOfRecordings = Array();
-    if($listOfMeetings) {
-        foreach ($listOfMeetings as $meeting) {
-            if( $meetingIDs != '' ) $meetingIDs .= ',';
-            $meetingIDs .= $meeting->meetingID;
-        }
+    // Normalise meetingIDs.
+    $meetingIDs = Array();
+    foreach ($listOfMeetings as $meeting) {
+        $meetingIDs[] = $meeting->meetingID;
     }
 
+    // Get the recordings if any.
     $listOfRecordings = Array();
-    if( $meetingIDs != '' ) {
-        $recordingsArray = BigBlueButton::getRecordingsArray($meetingIDs, $url_val, $salt_val);
-        if( $recordingsArray['returncode'] == 'SUCCESS' && !$recordingsArray['messageKey'] ) {
-            $listOfRecordings = $recordingsArray['recordings'];
-        }
+    $recordingsArray = BigBlueButton::getRecordingsArray($meetingIDs, $url_val, $salt_val);
+    if ($recordingsArray['returncode'] == 'SUCCESS' && !$recordingsArray['messageKey']) {
+        $listOfRecordings = $recordingsArray['recordings'];
     }
 
-    //Displays the title of the page
+    // Displays the title of the page.
     if (!empty($title)) {
-        $out .= "<h2>".$title."</h2>";
+        $out .= '<h2>'.$title.'</h2>'."\n";
     }
 
-    //Checks to see if there are no meetings in the wordpress db and if so alerts the user
+    // Checks to see if there are no meetings in the wordpress db and if so alerts the user.
     if(empty($listOfRecordings)) {
-        $out .= '<div><p><strong>There are no recordings available.</strong></p></div>';
+        $out .= '<div><p><strong>There are no recordings available.</strong></p></div>'."\n";
         return $out;
     }
 
@@ -1336,27 +1327,23 @@ function bigbluebutton_list_recordings($args=[]) {
         </script>';
     }
 
-
-    //Print begining of the table
-    $out .= '
-    <div id="bbb-recordings-div" class="bbb-recordings">
-    <table class="stats" cellspacing="5">
-      <tr>
-        <th class="hed" colspan="1">Recording</td>
-        <th class="hed" colspan="1">Meeting Room Name</td>
-        <th class="hed" colspan="1">Date</td>
-        <th class="hed" colspan="1">Duration</td>';
-    if ( bigbluebutton_can_manageRecordings($role) ) {
-        $out .= '
-        <th class="hedextra" colspan="1">Toolbar</td>';
+    // Print begining of the table.
+    $out .= '<div id="bbb-recordings-div" class="bbb-recordings">'."\n";
+    $out .= '  <table class="stats" cellspacing="5">'."\n";
+    $out .= '    <tr>'."\n";
+    $out .= '      <th class="hed" colspan="1">Recording</td>'."\n";
+    $out .= '      <th class="hed" colspan="1">Meeting Room Name</td>'."\n";
+    $out .= '      <th class="hed" colspan="1">Date</td>'."\n";
+    $out .= '      <th class="hed" colspan="1">Duration</td>'."\n";
+    if (bigbluebutton_can_manageRecordings($role)) {
+        $out .= '      <th class="hedextra" colspan="1">Toolbar</td>'."\n";
     }
-    $out .= '
-      </tr>';
-    foreach( $listOfRecordings as $recording) {
+    $out .= '    </tr>'."\n";
+    foreach ($listOfRecordings as $recording) {
         if ( bigbluebutton_can_manageRecordings($role) || $recording['published'] == 'true') {
-            /// Prepare playback recording links
+            // Prepare playback recording links.
             $type = '';
-            foreach ( $recording['playbacks'] as $playback ) {
+            foreach ($recording['playbacks'] as $playback) {
                 if ($recording['published'] == 'true') {
                     $type .= '<a href="'.$playback['url'].'" target="_new">'.$playback['type'].'</a>&#32;';
                 } else {
@@ -1364,57 +1351,52 @@ function bigbluebutton_list_recordings($args=[]) {
                 }
             }
 
-            /// Prepare duration
+            // Prepare duration.
             $endTime = isset($recording['endTime'])? floatval($recording['endTime']):0;
             $endTime = $endTime - ($endTime % 1000);
             $startTime = isset($recording['startTime'])? floatval($recording['startTime']):0;
             $startTime = $startTime - ($startTime % 1000);
             $duration = intval(($endTime - $startTime) / 60000);
 
-            /// Prepare date
-            //Make sure the startTime is timestamp
-            if( !is_numeric($recording['startTime']) ) {
+            // Prepare date.
+            // Make sure the startTime is timestamp.
+            if (!is_numeric($recording['startTime'])) {
                 $date = new DateTime($recording['startTime']);
                 $recording['startTime'] = date_timestamp_get($date);
             } else {
                 $recording['startTime'] = ($recording['startTime'] - $recording['startTime'] % 1000) / 1000;
             }
 
-            //Format the date
+            // Format the date.
             $formatedStartDate = date_i18n( "M d Y H:i:s T", $recording['startTime'] + (get_option('gmt_offset') * 60 * 60) , false, true );
 
-            //Print detail
-            $out .= '
-            <tr id="actionbar-tr-'.$recording['recordID'].'">
-              <td>'.$type.'</td>
-              <td>'.$recording['meetingName'].'</td>
-              <td>'.$formatedStartDate.'</td>
-              <td>'.$duration.' min</td>';
+            // Print detail.
+            $out .= '    <tr id="actionbar-tr-'.$recording['recordID'].'">'."\n";
+            $out .= '      <td>'.$type.'</td>'."\n";
+            $out .= '      <td>'.$recording['meetingName'].'</td>'."\n";
+            $out .= '      <td>'.$formatedStartDate.'</td>'."\n";
+            $out .= '      <td>'.$duration.' min</td>'."\n";
 
-            /// Prepare actionbar if role is allowed to manage the recordings
-            if ( bigbluebutton_can_manageRecordings($role) ) {
+            // Prepare actionbar if role is allowed to manage the recordings.
+            if (bigbluebutton_can_manageRecordings($role)) {
                 $action = ($recording['published'] == 'true')? 'Hide': 'Show';
-                $actionbar = "<a id=\"actionbar-publish-a-".$recording['recordID']."\" title=\"".$action."\" href=\"#\"><img id=\"actionbar-publish-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/".strtolower($action).".gif\" class=\"iconsmall\" onClick=\"actionCall('publish', '".$recording['recordID']."'); return false;\" /></a>";
+                $actionbar  = "<a id=\"actionbar-publish-a-".$recording['recordID']."\" title=\"".$action."\" href=\"#\"><img id=\"actionbar-publish-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/".strtolower($action).".gif\" class=\"iconsmall\" onClick=\"actionCall('publish', '".$recording['recordID']."'); return false;\" /></a>";
                 $actionbar .= "<a id=\"actionbar-delete-a-".$recording['recordID']."\" title=\"Delete\" href=\"#\"><img id=\"actionbar-delete-img-".$recording['recordID']."\" src=\"".get_bloginfo('url')."/wp-content/plugins/bigbluebutton/images/delete.gif\" class=\"iconsmall\" onClick=\"actionCall('delete', '".$recording['recordID']."'); return false;\" /></a>";
-                $out .= '
-                <td>'.$actionbar.'</td>';
+                $out .= '      <td>'.$actionbar.'</td>'."\n";
             }
-
-            $out .= '
-            </tr>';
+            $out .= '    </tr>';
         }
     }
 
-    //Print end of the table
-    $out .= '  </table>
-    </div>';
+    // Print end of the table.
+    $out .= '  </table>'."\n";
+    $out .= '</div>';
 
     return $out;
-
 }
 
 
-//Begins the table of list meetings with the number of columns specified
+// Begins the table of list meetings with the number of columns specified.
 function bigbluebutton_print_table_header() {
     return '
     <div>
