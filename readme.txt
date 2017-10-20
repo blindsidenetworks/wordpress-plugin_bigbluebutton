@@ -3,8 +3,8 @@ Contributors: blindsidenetworks, jfederico
 Donate link: http://www.blindsidenetworks.com/integrations/wordpress/
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 3.0.1
-Tested up to: 4.8.1
-Stable tag: 1.4.5
+Tested up to: 4.8.2
+Stable tag: 1.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,11 @@ You should enable the curl extension in php.ini.
 6. Recordings in a front end page.
 
 == Changelog ==
+
+= 1.4.6 =
+* Updated. Added option for filtering recordings by token when using the shortcode bigbluebutton_recordings.
+* Fixed issue. Recordings were not shown when the BigBlueButton server was holding a large number of them.
+* Updated. Tested on WP 4.8.2 and updated version tag.
 
 = 1.4.5 =
 * Updated. Implemented notification message for critical upgrades.
