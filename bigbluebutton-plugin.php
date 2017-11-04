@@ -1017,50 +1017,80 @@ function bigbluebutton_form_setup($currentuser, $atts)
  */
 function bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue)
 {
-    $outputstring = '';
-    if ($atts['enclosed'] === "true") {
-        $outputstring .= '<form id="recording">'."\n";
-        $outputstring .= '  <label>'.$atts['title'].'</label>'."\n";
-        $outputstring .= '  <div id="bbb-recordings-div" class="bbb-recordings">'."\n";
+    if ($atts['enclosed'] !== "true") {
+	      return '';
     }
+    $outputstring  = '<form id="recording">'."\n";
+    $outputstring .= '  <label>'.$atts['title'].'</label>'."\n";
+    $outputstring .= '  <div id="bbb-recordings-div" class="bbb-recordings">'."\n";
+	  $outputstring .= bigbluebutton_print_recordings_table($currentuser);
+    $outputstring .= '  </div>'."\n";
+    $outputstring .= '</form>'."\n";
+    return $outputstring;
+}
+
+/**
+*   Prints the header of the recording table.
+*
+* @param  array $currentuser Details of the current user
+* @return
+*/
+function bigbluebutton_print_recordings_table($currentuser)
+{
     $listofallrecordings = array();
     $outputstring .= '    <table  class="stats" cellspacing="5">'."\n";
-	  $outputstring .= bigbluebutton_print_recordings_table_headers($currentuser);
+	  $outputstring .= bigbluebutton_print_recordings_table_header($currentuser);
     while ($bbbposts->have_posts()) {
         $bbbposts->the_post();
         $roomtoken = get_post_meta($bbbposts->post->ID, '_bbb_room_token', true);
         $meetingID = bigbluebutton_normalize_meeting_id($roomtoken);
-
-        if ($atts['token'] == null||(strpos($atts['token'], $roomtoken) !== false)) {
-            if ($meetingID != '') {
-                $recordingsarray = BigBlueButton::getRecordingsArray($meetingID, $endpointvalue, $secretvalue);
-                if ($recordingsarray['returncode'] == 'SUCCESS' && !$recordingsarray['messageKey']) {
-                    $listofrecordings = $recordingsarray['recordings'];
-                    $outputstring .= bigbluebutton_print_recordings_data($listofrecordings, $currentuser);
-                    array_push($listofallrecordings, $listofrecordings);
-                }
+	      if ($meetingID == '') {
+	          continue;
+	      }
+        if ($atts['token'] == null || strpos($atts['token'], $roomtoken)) {
+            $recordingsarray = BigBlueButton::getRecordingsArray($meetingID, $endpointvalue, $secretvalue);
+            if ($recordingsarray['returncode'] == 'SUCCESS' && !$recordingsarray['messageKey']) {
+                $listofrecordings = $recordingsarray['recordings'];
+                $outputstring .= bigbluebutton_print_recordings_data($listofrecordings, $currentuser);
+                array_push($listofallrecordings, $listofrecordings);
             }
         }
     }
     wp_reset_postdata();
     $outputstring .= '    </table>'."\n";
-    if ($atts['enclosed'] === "true") {
-        $outputstring .= '  </div>'."\n";
-        $outputstring .= '</form>'."\n";
-    }
-    if ((count($listofallrecordings) == 0)) {
+    if (count($listofallrecordings) == 0) {
         $outputstring = '<p><strong>There are no recordings available.</strong></p>';
-		}
-    return $outputstring;
+    }
 }
 
 /**
-*   Prints the headers of the recording table.
+*   Prints the header of the recording table.
 *
 * @param  array $currentuser Details of the current user
 * @return
 */
-function bigbluebutton_print_recordings_table_headers($currentuser)
+function bigbluebutton_print_recordings_table_header($currentuser)
+{
+    $outputstring = '';
+    $outputstring .= '      <tr>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">Recording</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">Meeting Room Name</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">Date</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">Duration</th>'."\n";
+    if ($currentuser->allcaps["manage_recordings_room"] == true) {
+        $outputstring  .= '        <th class="hedextra" colspan="1">Toolbar</th>'."\n";
+    }
+    $outputstring .= '      </tr>'."\n";
+    return $outputstring;
+}
+
+/**
+*   Prints the body of the recording table.
+*
+* @param  array $currentuser Details of the current user
+* @return
+*/
+function bigbluebutton_print_recordings_table_body($currentuser)
 {
     $outputstring = '';
     $outputstring .= '      <tr>'."\n";
