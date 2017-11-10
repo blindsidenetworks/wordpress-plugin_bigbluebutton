@@ -51,6 +51,11 @@ table.custom-admin-table td {
    vertical-align: top;
 }
 
+.bbb-recordings div {
+	width: 100%;
+}
+
+.bbb-recordings div.span,
 .bbb-recordings table.stats th,
 .bbb-recordings table.stats td,
 .bbb-recordings table.stats p {
@@ -58,6 +63,7 @@ table.custom-admin-table td {
     padding-right:10px;
 }
 
+.bbb-recordings div.span,
 table.stats td.hed {
   background-color: #666;
   color: #fff;
@@ -68,6 +74,7 @@ table.stats td.hed {
   font-weight: bold;
 }
 
+.bbb-recordings div.span,
 table.stats td.hedextra {
   background-color: #666;
   color: #fff;

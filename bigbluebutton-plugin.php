@@ -942,9 +942,11 @@ function bigbluebutton_shortcode_output_form_single($bbbposts, $atts, $currentus
 	      $text = $atts['text'];
 	  }
     $outputstring .= bigbluebutton_form_setup($currentuser, $atts);
+    $outputstring .= '<div id="bbb-join-container"></div>';
+    $outputstring .= '<div id="bbb-error-container"></div>';
     $outputstring .= '<input type="hidden" name="hiddenInput" id="hiddenInput" value="'.$slug.'" />';
     $usercapabilitiesarray = bigbluebutton_assign_capabilities_array($currentuser);
-    $outputstring .= '<a href="#" class="btn btn-'.$atts['style'].' btn-'.$atts['size'].' btn-'.$atts['display'].' bbb-shortcode-selector" onClick="bigbluebutton_join_meeting(\''.$atts['join'].'\',\''.json_encode(is_user_logged_in()).'\',\''.json_encode($usercapabilitiesarray["custom_join_meeting_password"]).'\')" >'.$text.'</a>'."\n";
+    $outputstring .= '<a href="#" class="btn btn-'.$atts['style'].' btn-'.$atts['size'].' btn-'.$atts['display'].' bbb-shortcode-selector" onClick="bigbluebutton_join_meeting(\''.$atts['join'].'\',\''.json_encode(is_user_logged_in()).'\',\''.json_encode($usercapabilitiesarray["custom_join_meeting_password"]).'\'); console.log(\'bigbluebutton_shortcode_output_form_single\');" >'.$text.'</a>'."\n";
     return $outputstring;
 }
 
@@ -971,9 +973,13 @@ function bigbluebutton_shortcode_output_form_multiple($bbbposts, $atts, $current
     wp_reset_postdata();
     $outputstring .= '</select>'."\n";
     $outputstring .= bigbluebutton_form_setup($currentuser, $atts);
-    $outputstring .= '<input type="hidden" name="hiddenInput" id="hiddenInput" value="'.$slug.'" />';
+    $outputstring .= '<input type="hidden" name="hiddenInput" id="hiddenInput" value="'.$slug.'" />'."\n";
     $usercapabilitiesarray = bigbluebutton_assign_capabilities_array($currentuser);
-    $outputstring .= '<a href="#" class="btn btn-'.$atts['style'].' btn-'.$atts['size'].' btn-'.$atts['display'].' bbb-shortcode-selector" onClick="bigbluebutton_join_meeting(\''.$atts['join'].'\',\''.json_encode(is_user_logged_in()).'\',\''.json_encode($usercapabilitiesarray["custom_join_meeting_password"]).'\')" >'.$joinorview.'</a>'."\n";
+	  $outputstring .= bigbluebutton_btn_join();
+    $outputstring .= '<a href="#" class="btn btn-'.$atts['style'].' btn-'.$atts['size'].' btn-'.$atts['display'].' bbb-shortcode-selector" ';
+    $outputstring .= 'onClick="bigbluebutton_join_meeting(\''.$atts['join'].'\',\''.json_encode(is_user_logged_in()).'\',\''.json_encode($usercapabilitiesarray["custom_join_meeting_password"]).'\'); console.log(\'bigbluebutton_shortcode_output_form_multiple\');" >'."\n";
+    $outputstring .= '  '.$joinorview."\n";
+    $outputstring .= '</a>'."\n";
     return $outputstring;
 }
 
@@ -1015,17 +1021,17 @@ function bigbluebutton_form_setup($currentuser, $atts)
 * @param  string $secretvalue BBB secret value
 * @return
  */
-function bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $endpointvalue, $secretvalue)
+function bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuser, $bbbendpoint, $bbbsecret)
 {
     if ($atts['enclosed'] !== "true") {
 	      return '';
     }
-    $outputstring  = '<form id="recording">'."\n";
-    $outputstring .= '  <label>'.$atts['title'].'</label>'."\n";
-    $outputstring .= '  <div id="bbb-recordings-div" class="bbb-recordings">'."\n";
-	  $outputstring .= bigbluebutton_print_recordings_table($currentuser);
-    $outputstring .= '  </div>'."\n";
-    $outputstring .= '</form>'."\n";
+    $outputstring  = '<div class="bbb-recording">'."\n";
+	  $outputstring .= '  <div class="span span4">'."\n";
+    $outputstring .= '    <label>'.$atts['title'].'</label>'."\n";
+	  $outputstring .= bigbluebutton_print_recordings_table($bbbposts, $atts, $currentuser, $bbbendpoint, $bbbsecret);
+	  $outputstring .= '  </div>'."\n";
+	  $outputstring .= '</div>'."\n";
     return $outputstring;
 }
 
@@ -1035,11 +1041,9 @@ function bigbluebutton_shortcode_output_recordings($bbbposts, $atts, $currentuse
 * @param  array $currentuser Details of the current user
 * @return
 */
-function bigbluebutton_print_recordings_table($currentuser)
+function bigbluebutton_print_recordings_table($bbbposts, $atts, $currentuser, $bbbendpoint, $bbbsecret)
 {
     $listofallrecordings = array();
-    $outputstring .= '    <table  class="stats" cellspacing="5">'."\n";
-	  $outputstring .= bigbluebutton_print_recordings_table_header($currentuser);
     while ($bbbposts->have_posts()) {
         $bbbposts->the_post();
         $roomtoken = get_post_meta($bbbposts->post->ID, '_bbb_room_token', true);
@@ -1048,19 +1052,26 @@ function bigbluebutton_print_recordings_table($currentuser)
 	          continue;
 	      }
         if ($atts['token'] == null || strpos($atts['token'], $roomtoken)) {
-            $recordingsarray = BigBlueButton::getRecordingsArray($meetingID, $endpointvalue, $secretvalue);
+            $recordingsarray = BigBlueButton::getRecordingsArray($meetingID, $bbbendpoint, $bbbsecret);
             if ($recordingsarray['returncode'] == 'SUCCESS' && !$recordingsarray['messageKey']) {
                 $listofrecordings = $recordingsarray['recordings'];
-                $outputstring .= bigbluebutton_print_recordings_data($listofrecordings, $currentuser);
                 array_push($listofallrecordings, $listofrecordings);
             }
         }
     }
+		error_log(json_encode($listofallrecordings));
     wp_reset_postdata();
-    $outputstring .= '    </table>'."\n";
     if (count($listofallrecordings) == 0) {
-        $outputstring = '<p><strong>There are no recordings available.</strong></p>';
+        return '    <p><strong>There are no recordings available.</strong></p>';
     }
+
+	  $outputstring  = '    <table class="stats" cellspacing="5">'."\n";
+	  $outputstring .= bigbluebutton_print_recordings_table_header($currentuser);
+    foreach ($listofallrecordings as $recording) {
+        $outputstring .= bigbluebutton_print_recordings_data($listofrecordings, $currentuser);
+    }
+    $outputstring .= '    </table>'."\n";
+	return $outputstring;
 }
 
 /**
@@ -1433,7 +1444,7 @@ function bigbluebutton_filter($content)
         }
         $outputstring .= bigbluebutton_form_setup($currentuser, $atts);
         $outputstring .= '<input type="hidden" name="hiddenInput" id="hiddenInput" value="'.$slug.'" />';
-        $outputstring .= '<input class="bbb-shortcode-selector" type="button" onClick="bigbluebutton_join_meeting(\'true\',\''.json_encode(is_user_logged_in()).'\',\''.json_encode($usercapabilitiesarray["custom_join_meeting_password"]).'\')" value="Join  '.$meetingname.'"/>'."\n";
+        $outputstring .= '<input class="bbb-shortcode-selector" type="button" onClick="bigbluebutton_join_meeting(\'true\',\''.json_encode(is_user_logged_in()).'\',\''.json_encode($usercapabilitiesarray["custom_join_meeting_password"]).'\'); console.log(\'bigbluebutton_filter\');" value="Join  '.$meetingname.'"/>'."\n";
         $outputstring .= '</form>';
     }
     return $content.$outputstring;
