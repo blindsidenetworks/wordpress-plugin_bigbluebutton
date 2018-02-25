@@ -37,7 +37,7 @@ define("BIGBLUEBUTTON_FORM_IN_WIDGET", TRUE );
 //================================================================================
 //------------------Required Libraries and Global Variables-----------------------
 //================================================================================
-require('php/bbb_api.php');
+require_once(dirname(__FILE__) . '/php/bbb_api.php');
 
 //================================================================================
 //------------------Code for development------------------------------------------
@@ -542,9 +542,6 @@ function bigbluebutton_form($args, $bigbluebutton_form_in_widget = false) {
                 //If the viewer has the correct password, but the meeting has not yet started they have to wait
                 //for the moderator to start the meeting
                 else if ($found->attendeePW == $password) {
-                    //Stores the url and salt of the bigblubutton server in the session
-                    $_SESSION['mt_bbb_url'] = $url_val;
-                    $_SESSION['mt_salt'] = $salt_val;
                     //Displays the javascript to automatically redirect the user when the meeting begins
                     $out .= bigbluebutton_display_redirect_script($bigbluebutton_joinURL, $found->meetingID, $found->meetingName, $name);
                     return $out;
@@ -1242,9 +1239,6 @@ function bigbluebutton_list_recordings($args=[]) {
 
     $url_val = get_option('bigbluebutton_url');
     $salt_val = get_option('bigbluebutton_salt');
-
-    $_SESSION['mt_bbb_url'] = $url_val;
-    $_SESSION['mt_salt'] = $salt_val;
 
     // Get meetings from wordpress database.
     $sql = "SELECT DISTINCT meetingID FROM " . $table_logs_name . " WHERE recorded = 1";
