@@ -1,17 +1,19 @@
 <?php
-/*
-Plugin Name: BigBlueButton
-Plugin URI: http://blindsidenetworks.com/integration
-Description: BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meetings rooms by using a Custom Post Type. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit http://bigbluebutton.org/support
-Version: 2.0.0
-Author: Blindside Networks
-Author URI: http://blindsidenetworks.com/
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+/**
+* Plugin Name: BigBlueButton
+* Plugin URI: http://blindsidenetworks.com/integration
+* Description: BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meetings rooms by using a Custom Post Type. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit http://bigbluebutton.org/support
+* Version: 2.0.0
+* Author: Blindside Networks
+* Author URI: http://blindsidenetworks.com/
+* Text Domain: bigbluebutton
+* Domain Path: /languages
+* License: GPLv2 or later
+* License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
 global $wp_version;
-$exitmessage = 'This plugin has been designed for Wordpress 2.5 and later, please upgrade your current one.';
+$exitmessage = __('This plugin has been designed for Wordpress 2.5 and later, please upgrade your current one.','bigbluebutton');
 
 if (version_compare($wp_version, '2.5', '<')) {
     exit($exitmessage);
@@ -416,7 +418,9 @@ function bigbluebutton_show_upgrade_notification($currentPluginMetadata, $newPlu
     }
     // check "upgrade_notice"
     if (isset($newPluginMetadata->upgrade_notice) && strlen(trim($newPluginMetadata->upgrade_notice)) > 0) {
-        echo '<div style="background-color: #d54e21; padding: 10px; color: #f9f9f9; margin-top: 10px"><strong>Important Upgrade Notice:</strong> ';
+        echo '<div style="background-color: #d54e21; padding: 10px; color: #f9f9f9; margin-top: 10px"><strong>';
+	_e('Important Upgrade Notice','bigbluebutton');
+	echo ':</strong> ';
         echo esc_html(strip_tags($newPluginMetadata->upgrade_notice)), '</div>';
     }
 }
@@ -441,6 +445,8 @@ function bigbluebutton_update_metadata($pluginslug)
 */
 function bigbluebutton_init()
 {
+    load_plugin_textdomain( 'bigbluebutton' );
+    
     bigbluebutton_start_session();
     bigbluebutton_room_taxonomies();
     bigbluebutton_init_custom_post_type();
@@ -649,26 +655,26 @@ function bigbluebutton_options_page_callback()
 	  $outputstring .= '<div id="icon-options-general" class="icon32"><br /></div><h2>BigBlueButton Settings</h2>'."\n";
 	  $outputstring .= '    <form  action="'.$_SERVER['REQUEST_URI'].'" method="post" name="site_options_page" >'."\n";
 	  $outputstring .= '        <h2 class="title">Server</h2>'."\n";
-	  $outputstring .= '        <p>The settings listed below determine the BigBlueButton server that will be used for the live sessions.</p>'."\n";
+	  $outputstring .= '        <p>'.__('The settings listed below determine the BigBlueButton server that will be used for the live sessions.','bigbluebutton').'</p>'."\n";
 	  $outputstring .= '        <table class="form-table">'."\n";
 	  $outputstring .= '            <tr>'."\n";
-	  $outputstring .= '                <th scope="row">Endpoint</th>'."\n";
+	  $outputstring .= '                <th scope="row">'.__('Endpoint','bigbluebutton').'</th>'."\n";
 	  $outputstring .= '                <td>'."\n";
 	  $outputstring .= '                    <input type="text" size="56" name="endpoint" value="'.trim(get_option('bigbluebutton_endpoint')).'" />'."\n";
-	  $outputstring .= '                    <p>Example: http://test-install.blindsidenetworks.com/bigbluebutton/</p>'."\n";
+	  $outputstring .= '                    <p>'.__('Example','bigbluebutton').': http://test-install.blindsidenetworks.com/bigbluebutton/</p>'."\n";
 	  $outputstring .= '                </td>'."\n";
 	  $outputstring .= '            </tr>'."\n";
 	  $outputstring .= '            <tr>'."\n";
-	  $outputstring .= '                <th>Shared Secret</th>'."\n";
+	  $outputstring .= '                <th>'.__('Shared Secret','bigbluebutton').'</th>'."\n";
 	  $outputstring .= '                <td>'."\n";
 	  $outputstring .= '                    <input type="text" size="56" name="secret" value="'.trim(get_option('bigbluebutton_secret')).'" />'."\n";
-	  $outputstring .= '                    <p>Example: 8cd8ef52e8e101574e400365b55e11a6</p>'."\n";
+	  $outputstring .= '                    <p>'.__('Example','bigbluebutton').' 8cd8ef52e8e101574e400365b55e11a6</p>'."\n";
 	  $outputstring .= '                </td>'."\n";
 	  $outputstring .= '            </tr>'."\n";
 	  $outputstring .= '        </table>'."\n";
-	  $outputstring .= '        <p>The default values included as part of this settings are for using a FREE BigBlueButton server provided by Blindside Networks for testing purposes. They must be replaced with the parameters obtained from a BigBlueButton server better suited for production.</p>'."\n";
+	  $outputstring .= '        <p>'.__('The default values included as part of this settings are for using a FREE BigBlueButton server provided by Blindside Networks for testing purposes. They must be replaced with the parameters obtained from a BigBlueButton server better suited for production.','bigbluebutton').'</p>'."\n";
 	  $outputstring .= '        <p class="submit">'."\n";
-	  $outputstring .= '            <input type="submit" name="submit" id="submit" class="button button-primary" value="Save Settings">'."\n";
+	  $outputstring .= '            <input type="submit" name="submit" id="submit" class="button button-primary" value="'.__('Save Settings','bigbluebutton').'">'."\n";
 	  $outputstring .= '        </p>'."\n";
 	  $outputstring .= '    </form>'."\n";
 	  $outputstring .= '    </div>'."\n";
@@ -712,7 +718,7 @@ function bigbluebutton_sidebar($args)
     $atts = array('join' => 'true');
     bigbluebutton_shortcode_defaults($atts, 'rooms');
     echo $args['before_widget'];
-    echo $args['before_title'].'BigBlueButton Rooms'.$args['after_title'];
+    echo $args['before_title'].__('BigBlueButton Rooms','bigbluebutton').$args['after_title'];
     echo bigbluebutton_shortcode_output_form($bbbposts, $atts, $currentuser);
     echo $args['after_widget'];
 }
@@ -724,7 +730,7 @@ function bigbluebutton_rooms_sidebar($args)
     $atts = array('join' => 'false');
     bigbluebutton_shortcode_defaults($atts, 'rooms');
     echo $args['before_widget'];
-    echo $args['before_title'].'BigBlueButton'.$args['after_title'];
+    echo $args['before_title'].__('BigBlueButton','bigbluebutton').$args['after_title'];
     echo bigbluebutton_shortcode_output_form($bbbposts, $atts, $currentuser);
     echo $args['after_widget'];
 }
@@ -732,10 +738,10 @@ function bigbluebutton_rooms_sidebar($args)
 // Registers the bigbluebutton widget.
 function bigbluebutton_widget_init()
 {
-    wp_register_sidebar_widget('bigbluebuttonsidebarwidget', __('BigBlueButton'), 'bigbluebutton_sidebar',
-                          array('description' => 'Displays a BigBlueButton login form in a sidebar.'));
-    wp_register_sidebar_widget('bigbluebuttonroomswidget', __('BigBlueButton Rooms'), 'bigbluebutton_rooms_sidebar',
-                          array('description' => 'Displays a dropdown menu for selecting BigBlueButton Rooms in a sidebar.'));
+    wp_register_sidebar_widget('bigbluebuttonsidebarwidget', __('BigBlueButton','bigbluebutton'), 'bigbluebutton_sidebar',
+                          array('description' => __('Displays a BigBlueButton login form in a sidebar.','bigbluebutton')));
+    wp_register_sidebar_widget('bigbluebuttonroomswidget', __('BigBlueButton Rooms','bigbluebutton'), 'bigbluebutton_rooms_sidebar',
+                          array('description' => __('Displays a dropdown menu for selecting BigBlueButton Rooms in a sidebar.','bigbluebutton')));
 }
 
 
@@ -1000,12 +1006,12 @@ function bigbluebutton_form_setup($currentuser, $atts)
         $anonymousrole = get_role('anonymous');
         $userArray = $anonymousrole->capabilities;
         if ($atts['join'] === "true") {
-            $outputstring .= '<label>Name:</label>'."\n";
+            $outputstring .= '<label>'.__('Name','bigbluebutton').':</label>'."\n";
             $outputstring .= '<input type="text" name="displayname" id="displayname" >'."\n";
         }
     }
     if (($userArray["custom_join_meeting_password"] == true) && ($atts['join'] === "true")) {
-        $outputstring .= '<label>Password:</label>'."\n";
+        $outputstring .= '<label>'.__('Password','bigbluebutton').':</label>'."\n";
         $outputstring .= '<input type="password" name="roompw" id="roompw" >'."\n";
     }
     return $outputstring;
@@ -1062,7 +1068,7 @@ function bigbluebutton_print_recordings_table($bbbposts, $atts, $currentuser, $b
 		error_log(json_encode($listofallrecordings));
     wp_reset_postdata();
     if (count($listofallrecordings) == 0) {
-        return '    <p><strong>There are no recordings available.</strong></p>';
+        return '    <p><strong>'.__('There are no recordings available.','bigbluebutton').'</strong></p>';
     }
 
 	  $outputstring  = '    <table class="stats" cellspacing="5">'."\n";
@@ -1084,12 +1090,12 @@ function bigbluebutton_print_recordings_table_header($currentuser)
 {
     $outputstring = '';
     $outputstring .= '      <tr>'."\n";
-    $outputstring .= '        <th class="hed" colspan="1">Recording</th>'."\n";
-    $outputstring .= '        <th class="hed" colspan="1">Meeting Room Name</th>'."\n";
-    $outputstring .= '        <th class="hed" colspan="1">Date</th>'."\n";
-    $outputstring .= '        <th class="hed" colspan="1">Duration</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">'.__('Recording','bigbluebutton').'</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">'.__('Meeting Room Name','bigbluebutton').'</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">'.__('Date','bigbluebutton').'</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">'.__('Duration','bigbluebutton').'</th>'."\n";
     if ($currentuser->allcaps["manage_recordings_room"] == true) {
-        $outputstring  .= '        <th class="hedextra" colspan="1">Toolbar</th>'."\n";
+        $outputstring  .= '        <th class="hedextra" colspan="1">'.__('Toolbar','bigbluebutton').'</th>'."\n";
     }
     $outputstring .= '      </tr>'."\n";
     return $outputstring;
@@ -1105,12 +1111,12 @@ function bigbluebutton_print_recordings_table_body($currentuser)
 {
     $outputstring = '';
     $outputstring .= '      <tr>'."\n";
-    $outputstring .= '        <th class="hed" colspan="1">Recording</th>'."\n";
-    $outputstring .= '        <th class="hed" colspan="1">Meeting Room Name</th>'."\n";
-    $outputstring .= '        <th class="hed" colspan="1">Date</th>'."\n";
-    $outputstring .= '        <th class="hed" colspan="1">Duration</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">'.__('Recording','bigbluebutton').'</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">'.__('Meeting Room Name','bigbluebutton').'</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">'.__('Date','bigbluebutton').'</th>'."\n";
+    $outputstring .= '        <th class="hed" colspan="1">'.__('Duration','bigbluebutton').'</th>'."\n";
     if ($currentuser->allcaps["manage_recordings_room"] == true) {
-        $outputstring  .= '        <th class="hedextra" colspan="1">Toolbar</th>'."\n";
+        $outputstring  .= '        <th class="hedextra" colspan="1">'.__('Toolbar','bigbluebutton').'</th>'."\n";
     }
     $outputstring .= '      </tr>'."\n";
     return $outputstring;
@@ -1224,9 +1230,9 @@ function bigbluebutton_formatted_startdate($recording)
 */
 function bigbluebutton_meta_boxes()
 {
-    add_meta_box('room-details', __('Room Details'), 'bigbluebutton_room_details_metabox', 'room', 'normal', 'low');
-    add_meta_box('room-recordings', __('Room Recordings'), 'bigbluebutton_list_room_recordings', 'room', 'normal', 'low');
-    add_meta_box('room-status', __('Room Status'), 'bigbluebutton_room_status_metabox', 'room', 'normal', 'low');
+    add_meta_box('room-details', __('Room Details','bigbluebutton'), 'bigbluebutton_room_details_metabox', 'room', 'normal', 'low');
+    add_meta_box('room-recordings', __('Room Recordings','bigbluebutton'), 'bigbluebutton_list_room_recordings', 'room', 'normal', 'low');
+    add_meta_box('room-status', __('Room Status','bigbluebutton'), 'bigbluebutton_room_status_metabox', 'room', 'normal', 'low');
 }
 
 /*
@@ -1244,45 +1250,45 @@ function bigbluebutton_room_details_metabox($post)
     $outputstring = '';
     $outputstring .= '    <table class="custom-admin-table">'."\n";
     $outputstring .= '        <tr>'."\n";
-    $outputstring .= '            <th>Attendee Password</th>'."\n";
+    $outputstring .= '            <th>'.__('Attendee Password','bigbluebutton').'</th>'."\n";
     $outputstring .= '            <td>'."\n";
     $outputstring .= '                <input type="text" name="bbb_attendee_password" id="bbb_attendee_password" value="'.$attendeepassword.'" />'."\n";
     $outputstring .= '            </td>'."\n";
     $outputstring .= '        </tr>'."\n";
     $outputstring .= '        <tr>'."\n";
-    $outputstring .= '            <th>Moderator Password</th>'."\n";
+    $outputstring .= '            <th>'.__('Moderator Password','bigbluebutton').'</th>'."\n";
     $outputstring .= '            <td>'."\n";
     $outputstring .= '                <input type="text" name="bbb_moderator_password"  value="'.$moderatorpassword.'" />'."\n";
     $outputstring .= '            </td>'."\n";
     $outputstring .= '        </tr>'."\n";
     $outputstring .= '        <tr>'."\n";
-    $outputstring .= '            <th>Wait for Admin to start meeting?</th>'."\n";
+    $outputstring .= '            <th>'.__('Wait for Admin to start meeting?','bigbluebutton').'</th>'."\n";
     $outputstring .= '            <td>'."\n";
     $outputstring .= '               	<input type="radio" name="bbb_must_wait_for_admin_start" id="bbb_must_wait_for_admin_start_yes" value="1"'.(!$bbbwaitadminstart || $bbbwaitadminstart == '1' ? 'checked="checked"' : '').' />'."\n";
-    $outputstring .= '                <label for="bbb_must_wait_for_admin_start_yes" >Yes</label>'."\n";
+    $outputstring .= '                <label for="bbb_must_wait_for_admin_start_yes" >'.__('Yes','bigbluebutton').'</label>'."\n";
     $outputstring .= '               	<input type="radio" name="bbb_must_wait_for_admin_start" id="bbb_must_wait_for_admin_start_no" value="0"'.($bbbwaitadminstart == '0' ? 'checked="checked"' : '').' />'."\n";
-    $outputstring .= '                <label for="bbb_must_wait_for_admin_start_no" >No</label>'."\n";
+    $outputstring .= '                <label for="bbb_must_wait_for_admin_start_no" >'.__('No','bigbluebutton').'</label>'."\n";
     $outputstring .= '            </td>'."\n";
     $outputstring .= '        </tr>'."\n";
     $outputstring .= '        <tr>'."\n";
-    $outputstring .= '            <th>Record meeting?</th>'."\n";
+    $outputstring .= '            <th>'.__('Record meeting?','bigbluebutton').'</th>'."\n";
     $outputstring .= '            <td>'."\n";
     $outputstring .= '                <input type="radio" name="bbb_is_recorded" id="bbb_is_recorded_yes" value="1"'.(!$isrecorded || $isrecorded == '1' ? 'checked="checked"' : '').'/>'."\n";
-    $outputstring .= '                <label for="bbb_is_recorded_yes" >Yes</label>'."\n";
+    $outputstring .= '                <label for="bbb_is_recorded_yes" >'.__('Yes','bigbluebutton').'</label>'."\n";
     $outputstring .= '                <input type="radio" name="bbb_is_recorded" id="bbb_is_recorded_no" value="0"'.($isrecorded == '0' ? 'checked="checked"' : '').' />'."\n";
-    $outputstring .= '                <label for="bbb_is_recorded_no" >No</label>'."\n";
+    $outputstring .= '                <label for="bbb_is_recorded_no" >'.__('No','bigbluebutton').'</label>'."\n";
     $outputstring .= '            </td>'."\n";
     $outputstring .= '        </tr>'."\n";
     $outputstring .= '        <tr>'."\n";
-    $outputstring .= '            <th>Room Token</th>'."\n";
+    $outputstring .= '            <th>'.__('Room Token','bigbluebutton').'</th>'."\n";
     $outputstring .= '            <td>'."\n";
-    $outputstring .= '                <p>The room token is set when the post is saved. This is not editable.</p>'."\n";
+    $outputstring .= '                <p>'.__('The room token is set when the post is saved. This is not editable.','bigbluebutton').'</p>'."\n";
     $outputstring .= '                <input type="hidden" name="bbb_room_token" value="'.($roomtoken ? $roomtoken : 'Token Not Set').'" />'."\n";
-    $outputstring .= '                <p>Room Token: <strong>'.($roomtoken ? $roomtoken : 'Token Not Set').'</strong></p>'."\n";
+    $outputstring .= '                <p>'.__('Room Token:','bigbluebutton').' <strong>'.($roomtoken ? $roomtoken : 'Token Not Set').'</strong></p>'."\n";
     $outputstring .= '            </td>'."\n";
     $outputstring .= '        </tr>'."\n";
     $outputstring .= '        <tr>'."\n";
-    $outputstring .= '            <th>Room Welcome Msg</th>'."\n";
+    $outputstring .= '            <th>'.__('Room Welcome Msg','bigbluebutton').'</th>'."\n";
     $outputstring .= '            <td>'."\n";
     $outputstring .= '                <textarea name="bbb_room_welcome_msg">'.$roomwelcomemessage.'</textarea>'."\n";
     $outputstring .= '            </td>'."\n";
@@ -1484,10 +1490,10 @@ function bigbluebutton_error_notice()
           ),
           admin_url( 'plugin-install.php' )
         );
-        $pluginlink = '<a href="'.esc_url($url).'" class="thickbox" title="Members">Members</a>';
+        $pluginlink = '<a href="'.esc_url($url).'" class="thickbox" title="Members">'.__('Members','bigbluebutton').'</a>';
         //$pluginresolvelink = '<a href="'.esc_url($url).'">Begin installing plugin</a>';
         echo '<div class="notice notice-info is-dismissible">';
-        echo '<p><strong>For updating the default role capabilities is recommended to use an additional plugin as '.$pluginlink.'.</strong></p>';
+        echo '<p><strong>'.__('For updating the default role capabilities is recommended to use an additional plugin as ','bigbluebutton').$pluginlink.'.</strong></p>';
         //echo '<p><strong>'.$pluginresolvelink.'</strong></p>';
         echo '</div>';
     }
