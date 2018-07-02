@@ -3,13 +3,13 @@ wordpress-plugin_bigbluebutton
 
 This plugin integrates BigBlueButton functionality into Wordpress.
 
-== Description ==
+## Description
 
 [BigBlueButton](http://bigbluebutton.org/ "BigBlueButton") is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meetings rooms to interact with their readers.
 
 **For more information on setting up your own BigBlueButton server or for using an external hosting provider visit [http://bigbluebutton.org/support](http://bigbluebutton.org/support "http://bigbluebutton.org/support")**
 
-== Installation ==
+## Installation
 
 The easiest way to install is to watch this [installation video](http://www.youtube.com/watch?v=8Tle9BEKfFo "installation video") on YouTube. Here's an overview of the installation.
 
@@ -24,11 +24,11 @@ The easiest way to install is to watch this [installation video](http://www.yout
    1. Fill out the URL of where the BigBlueButton server is running (be sure to add /bigbluebutton/ to the end of the URL) and its salt. Then click on save changes.
    1. You are ready to begin creating meetings, and holding conferences.
 
-== Frequently Asked Questions ==
+## Frequently Asked Questions 
 
-**How do I create meetings?**
+### How do I create meetings?
 
-**How users join meetings?**
+### How users join meetings?
 
 Users join meetings using a joining form. This form can be shown in a site as a sidebar element or as a page/post.
 
@@ -36,7 +36,7 @@ For setting up in the sidebar, add the bigbluebutton widget, as you do with any 
 
 For setting the joining form up as a page/post, add the shortcode [bigbluebutton] right where you want the form to appear in the page/post. If there are pre-created meetings in wordpress, their names should appear in a listbox from which users can select. If there is only one pre-created meeting the listbox will not be shown and one button with the name of the meeting will appear instead.
 
-**Why sometimes the Name and Password are required, some others only the Name and others only the Password?**
+### Why sometimes the Name and Password are required, some others only the Name and others only the Password?
 
 The plugin gatters the much information it cans from Wordpress, but what will be taken depends of the configuration.
 
@@ -46,21 +46,21 @@ For registered users whose role has ben set for requiring always a password, onl
 
 For anonymous users the Name will be always required, but again the Password requirment will depend of the configuration. If Moderator/Attendee role has ben set for them no Password box will be shown in their joining form.   
 
-**Is there any way users can go directly into a meeting?**
+### Is there any way users can go directly into a meeting?
 
 Since version 1.3.4 it is possible to provide direct access to the meeting rooms by adding the meeting token ID to the shortcode: (eg. [bigbluebutton token=aa2817f3a1e1]).
 
 The joining form is the same, so with the right permission configuration users would be able to join meetings in one click.
 
-**How can I show the recordings?**
+### How can I show the recordings?
 
 The only way to show recordings to users is using the shortcode [bigbluebutton_recordings] in a page/post.
 
-**Why is it giving an error about creating a meeting room?**
+### Why is it giving an error about creating a meeting room?
 
 Make sure you are using BigBlueButton 0.8 or higher.
 
-**What is this error: "Unable to display the meetings. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running."?**
+### What is this error: "Unable to display the meetings. Please check the url of the bigbluebutton server AND check to see if the bigbluebutton server is running."?
 
 You must make sure that your url ends with "/bigbluebutton/" at the end.
 
