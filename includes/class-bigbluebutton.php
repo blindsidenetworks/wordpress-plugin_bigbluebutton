@@ -140,7 +140,6 @@ class Bigbluebutton {
 		$plugin_i18n = new Bigbluebutton_i18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-		error_log( __("Save server settings success message.", "bigbluebutton") );
 
 	}
 
