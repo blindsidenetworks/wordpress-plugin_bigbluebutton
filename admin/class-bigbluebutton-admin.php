@@ -118,7 +118,7 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Retrieve the 
+	 * Retrieve the room server settings
 	 */
 	public function fetch_room_server_settings() {
 		return array (
@@ -129,6 +129,9 @@ class Bigbluebutton_Admin {
 		);
 	}
 
+	/**
+	 * Check for room server settings change requests
+	 */
 	private function room_server_settings_change() {
 		if (!empty($_POST['action']) && $_POST['action'] == 'bbb_general_settings') {
 
