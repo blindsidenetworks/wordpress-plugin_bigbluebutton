@@ -29,4 +29,9 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
+	 $( window ).load(function() { 
+		if ($(".updated").length) {
+			$(".updated").delay(2000).fadeOut();
+		}
+	 });
 })( jQuery );

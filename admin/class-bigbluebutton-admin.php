@@ -100,4 +100,46 @@ class Bigbluebutton_Admin {
 
 	}
 
+	/**
+	 * Add new admin page the BigBlueButton server settings
+	 */
+	public function room_server_settings() {
+		add_menu_page( __('Rooms', 'bigbluebutton'), __('Rooms', 'bigbluebutton'), 'manage_options', 'rooms-server-settings', 
+		array( $this, 'display_room_server_settings'), 'dashicons-video-alt2' );
+	}
+
+	/**
+	 * Render the server settings page for plugin
+	 */
+	public function display_room_server_settings() {
+		$change_success = $this->room_server_settings_change();
+		$bbb_settings = $this->fetch_room_server_settings();
+		include_once 'partials/bigbluebutton-admin-display.php';
+	}
+
+	/**
+	 * Retrieve the 
+	 */
+	public function fetch_room_server_settings() {
+		return array (
+			'bbb_url' => get_option( 'bigbluebutton_endpoint_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' ),
+			'bbb_salt' => get_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' ),
+			'bbb_default_url' => 'http://test-install.blindsidenetworks.com/bigbluebutton/',
+			'bbb_default_salt' => '8cd8ef52e8e101574e400365b55e11a6'
+		);
+	}
+
+	private function room_server_settings_change() {
+		if (!empty($_POST['action']) && $_POST['action'] == 'bbb_general_settings') {
+
+			$bbb_url =  sanitize_text_field($_POST['bbb_url']);
+			$bbb_salt =  sanitize_text_field($_POST['bbb_salt']);
+		
+			update_option( 'bigbluebutton_endpoint_url', $bbb_url );
+			update_option( 'bigbluebutton_salt', $bbb_salt );
+
+			return true;
+		}
+		return false;
+	}
 }
