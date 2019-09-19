@@ -34,21 +34,21 @@
 										'name'             => 'parent',
 										'orderby'          => 'name',
 										'hierarchical'     => true,
-										'show_option_none' => __( 'None' ),
+										'show_option_none' => __('None'),
 									);
 
 									/** This filter is documented in wp-admin/edit-tags.php */
-									$dropdown_args = apply_filters( 'taxonomy_parent_dropdown_args', $dropdown_args, 'bbb-room-category', 'edit' );
-									wp_dropdown_categories( $dropdown_args );
+									$dropdown_args = apply_filters('taxonomy_parent_dropdown_args', $dropdown_args, 'bbb-room-category', 'edit');
+									wp_dropdown_categories($dropdown_args);
 									?>
-                                    <p class="description"><?php esc_html_e( 'Assign a parent term to create a hierarchy. The term Jazz, for example, would be the parent of Bebop and Big Band.' ); ?></p>
+                                    <p class="description"><?php esc_html_e('Assign a parent term to create a hierarchy. The term Jazz, for example, would be the parent of Bebop and Big Band.'); ?></p>
                                 </td>
                             </tr>
 	                    <div class="form-field term-description-wrap">
-                            <label for="tag-description"><?php esc_html_e( 'Description' ); ?></label>
+                            <label for="tag-description"><?php esc_html_e('Description'); ?></label>
                             <textarea name="description" id="tag-description" rows="5" cols="40"></textarea>
                         </div>
-                        <p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_html_e( 'Add New Category' ); ?>"></p>
+                        <p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_html_e('Add New Category'); ?>"></p>
                     </form>
                 </div>
             </div>
