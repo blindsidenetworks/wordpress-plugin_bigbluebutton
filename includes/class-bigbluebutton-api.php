@@ -15,7 +15,7 @@ class BigbluebuttonApi {
 	 * @return  Integer $return_code|404    HTML response of the bigbluebutton server.
 	 */
 	public static function create_meeting( $room_id ) {
-		$rid = sanitize_key( $room_id );
+		$rid = intval( $room_id );
 
 		if (get_post( $rid ) === false || get_post_type( $rid ) != 'bbb-room' ) {
 			return 404;
@@ -36,6 +36,10 @@ class BigbluebuttonApi {
 		$url = self::build_url( 'create', $arr_params );
 
 		$response = self::get_response( $url );
+
+        if (is_wp_error( $response )) {
+            return 404;
+        }
 
 		$return_code = $response['response']['code'];
 
@@ -88,29 +92,24 @@ class BigbluebuttonApi {
 	 */
 	public static function is_meeting_running( $room_id ) {
 
-		$rid = sanitize_key( $room_id );
+		$rid = intval( $room_id );
 
 		if (get_post( $rid ) === false || get_post_type( $rid ) != 'bbb-room' ) {
 			return null;
 		}
-
-		$url_val = get_option('bigbluebutton_url');
-		$salt_val = get_option('bigbluebutton_salt');
 
 		$arr_params = array(
 			'meetingID' => urlencode( 'meeting-' . $rid ),
 		);
 
 		$url = self::build_url( 'isMeetingRunning', $arr_params );
+        $full_response = self::get_response( $url );
 
-		try {
-			$response = new SimpleXMLElement( wp_remote_retrieve_body( self::get_response( $url ) ) );
-		} catch (Exception $e) {
-			error_log("Exception in BigbluebuttonApi::is_meeting_running: " . $e->get_message());
-			return false;
-		}
+        if (is_wp_error( $response )) {
+            return null;
+        }
 
-		$response = new SimpleXMLElement( wp_remote_retrieve_body( self::get_response( $url ) ) );
+		$response = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
 
 		if (array_key_exists('running', $response) && $response['running'] == "true") {
 			return true;
@@ -124,8 +123,8 @@ class BigbluebuttonApi {
 	 * 
 	 * @since   3.0.0
 	 * 
-	 * @param   String    $url        URL to get response from.
-	 * @return  Array     $response   Server response in array format.
+	 * @param   String          $url        URL to get response from.
+	 * @return  Array|WP_Error  $response   Server response in array format.
 	 */
 	private static function get_response($url) {
 		$result = wp_remote_get( esc_url_raw( $url ) );
@@ -144,8 +143,8 @@ class BigbluebuttonApi {
 	private static function build_url($request_type, $args) {
 		$type = sanitize_text_field( $request_type );
 
-		$url_val = get_option('bigbluebutton_url');
-		$salt_val = get_option('bigbluebutton_salt');
+		$url_val = strval(get_option('bigbluebutton_url'));
+		$salt_val = strval(get_option('bigbluebutton_salt'));
 
 		$url = $url_val . 'api/' . $type . '?';
 
