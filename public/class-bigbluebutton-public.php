@@ -111,7 +111,7 @@ class Bigbluebutton_Public {
 	public function bbb_room_join_form_content($content) {
 		$room_id = get_the_ID();
 
-		if ($room_id === null || get_post($room_id)->post_type != 'bbb-room') {
+		if ($room_id === null || !isset(get_post($room_id)->post_type) || get_post($room_id)->post_type != 'bbb-room') {
 			return $content;
 		}
 		$meta_nonce = wp_create_nonce('bbb_join_room_meta_nonce');
