@@ -33,7 +33,9 @@
         </thead>
         <tbody id="the-list">
             <?php while ($loop->have_posts()) : $loop->the_post(); $post = $loop->post; ?>
-                <?php if ($post->post_status == 'trash') continue; ?>
+                <?php if ($post->post_status == 'trash') { ?>
+                    <?php continue; ?>
+                <?php } ?>
                 <tr id="post-<?php echo $post->ID; ?>" class="iedit author-self level-0 post-<?php echo $post->ID; ?> type-bbb-room status-<?php echo $post->post_status; ?> hentry">
                     <td class="title column-title has-row-actions column-primary page-title" data-colname="Title">
                         <strong>

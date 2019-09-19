@@ -161,9 +161,9 @@ class Bigbluebutton_Admin {
 	/**
 	 * Get all rooms.
 	 * 
-	 * @since    3.0.0
+	 * @since	3.0.0
 	 * 
-	 * @return	Array	$rooms	The list of rooms.
+	 * @return	WP_Query	$rooms	The list of rooms.
 	 */
 	public function get_rooms() {
 		$args = array('post_type' => 'bbb-room', 'posts_per_page' => 20);
@@ -219,7 +219,7 @@ class Bigbluebutton_Admin {
 			'hierarchical' => true,
 		);
 
-		$children = get_categories($args);
+		$children = get_categories($args); // wordpress native get categories function
 		
 		return $children;
 	}
