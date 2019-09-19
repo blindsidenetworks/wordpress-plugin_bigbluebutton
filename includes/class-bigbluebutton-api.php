@@ -15,27 +15,27 @@ class BigbluebuttonApi {
 	 * @return  Integer $return_code|404    HTML response of the bigbluebutton server.
 	 */
 	public static function create_meeting( $room_id ) {
-		$rid = intval( $room_id );
+		$rid = intval($room_id);
 
-		if (get_post( $rid ) === false || get_post_type( $rid ) != 'bbb-room' ) {
+		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
 			return 404;
 		}
 
-		$name = get_the_title( $rid );
-		$moderator_code = get_post_meta( $rid, 'bbb-room-moderator-code', true );
-		$viewer_code = get_post_meta( $rid, 'bbb-room-viewer-code', true );
-		$logout_url = get_permalink( $rid );
+		$name = get_the_title($rid);
+		$moderator_code = get_post_meta($rid, 'bbb-room-moderator-code', true);
+		$viewer_code = get_post_meta($rid, 'bbb-room-viewer-code', true);
+		$logout_url = get_permalink($rid);
 		$arr_params = array(
-			'name' => urlencode( $name ),
-			'meetingID' => urlencode( 'meeting-' . $rid ),
-			'attendeePW' => urlencode( $viewer_code ),
-			'moderatorPW' => urlencode( $moderator_code ),
+			'name' => urlencode($name),
+			'meetingID' => urlencode('meeting-' . $rid),
+			'attendeePW' => urlencode($viewer_code),
+			'moderatorPW' => urlencode($moderator_code),
 			'logoutURL' => $logout_url
 		);
 
-		$url = self::build_url( 'create', $arr_params );
+		$url = self::build_url('create', $arr_params);
 
-		$response = self::get_response( $url );
+		$response = self::get_response($url);
 
         if (is_wp_error( $response )) {
             return 404;
@@ -57,27 +57,27 @@ class BigbluebuttonApi {
 	 * @param   String    $password   Entry code of the meeting that the user is attempting to join with.
 	 * @return  String    $url|null   URL to enter the meeting.
 	 */
-	public static function get_join_meeting_url( $room_id, $username, $password ) {
+	public static function get_join_meeting_url($room_id, $username, $password) {
 
-		$rid = sanitize_key( $room_id );
-		$uname = sanitize_text_field( $username );
-		$pword = sanitize_text_field( $password );
+		$rid = sanitize_key($room_id);
+		$uname = sanitize_text_field($username);
+		$pword = sanitize_text_field($password);
 
-		if (get_post( $rid ) === false || get_post_type( $rid ) != 'bbb-room' ) {
+		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
 			return null;
 		}
 
-		if (! self::is_meeting_running( $rid )) {
-			self::create_meeting( $rid );
+		if ( ! self::is_meeting_running($rid)) {
+			self::create_meeting($rid);
 		}
 
 		$arr_params = array(
-			'meetingID' => urlencode( 'meeting-' . $rid ),
-			'fullName' => urlencode( $uname ),
-			'password' => urlencode( $pword ),
+			'meetingID' => urlencode('meeting-' . $rid),
+			'fullName' => urlencode($uname),
+			'password' => urlencode($pword),
 		);
 
-		$url = self::build_url( 'join', $arr_params );
+		$url = self::build_url('join', $arr_params);
 
 		return $url;
 	}
@@ -90,26 +90,26 @@ class BigbluebuttonApi {
 	 * @param   Integer     $room_id            Custom post id of a room.
 	 * @return  Boolean     true|false|null     If the meeting is running or not.
 	 */
-	public static function is_meeting_running( $room_id ) {
+	public static function is_meeting_running($room_id) {
 
-		$rid = intval( $room_id );
+		$rid = intval($room_id);
 
-		if (get_post( $rid ) === false || get_post_type( $rid ) != 'bbb-room' ) {
+		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
 			return null;
 		}
 
 		$arr_params = array(
-			'meetingID' => urlencode( 'meeting-' . $rid ),
+			'meetingID' => urlencode('meeting-' . $rid),
 		);
 
-		$url = self::build_url( 'isMeetingRunning', $arr_params );
+		$url = self::build_url('isMeetingRunning', $arr_params);
         $full_response = self::get_response( $url );
 
-        if (is_wp_error( $response )) {
+        if (is_wp_error($response)) {
             return null;
         }
 
-		$response = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
+		$response = new SimpleXMLElement(wp_remote_retrieve_body($full_response));
 
 		if (array_key_exists('running', $response) && $response['running'] == "true") {
 			return true;
@@ -127,7 +127,7 @@ class BigbluebuttonApi {
 	 * @return  Array|WP_Error  $response   Server response in array format.
 	 */
 	private static function get_response($url) {
-		$result = wp_remote_get( esc_url_raw( $url ) );
+		$result = wp_remote_get(esc_url_raw($url));
 		return $result;
 	}
 
@@ -141,7 +141,7 @@ class BigbluebuttonApi {
 	 * @return  String   $url            URL with all parameters and calculated checksum.   
 	 */
 	private static function build_url($request_type, $args) {
-		$type = sanitize_text_field( $request_type );
+		$type = sanitize_text_field($request_type);
 
 		$url_val = strval(get_option('bigbluebutton_url'));
 		$salt_val = strval(get_option('bigbluebutton_salt'));
@@ -150,7 +150,7 @@ class BigbluebuttonApi {
 
 		$params = http_build_query($args);
 
-		$url .= $params . "&checksum=" . sha1( $type . $params . $salt_val );
+		$url .= $params . "&checksum=" . sha1($type . $params . $salt_val);
 
 		return $url;
 	}
