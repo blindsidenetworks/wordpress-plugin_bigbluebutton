@@ -59,7 +59,7 @@ class BigbluebuttonApi {
 	 */
 	public static function get_join_meeting_url($room_id, $username, $password) {
 
-		$rid = sanitize_key($room_id);
+		$rid = intval($room_id);
 		$uname = sanitize_text_field($username);
 		$pword = sanitize_text_field($password);
 
@@ -105,7 +105,7 @@ class BigbluebuttonApi {
 		$url = self::build_url('isMeetingRunning', $arr_params);
         $full_response = self::get_response( $url );
 
-        if (is_wp_error($response)) {
+        if (is_wp_error($full_response)) {
             return null;
         }
 
