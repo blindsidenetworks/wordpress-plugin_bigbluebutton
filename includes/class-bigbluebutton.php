@@ -67,7 +67,7 @@ class Bigbluebutton {
 	 * @since    3.0.0
 	 */
 	public function __construct() {
-		if ( defined( 'BIGBLUEBUTTON_VERSION' ) ) {
+		if (defined('BIGBLUEBUTTON_VERSION')) {
 			$this->version = BIGBLUEBUTTON_VERSION;
 		} else {
 			$this->version = '3.0.0';
@@ -103,29 +103,29 @@ class Bigbluebutton {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-bigbluebutton-loader.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-bigbluebutton-i18n.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-bigbluebutton-admin.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-bigbluebutton-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-bigbluebutton-public.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-bigbluebutton-public.php';
 
 		/**
 		 * Bigbluebutton API
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-bigbluebutton-api.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-api.php';
 
 		$this->loader = new Bigbluebutton_Loader();
 
@@ -144,7 +144,7 @@ class Bigbluebutton {
 
 		$plugin_i18n = new Bigbluebutton_i18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
+		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 
 	}
 
@@ -157,19 +157,19 @@ class Bigbluebutton {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Bigbluebutton_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Bigbluebutton_Admin($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'admin_menu', $plugin_admin, 'create_admin_menu' );
-		$this->loader->add_action( 'admin_post_create_room', $plugin_admin, 'create_room' );
-		$this->loader->add_action( 'admin_post_edit_room', $plugin_admin, 'save_room_edits' );
-		$this->loader->add_action( 'admin_post_create_category', $plugin_admin, 'create_category' );
-		$this->loader->add_action( 'admin_post_edit_category', $plugin_admin, 'save_category_edits' );
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+		$this->loader->add_action('admin_menu', $plugin_admin, 'create_admin_menu');
+		$this->loader->add_action('admin_post_create_room', $plugin_admin, 'create_room');
+		$this->loader->add_action('admin_post_edit_room', $plugin_admin, 'save_room_edits');
+		$this->loader->add_action('admin_post_create_category', $plugin_admin, 'create_category');
+		$this->loader->add_action('admin_post_edit_category', $plugin_admin, 'save_category_edits');
 
 		// register bbb-rooms and custom fields
-		$this->loader->add_action( 'init', $plugin_admin, 'bbb_room_as_post_type' );
-		$this->loader->add_action( 'init', $plugin_admin, 'bbb_room_category_as_taxonomy_type' );
+		$this->loader->add_action('init', $plugin_admin, 'bbb_room_as_post_type');
+		$this->loader->add_action('init', $plugin_admin, 'bbb_room_category_as_taxonomy_type');
 
 	}
 
@@ -182,17 +182,17 @@ class Bigbluebutton {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Bigbluebutton_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Bigbluebutton_Public($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 
 		// display join room form/button
-		$this->loader->add_filter( 'the_content', $plugin_public, 'bbb_room_join_form_content' );
+		$this->loader->add_filter('the_content', $plugin_public, 'bbb_room_join_form_content');
 
 		// join room
-		$this->loader->add_action( 'admin_post_join_room', $plugin_public, 'bbb_user_join_room' );
-		$this->loader->add_action( 'admin_post_nopriv_join_room', $plugin_public, 'bbb_guest_join_room' );
+		$this->loader->add_action('admin_post_join_room', $plugin_public, 'bbb_user_join_room');
+		$this->loader->add_action('admin_post_nopriv_join_room', $plugin_public, 'bbb_guest_join_room');
 	}
 
 	/**

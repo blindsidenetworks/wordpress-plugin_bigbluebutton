@@ -47,7 +47,7 @@ class Bigbluebutton_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct($plugin_name, $version) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
@@ -73,7 +73,7 @@ class Bigbluebutton_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/bigbluebutton-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/bigbluebutton-admin.css', array(), $this->version, 'all');
 
 	}
 
@@ -96,7 +96,7 @@ class Bigbluebutton_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/bigbluebutton-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/bigbluebutton-admin.js', array('jquery'), $this->version, false);
 
 	}
 
@@ -109,14 +109,14 @@ class Bigbluebutton_Admin {
 				'public' => true,
 				'show_ui' => false,
 				'labels' => array( 
-					'name' => __( 'All Rooms', 'bigbluebutton' ),
-					'add_new' => __ ( 'Add New', 'bigbluebutton'  ),
-					'add_new_item' => __( 'Add New Room', 'bigbluebutton'  ),
-					'edit_item' => __( 'Edit Room', 'bigbluebutton'  )),
-				'description' => __( 'BBB room description.', 'bigbluebutton' ),
-				'taxonomies' => array( 'bbb-room-category' ),
-				'supports' => array( 'title', 'editor' ),
-				'rewrite' => array( 'slug' => 'bbb-room' )
+					'name' => __('All Rooms', 'bigbluebutton'),
+					'add_new' => __('Add New', 'bigbluebutton'),
+					'add_new_item' => __('Add New Room', 'bigbluebutton'),
+					'edit_item' => __('Edit Room', 'bigbluebutton')),
+				'description' => __('BBB room description.', 'bigbluebutton'),
+				'taxonomies' => array('bbb-room-category'),
+				'supports' => array('title', 'editor'),
+				'rewrite' => array('slug' => 'bbb-room')
 			)
 		);
 	}
@@ -125,14 +125,14 @@ class Bigbluebutton_Admin {
 	 * Register category as custom taxonomy
 	 */
 	function bbb_room_category_as_taxonomy_type() {
-		register_taxonomy( 'bbb-room-category',
+		register_taxonomy('bbb-room-category',
 			'bbb-room',
 			array(
 				'labels' => array(
-					'name' => __( 'Categories', 'bigbluebutton'  ),
-					'singular_name' => __( 'Category', 'bigbluebutton'  ),
+					'name' => __('Categories', 'bigbluebutton'),
+					'singular_name' => __('Category', 'bigbluebutton'),
 				),
-				'description' => __( 'BBB room category description.', 'bigbluebutton' ),
+				'description' => __('BBB room category description.', 'bigbluebutton'),
 				'hierarchical' => true,
 			)
 		);
@@ -142,22 +142,22 @@ class Bigbluebutton_Admin {
 	 * Add Rooms as its own menu item on the admin page
 	 */
 	public function create_admin_menu() {
-		add_menu_page( __('Rooms', 'bigbluebutton'), __('Rooms', 'bigbluebutton'), 'manage_options', 'rooms-list', 
-		array( $this, 'display_rooms_list'), 'dashicons-video-alt2' );
-		add_submenu_page( 'rooms-list', __('Rooms', 'bigbluebutton'), __('New Room', 'bigbluebutton'), 'manage_options', 
-		'new-room', array( $this, 'display_new_room_page') );
-		add_submenu_page( 'rooms-list', __('Categories'), __('Categories'), 'manage_options',
-		'room-categories', array( $this, 'display_categories_page') );
-		add_submenu_page( 'rooms-list', __('Rooms', 'bigbluebutton'), __('Settings'), 'manage_options', 
-		'rooms-server-settings', array( $this, 'display_room_server_settings') );
+		add_menu_page(__('Rooms', 'bigbluebutton'), __('Rooms', 'bigbluebutton'), 'manage_options', 'rooms-list', 
+		array($this, 'display_rooms_list'), 'dashicons-video-alt2');
+		add_submenu_page('rooms-list', __('Rooms', 'bigbluebutton'), __('New Room', 'bigbluebutton'), 'manage_options', 
+		'new-room', array($this, 'display_new_room_page'));
+		add_submenu_page('rooms-list', __('Categories'), __('Categories'), 'manage_options',
+		'room-categories', array($this, 'display_categories_page'));
+		add_submenu_page('rooms-list', __('Rooms', 'bigbluebutton'), __('Settings'), 'manage_options', 
+		'rooms-server-settings', array($this, 'display_room_server_settings'));
 	}
 
 	/**
 	 * Get all rooms
 	 */
 	public function get_rooms() {
-		$args = array( 'post_type' => 'bbb-room', 'posts_per_page' => 20 );
-		$query = new WP_Query( $args ); // contains list of rooms
+		$args = array('post_type' => 'bbb-room', 'posts_per_page' => 20);
+		$query = new WP_Query($args); // contains list of rooms
 		return $query;
 	}
 
@@ -171,7 +171,7 @@ class Bigbluebutton_Admin {
 
 		$categories = array();
 		if (count($children) > 0) {
-			foreach($children as $child) {
+			foreach ($children as $child) {
 				$child->depth_level = $depth;
 				if (empty($categories)) {
 					$categories = array($child);
@@ -179,7 +179,7 @@ class Bigbluebutton_Admin {
 					array_push($categories, $child);
 				}
 				
-				$categories = array_merge($categories, $this->get_categories($child->term_id, $depth+1));
+				$categories = array_merge($categories, $this->get_categories($child->term_id, $depth + 1));
 			}
 			return $categories;
 		} else {
@@ -194,14 +194,14 @@ class Bigbluebutton_Admin {
 	public function get_category_children($parent = 0) {
 		$args = array( 
 			'hide_empty' => 0,
-        	'hide_if_empty' => false,
-            'taxonomy' => 'bbb-room-category',
+			'hide_if_empty' => false,
+			'taxonomy' => 'bbb-room-category',
 			'orderby' => 'name',
 			'parent' => $parent,
-            'hierarchical' => true,
+			'hierarchical' => true,
 		);
 
-		$query = get_categories( $args );
+		$query = get_categories($args);
 		
 		return $query;
 	}
@@ -222,10 +222,10 @@ class Bigbluebutton_Admin {
 		$this->check_delete_room_requests();
 		$url = get_site_url();
 		$loop = $this->get_rooms();
-		$edit_room_nonce = wp_create_nonce( 'bbb_can_edit_room_meta_nonce' );
-		$delete_room_nonce = wp_create_nonce( 'bbb_can_delete_room_meta_nonce');
-		if (! $this->edit_room()) {
-			include_once( 'partials/bigbluebutton-all-rooms-display.php' );	
+		$edit_room_nonce = wp_create_nonce('bbb_can_edit_room_meta_nonce');
+		$delete_room_nonce = wp_create_nonce('bbb_can_delete_room_meta_nonce');
+		if ( ! $this->edit_room()) {
+			include_once('partials/bigbluebutton-all-rooms-display.php');	
 		}
 	}
 
@@ -233,16 +233,16 @@ class Bigbluebutton_Admin {
 	 * Delete rooms if requested
 	 */
 	private function check_delete_room_requests() {
-		if ( !empty($_REQUEST['action']) && $_REQUEST['action'] == 'trash' ) {
-			if (wp_verify_nonce(sanitize_text_field( $_REQUEST['nonce'] ), 'bbb_can_delete_room_meta_nonce')) {
-				$post_id = sanitize_key( $_REQUEST['post'] );
-				if ( get_post_status( $post_id ) ) {
-					$post = get_post( $post_id );
+		if ( ! empty($_REQUEST['action']) && $_REQUEST['action'] == 'trash') {
+			if (wp_verify_nonce(sanitize_text_field($_REQUEST['nonce']), 'bbb_can_delete_room_meta_nonce')) {
+				$post_id = sanitize_key($_REQUEST['post']);
+				if (get_post_status($post_id)) {
+					$post = get_post($post_id);
 					$post->post_type = 'bbb-room';
-					wp_delete_post( $post_id );
+					wp_delete_post($post_id);
 				}
 			} else {
-				wp_die( _( 'The form has expired or is invalid. Please try again.', 'bigbluebutton' ) );
+				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
 	}
@@ -251,25 +251,25 @@ class Bigbluebutton_Admin {
 	 * Get information to populate edit room form
 	 */
 	private function edit_room() {
-		if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'edit') {
-			if (wp_verify_nonce(sanitize_text_field( $_REQUEST['nonce'] ), 'bbb_can_edit_room_meta_nonce')) {
-				$post_id = sanitize_key( $_REQUEST['post'] );
+		if ( ! empty($_REQUEST['action']) && $_REQUEST['action'] == 'edit') {
+			if (wp_verify_nonce(sanitize_text_field($_REQUEST['nonce']), 'bbb_can_edit_room_meta_nonce')) {
+				$post_id = sanitize_key($_REQUEST['post']);
 
-				$title = get_the_title( $post_id );
+				$title = get_the_title($post_id);
 				$description = apply_filters('the_content', get_post_field('post_content', $post_id));
-				$url = get_permalink( $post_id );
-				$moderator_code = get_post_meta( $post_id, 'bbb-room-moderator-code', true );
-				$viewer_code = get_post_meta( $post_id, 'bbb-room-viewer-code', true );
+				$url = get_permalink($post_id);
+				$moderator_code = get_post_meta($post_id, 'bbb-room-moderator-code', true);
+				$viewer_code = get_post_meta($post_id, 'bbb-room-viewer-code', true);
 
 				$categories = $this->get_categories();
-				$selected_category_ids = wp_list_pluck( wp_get_post_terms( $post_id, 'bbb-room-category' ), 'term_id' );
+				$selected_category_ids = wp_list_pluck(wp_get_post_terms($post_id, 'bbb-room-category'), 'term_id');
 
-				$meta_nonce = wp_create_nonce( 'bbb_edit_room_meta_nonce' );
-				$delete_room_nonce = wp_create_nonce( 'bbb_can_delete_room_meta_nonce');
-				include_once( 'partials/bigbluebutton-edit-room-display.php' );
+				$meta_nonce = wp_create_nonce('bbb_edit_room_meta_nonce');
+				$delete_room_nonce = wp_create_nonce('bbb_can_delete_room_meta_nonce');
+				include_once('partials/bigbluebutton-edit-room-display.php');
 				return true;
 			} else {
-				wp_die( _( 'The form has expired or is invalid. Please try again.', 'bigbluebutton' ) );
+				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
 		return false;
@@ -281,7 +281,7 @@ class Bigbluebutton_Admin {
 	public function display_new_room_page() {
 		$url = get_site_url() . '/bbb-room';
 		$user_id = wp_get_current_user()->ID;
-		$post_id = wp_insert_post( array(
+		$post_id = wp_insert_post(array(
 			'post_type' => 'bbb-room',
 			'post_title' => 'Auto Draft',
 			'post_status' => 'auto-draft'
@@ -289,26 +289,26 @@ class Bigbluebutton_Admin {
 		$moderator_code = $this->generate_random_code();
 		$viewer_code = $this->generate_random_code();
 		$categories = $this->get_categories();
-		$meta_nonce = wp_create_nonce( 'bbb_create_room_meta_nonce' );
-		include_once( 'partials/bigbluebutton-new-room-display.php' );
+		$meta_nonce = wp_create_nonce('bbb_create_room_meta_nonce');
+		include_once('partials/bigbluebutton-new-room-display.php');
 	}
 
 	/**
 	 * Create new room
 	 */
 	public function create_room() {
-		if (!empty($_POST['action']) && $_POST['action'] == 'create_room') {
-			if (wp_verify_nonce(sanitize_text_field( $_POST['bbb_create_room_meta_nonce'] ), 'bbb_create_room_meta_nonce')) {
-				$post_id = sanitize_key( $_POST[ 'post_id' ] );
-				$title = sanitize_text_field( $_POST[ 'post_title' ] );
-				$description = esc_textarea( $_POST[ 'bbb-room-description' ] );
-				$categories = ( isset( $_POST['tax_input'] ) && isset( $_POST['tax_input'][ 'bbb-room-category' ] ) ) ? (array) $_POST['tax_input'][ 'bbb-room-category' ] : array();
-				$author = sanitize_key( $_POST[ 'post_author' ] );
-				$slug = sanitize_title( $_POST[ 'slug' ] );
-				$moderator_code = sanitize_text_field( $_POST[ 'bbb-moderator-code' ] );
-				$viewer_code = sanitize_text_field( $_POST[ 'bbb-viewer-code' ] );
+		if ( ! empty($_POST['action']) && $_POST['action'] == 'create_room') {
+			if (wp_verify_nonce(sanitize_text_field($_POST['bbb_create_room_meta_nonce']), 'bbb_create_room_meta_nonce')) {
+				$post_id = sanitize_key($_POST['post_id']);
+				$title = sanitize_text_field($_POST['post_title']);
+				$description = esc_textarea($_POST['bbb-room-description']);
+				$categories = (isset($_POST['tax_input']) && isset($_POST['tax_input']['bbb-room-category'])) ? (array) $_POST['tax_input']['bbb-room-category'] : array();
+				$author = sanitize_key($_POST['post_author']);
+				$slug = sanitize_title($_POST['slug']);
+				$moderator_code = sanitize_text_field($_POST['bbb-moderator-code']);
+				$viewer_code = sanitize_text_field($_POST['bbb-viewer-code']);
 
-				wp_update_post( array(
+				wp_update_post(array(
 					'ID' => $post_id,
 					'post_title' => $title,
 					'post_content' => $description,
@@ -318,18 +318,18 @@ class Bigbluebutton_Admin {
 				));
 
 				// link to categories
-				wp_set_post_terms( $post_id, $categories, 'bbb-room-category', false);
+				wp_set_post_terms($post_id, $categories, 'bbb-room-category', false);
 
 				// add room codes to postmeta data
-				update_post_meta( $post_id, 'bbb-room-moderator-code', $moderator_code );
-				update_post_meta( $post_id, 'bbb-room-viewer-code', $viewer_code );
+				update_post_meta($post_id, 'bbb-room-moderator-code', $moderator_code);
+				update_post_meta($post_id, 'bbb-room-viewer-code', $viewer_code);
 
-				BigblueButtonApi::create_meeting( $post_id );
+				BigblueButtonApi::create_meeting($post_id);
 
-				wp_redirect( wp_get_referer() );
+				wp_redirect(wp_get_referer());
 				return $post_id;
 			} else {
-				wp_die( _( 'The form has expired or is invalid. Please try again.', 'bigbluebutton' ) );
+				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
 	}
@@ -338,15 +338,15 @@ class Bigbluebutton_Admin {
 	 * Save the changes made to the room
 	 */
 	public function save_room_edits() {
-		if (!empty($_POST['action']) && $_POST['action'] == 'edit_room') {
-			if (wp_verify_nonce(sanitize_text_field( $_POST['bbb_edit_room_meta_nonce'] ), 'bbb_edit_room_meta_nonce')) {
-				$post_id = sanitize_key( $_POST[ 'post_id' ] );
-				$title = sanitize_text_field( $_POST[ 'post_title' ] );
-				$description = esc_textarea( $_POST[ 'bbb-room-description' ] );
-				$categories = ( isset( $_POST['tax_input'] ) && isset( $_POST['tax_input'][ 'bbb-room-category' ] ) ) ? (array) $_POST['tax_input'][ 'bbb-room-category' ] : array();
-				$author = sanitize_key( $_POST[ 'post_author' ] );
+		if ( ! empty($_POST['action']) && $_POST['action'] == 'edit_room') {
+			if (wp_verify_nonce(sanitize_text_field($_POST['bbb_edit_room_meta_nonce']), 'bbb_edit_room_meta_nonce')) {
+				$post_id = sanitize_key($_POST['post_id']);
+				$title = sanitize_text_field($_POST['post_title']);
+				$description = esc_textarea($_POST['bbb-room-description']);
+				$categories = (isset($_POST['tax_input']) && isset($_POST['tax_input']['bbb-room-category'])) ? (array) $_POST['tax_input']['bbb-room-category'] : array();
+				$author = sanitize_key($_POST['post_author']);
 
-				wp_update_post( array(
+				wp_update_post(array(
 					'ID' => $post_id,
 					'post_title' => $title,
 					'post_content' => $description,
@@ -355,11 +355,11 @@ class Bigbluebutton_Admin {
 				));
 
 				// link to categories
-				wp_set_post_terms( $post_id, $categories, 'bbb-room-category', false);
+				wp_set_post_terms($post_id, $categories, 'bbb-room-category', false);
 
-				wp_redirect( wp_get_referer() );
+				wp_redirect(wp_get_referer());
 			} else {
-				wp_die( _( 'The form has expired or is invalid. Please try again.', 'bigbluebutton' ) );
+				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
 	}
@@ -370,12 +370,12 @@ class Bigbluebutton_Admin {
 	public function display_categories_page() {
 		$this->check_delete_category_requests();
 		$base_url = get_site_url() . '/bbb-room-category';
-		$meta_nonce = wp_create_nonce( 'bbb_room_add_category_meta_nonce' );
-		$edit_categories_nonce = wp_create_nonce( 'bbb_can_edit_category_meta_nonce' );
-		$delete_categories_nonce = wp_create_nonce( 'bbb_can_delete_category_meta_nonce' );
+		$meta_nonce = wp_create_nonce('bbb_room_add_category_meta_nonce');
+		$edit_categories_nonce = wp_create_nonce('bbb_can_edit_category_meta_nonce');
+		$delete_categories_nonce = wp_create_nonce('bbb_can_delete_category_meta_nonce');
 		$categories = $this->get_categories(0);
 
-		if(!$this->edit_category()) {
+		if ( ! $this->edit_category()) {
 			include_once 'partials/bigbluebutton-room-categories-display.php';
 		}
 	}
@@ -384,14 +384,14 @@ class Bigbluebutton_Admin {
 	 * Delete categories if the request has been made
 	 */
 	private function check_delete_category_requests() {
-		if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'trash') {
-			if (wp_verify_nonce( sanitize_text_field( $_REQUEST['nonce'] ), 'bbb_can_delete_category_meta_nonce')) {
-				$term_id = sanitize_key( $_REQUEST['category'] );
-				if (term_exists((int)$term_id, 'bbb-room-category') !== null) {
-					wp_delete_term((int)$term_id, 'bbb-room-category' );
+		if ( ! empty($_REQUEST['action']) && $_REQUEST['action'] == 'trash') {
+			if (wp_verify_nonce(sanitize_text_field($_REQUEST['nonce']), 'bbb_can_delete_category_meta_nonce')) {
+				$term_id = sanitize_key($_REQUEST['category']);
+				if (term_exists((int) $term_id, 'bbb-room-category') !== null) {
+					wp_delete_term((int) $term_id, 'bbb-room-category');
 				}
 			} else {
-				wp_die( _( 'The form has expired or is invalid. Please try again.', 'bigbluebutton' ) );
+				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
 	}
@@ -400,21 +400,21 @@ class Bigbluebutton_Admin {
 	 * Display edit category page
 	 */
 	public function edit_category() {
-		if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'edit') {
-			if (wp_verify_nonce( sanitize_text_field( $_REQUEST['nonce'] ), 'bbb_can_edit_category_meta_nonce')) {
-				$category_id = sanitize_key( $_REQUEST['category'] );
+		if ( ! empty($_REQUEST['action']) && $_REQUEST['action'] == 'edit') {
+			if (wp_verify_nonce(sanitize_text_field($_REQUEST['nonce']), 'bbb_can_edit_category_meta_nonce')) {
+				$category_id = sanitize_key($_REQUEST['category']);
 
-				$category = get_term( $category_id, 'bbb-room-category' );
+				$category = get_term($category_id, 'bbb-room-category');
 				$name = $category->name;
 				$slug = $category->slug;
 				$description = $category->description;
 				$parent = $category->parent;
 
-				$meta_nonce = wp_create_nonce( 'bbb_room_edit_category_meta_nonce' );
-				include_once( 'partials/bigbluebutton-edit-category-display.php' );
+				$meta_nonce = wp_create_nonce('bbb_room_edit_category_meta_nonce');
+				include_once('partials/bigbluebutton-edit-category-display.php');
 				return true;
 			} else {
-				wp_die( _( 'The form has expired or is invalid. Please try again.', 'bigbluebutton' ) );
+				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
 		return false;
@@ -424,14 +424,14 @@ class Bigbluebutton_Admin {
 	 * Save changes made to existing category
 	 */
 	public function save_category_edits() {
-		if (!empty($_POST['action']) && $_POST['action'] == 'edit_category') {
-			if (wp_verify_nonce( sanitize_text_field( $_POST['bbb_room_edit_category_meta_nonce'] ), 'bbb_room_edit_category_meta_nonce')) {
+		if ( ! empty($_POST['action']) && $_POST['action'] == 'edit_category') {
+			if (wp_verify_nonce(sanitize_text_field($_POST['bbb_room_edit_category_meta_nonce']), 'bbb_room_edit_category_meta_nonce')) {
 
-				$category_id = sanitize_key( $_POST[ 'tag_ID' ] );
-				$name = sanitize_text_field( $_POST[ 'name' ] );
-				$slug = sanitize_title( $_POST[ 'slug' ] );
-				$parent = sanitize_text_field( $_POST[ 'parent' ] );
-				$description = esc_textarea( $_POST[ 'description' ] );
+				$category_id = sanitize_key($_POST['tag_ID']);
+				$name = sanitize_text_field($_POST['name']);
+				$slug = sanitize_title($_POST['slug']);
+				$parent = sanitize_text_field($_POST['parent']);
+				$description = esc_textarea($_POST['description']);
 
 				$category_args = array(
 					'name' => $name,
@@ -440,10 +440,10 @@ class Bigbluebutton_Admin {
 					'slug' => $slug
 				);
 
-				wp_update_term( $category_id, 'bbb-room-category', $category_args );
-				wp_redirect( wp_get_referer() );
+				wp_update_term($category_id, 'bbb-room-category', $category_args);
+				wp_redirect(wp_get_referer());
 			} else {
-				wp_die( _( 'The form has expired or is invalid. Please try again.', 'bigbluebutton' ) );
+				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
 	}
@@ -452,23 +452,23 @@ class Bigbluebutton_Admin {
 	 * Submit data for new category
 	 */
 	public function create_category() {
-		if (!empty($_POST['action']) && $_POST['action'] == 'create_category') {
-			if (wp_verify_nonce(sanitize_text_field( $_POST['bbb_room_add_category_meta_nonce'] ), 'bbb_room_add_category_meta_nonce')) {
+		if ( ! empty($_POST['action']) && $_POST['action'] == 'create_category') {
+			if (wp_verify_nonce(sanitize_text_field($_POST['bbb_room_add_category_meta_nonce']), 'bbb_room_add_category_meta_nonce')) {
 
-				$name = sanitize_text_field( $_POST[ 'tag-name' ] );
-				$slug = sanitize_title( $_POST[ 'slug' ] );
-				$parent = sanitize_key( $_POST[ 'parent' ] );
-				$description = esc_textarea( $_POST[ 'description' ] );
+				$name = sanitize_text_field($_POST['tag-name']);
+				$slug = sanitize_title($_POST['slug']);
+				$parent = sanitize_key($_POST['parent']);
+				$description = esc_textarea($_POST['description']);
 
 				$category_args = array(
 					'description' => $description,
 					'parent' => $parent,
 					'slug' => $slug
 				);
-				wp_insert_term( $name, 'bbb-room-category', $category_args );
-				wp_redirect( wp_get_referer() );
+				wp_insert_term($name, 'bbb-room-category', $category_args);
+				wp_redirect(wp_get_referer());
 			} else {
-				wp_die( _( 'The form has expired or is invalid. Please try again.', 'bigbluebutton' ) );
+				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
 	}
@@ -479,7 +479,7 @@ class Bigbluebutton_Admin {
 	public function display_room_server_settings() {
 		$change_success = $this->room_server_settings_change();
 		$bbb_settings = $this->fetch_room_server_settings();
-		$meta_nonce = wp_create_nonce( 'bbb_edit_server_settings_meta_nonce' );
+		$meta_nonce = wp_create_nonce('bbb_edit_server_settings_meta_nonce');
 		include_once 'partials/bigbluebutton-settings-display.php';
 	}
 
@@ -487,9 +487,9 @@ class Bigbluebutton_Admin {
 	 * Retrieve the room server settings
 	 */
 	public function fetch_room_server_settings() {
-		return array (
-			'bbb_url' => get_option( 'bigbluebutton_endpoint_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' ),
-			'bbb_salt' => get_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' ),
+		return array(
+			'bbb_url' => get_option('bigbluebutton_endpoint_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/'),
+			'bbb_salt' => get_option('bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6'),
 			'bbb_default_url' => 'http://test-install.blindsidenetworks.com/bigbluebutton/',
 			'bbb_default_salt' => '8cd8ef52e8e101574e400365b55e11a6'
 		);
@@ -499,14 +499,14 @@ class Bigbluebutton_Admin {
 	 * Check for room server settings change requests
 	 */
 	private function room_server_settings_change() {
-		if (!empty($_POST['action']) && $_POST['action'] == 'bbb_general_settings') {
-			if (wp_verify_nonce(sanitize_text_field( $_POST['bbb_edit_server_settings_meta_nonce'] ), 'bbb_edit_server_settings_meta_nonce')) {
+		if ( ! empty($_POST['action']) && $_POST['action'] == 'bbb_general_settings') {
+			if (wp_verify_nonce(sanitize_text_field($_POST['bbb_edit_server_settings_meta_nonce']), 'bbb_edit_server_settings_meta_nonce')) {
 
-				$bbb_url =  sanitize_text_field( $_POST['bbb_url'] );
-				$bbb_salt =  sanitize_text_field( $_POST['bbb_salt'] );
+				$bbb_url = sanitize_text_field($_POST['bbb_url']);
+				$bbb_salt = sanitize_text_field($_POST['bbb_salt']);
 			
-				update_option( 'bigbluebutton_endpoint_url', $bbb_url );
-				update_option( 'bigbluebutton_salt', $bbb_salt );
+				update_option('bigbluebutton_endpoint_url', $bbb_url);
+				update_option('bigbluebutton_salt', $bbb_salt);
 
 				return true;
 			}
