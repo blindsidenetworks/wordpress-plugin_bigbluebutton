@@ -332,7 +332,7 @@ class Bigbluebutton_Admin {
 			if (wp_verify_nonce(sanitize_text_field($_POST['bbb_create_room_meta_nonce']), 'bbb_create_room_meta_nonce')) {
 				$post_id = intval($_POST['post_id']);
 				$title = sanitize_text_field($_POST['post_title']);
-				$description = esc_textarea($_POST['bbb-room-description']);
+				$description = apply_filters('the_content', $_POST['bbb-room-description']);
 				$categories = (isset($_POST['tax_input']) && isset($_POST['tax_input']['bbb-room-category'])) ? (array) $_POST['tax_input']['bbb-room-category'] : array();
 				$author = intval($_POST['post_author']);
 				$slug = sanitize_title($_POST['slug']);
@@ -375,7 +375,7 @@ class Bigbluebutton_Admin {
 			if (wp_verify_nonce(sanitize_text_field($_POST['bbb_edit_room_meta_nonce']), 'bbb_edit_room_meta_nonce')) {
 				$post_id = intval($_POST['post_id']);
 				$title = sanitize_text_field($_POST['post_title']);
-				$description = esc_textarea($_POST['bbb-room-description']);
+				$description = apply_filters('the_content', $_POST['bbb-room-description']);
 				$categories = (isset($_POST['tax_input']) && isset($_POST['tax_input']['bbb-room-category'])) ? (array) $_POST['tax_input']['bbb-room-category'] : array();
 				$author = sanitize_key($_POST['post_author']);
 
@@ -448,7 +448,7 @@ class Bigbluebutton_Admin {
 				}
 				$name = $category->name;
 				$slug = $category->slug;
-				$description = $category->description;
+				$description = apply_filters('the_content', $category->description);
 				$parent = $category->parent;
 
 				$meta_nonce = wp_create_nonce('bbb_room_edit_category_meta_nonce');
@@ -474,7 +474,7 @@ class Bigbluebutton_Admin {
 				$name = sanitize_text_field($_POST['name']);
 				$slug = sanitize_title($_POST['slug']);
 				$parent = sanitize_text_field($_POST['parent']);
-				$description = esc_textarea($_POST['description']);
+				$description = apply_filters('the_content', $_POST['description']);
 
 				$category_args = array(
 					'name' => $name,
@@ -502,8 +502,8 @@ class Bigbluebutton_Admin {
 
 				$name = sanitize_text_field($_POST['tag-name']);
 				$slug = sanitize_title($_POST['slug']);
-				$parent = sanitize_key($_POST['parent']);
-				$description = esc_textarea($_POST['description']);
+				$parent = intval($_POST['parent']);
+				$description = apply_filters('the_content', $_POST['description']);
 
 				$category_args = array(
 					'description' => $description,
