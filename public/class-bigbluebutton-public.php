@@ -101,7 +101,12 @@ class Bigbluebutton_Public {
 	}
 
 	/**
-	 * Display join room button in the bbb-room post
+	 * Display join room button in the bbb-room post.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	String	$content	Post content as string.
+	 * @return	String	$content	Post content as string.
 	 */
 	public function bbb_room_join_form_content($content) {
 		$room_id = get_the_ID();
@@ -116,7 +121,9 @@ class Bigbluebutton_Public {
 	}
 	
 	/**
-	 * Handle authenticated user joining room
+	 * Handle authenticated user joining room.
+	 * 
+	 * @since 	3.0.0
 	 */
 	public function bbb_user_join_room() {
 		$join_url = '';
@@ -135,6 +142,8 @@ class Bigbluebutton_Public {
 
 	/**
 	 * Handle non-authenticated user joining room
+	 * 
+	 * @since 	3.0.0
 	 */
 	public function bbb_guest_join_room() {
 		$join_url = '';

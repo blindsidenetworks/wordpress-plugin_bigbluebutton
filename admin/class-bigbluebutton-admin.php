@@ -43,9 +43,9 @@ class Bigbluebutton_Admin {
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since    3.0.0
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @since	3.0.0
+	 * @param	String    $plugin_name       The name of this plugin.
+	 * @param	String    $version    The version of this plugin.
 	 */
 	public function __construct($plugin_name, $version) {
 
@@ -101,9 +101,11 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Register room as custom post
+	 * Register room as custom post.
+	 * 
+	 * @since	3.0.0
 	 */
-	function bbb_room_as_post_type() {
+	public function bbb_room_as_post_type() {
 		register_post_type('bbb-room',
 			array(
 				'public' => true,
@@ -122,9 +124,11 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Register category as custom taxonomy
+	 * Register category as custom taxonomy.
+	 * 
+	 * @since	3.0.0
 	 */
-	function bbb_room_category_as_taxonomy_type() {
+	public function bbb_room_category_as_taxonomy_type() {
 		register_taxonomy('bbb-room-category',
 			'bbb-room',
 			array(
@@ -139,7 +143,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Add Rooms as its own menu item on the admin page
+	 * Add Rooms as its own menu item on the admin page.
+	 * 
+	 * @since	3.0.0
 	 */
 	public function create_admin_menu() {
 		add_menu_page(__('Rooms', 'bigbluebutton'), __('Rooms', 'bigbluebutton'), 'manage_options', 'rooms-list', 
@@ -153,18 +159,26 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Get all rooms
+	 * Get all rooms.
+	 * 
+	 * @since    3.0.0
+	 * 
+	 * @return	Array	$rooms	The list of rooms.
 	 */
 	public function get_rooms() {
 		$args = array('post_type' => 'bbb-room', 'posts_per_page' => 20);
-		$query = new WP_Query($args); // contains list of rooms
-		return $query;
+		$rooms = new WP_Query($args); // contains list of rooms
+		return $rooms;
 	}
 
 	/**
-	 * Get the list of all possible categories a room can be assigned to
-	 * @param parent -- the item_id of the category that we are getting children and subchildren of
-	 * @param depth -- the number of ancestors of the parent category so far
+	 * Get the list of all possible categories a room can be assigned to.
+	 * 
+	 * @since    3.0.0
+	 * 
+	 * @param	Integer	$parent 		Item ID of the category that we are getting children and subchildren of
+	 * @param	Integer	$depth 			Number of ancestors of the parent category so far
+	 * @return  Array	$categories 	2D array of categories under parent category
 	 */
 	public function get_categories($parent = 0, $depth = 0) {
 		$children = $this->get_category_children($parent);
@@ -188,8 +202,12 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Get the categories under the current category
-	 * @param parent -- the item_id of the category that we are getting children of
+	 * Get the categories under the current category.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param 	Integer	$parent 	Item ID of the parent category.
+	 * @return	Array	$children	Immediate category children of the parent.
 	 */
 	public function get_category_children($parent = 0) {
 		$args = array( 
@@ -201,13 +219,17 @@ class Bigbluebutton_Admin {
 			'hierarchical' => true,
 		);
 
-		$query = get_categories($args);
+		$children = get_categories($args);
 		
-		return $query;
+		return $children;
 	}
 
 	/**
-	 * Generate default code for moderators/viewers to enter a room
+	 * Generate default code for moderators/viewers to enter a room.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @return	String	$default_code	A default entry code into a bigbluebutton meeting.
 	 */
 	public function generate_random_code() {
 		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -216,11 +238,12 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Display rooms list view page
+	 * Display rooms list view page.
+	 * 
+	 * @since	3.0.0
 	 */
 	public function display_rooms_list() {
 		$this->check_delete_room_requests();
-		$url = get_site_url();
 		$loop = $this->get_rooms();
 		$edit_room_nonce = wp_create_nonce('bbb_can_edit_room_meta_nonce');
 		$delete_room_nonce = wp_create_nonce('bbb_can_delete_room_meta_nonce');
@@ -230,7 +253,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Delete rooms if requested
+	 * Delete rooms if requested.
+	 * 
+	 * @since	3.0.0
 	 */
 	private function check_delete_room_requests() {
 		if ( ! empty($_REQUEST['action']) && $_REQUEST['action'] == 'trash') {
@@ -248,7 +273,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Get information to populate edit room form
+	 * Send information to populate edit room form.
+	 * 
+	 * @since	3.0.0
 	 */
 	private function edit_room() {
 		if ( ! empty($_REQUEST['action']) && $_REQUEST['action'] == 'edit') {
@@ -276,7 +303,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Display new room page
+	 * Display new room page.
+	 * 
+	 * @since	3.0.0
 	 */
 	public function display_new_room_page() {
 		$url = get_site_url() . '/bbb-room';
@@ -294,7 +323,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Create new room
+	 * Create new room.
+	 * 
+	 * @since	3.0.0
 	 */
 	public function create_room() {
 		if ( ! empty($_POST['action']) && $_POST['action'] == 'create_room') {
@@ -335,7 +366,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Save the changes made to the room
+	 * Save the changes made to the room.
+	 * 
+	 * @since	3.0.0
 	 */
 	public function save_room_edits() {
 		if ( ! empty($_POST['action']) && $_POST['action'] == 'edit_room') {
@@ -365,7 +398,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Display room categories page
+	 * Display room categories page.
+	 * 
+	 * @since	3.0.0
 	 */
 	public function display_categories_page() {
 		$this->check_delete_category_requests();
@@ -381,7 +416,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Delete categories if the request has been made
+	 * Delete categories if the request has been made.
+	 * 
+	 * @since 	3.0.0
 	 */
 	private function check_delete_category_requests() {
 		if ( ! empty($_REQUEST['action']) && $_REQUEST['action'] == 'trash') {
@@ -397,7 +434,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Display edit category page
+	 * Display edit category page.
+	 * 
+	 * @since	3.0.0
 	 */
 	public function edit_category() {
 		if ( ! empty($_REQUEST['action']) && $_REQUEST['action'] == 'edit') {
@@ -421,7 +460,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Save changes made to existing category
+	 * Save changes made to existing category.
+	 * 
+	 * @since	3.0.0
 	 */
 	public function save_category_edits() {
 		if ( ! empty($_POST['action']) && $_POST['action'] == 'edit_category') {
@@ -449,7 +490,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Submit data for new category
+	 * Submit data for new category.
+	 * 
+	 * @since	3.0.0
 	 */
 	public function create_category() {
 		if ( ! empty($_POST['action']) && $_POST['action'] == 'create_category') {
@@ -474,7 +517,9 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Render the server settings page for plugin
+	 * Render the server settings page for plugin.
+	 * 
+	 * @since	3.0.0
 	 */
 	public function display_room_server_settings() {
 		$change_success = $this->room_server_settings_change();
@@ -484,19 +529,29 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Retrieve the room server settings
+	 * Retrieve the room server settings.
+	 * 
+	 * @since 	3.0.0
+	 * 
+	 * @return	Array	$settings	Room server default and current settings.
 	 */
 	public function fetch_room_server_settings() {
-		return array(
+		$settings = array(
 			'bbb_url' => get_option('bigbluebutton_endpoint_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/'),
 			'bbb_salt' => get_option('bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6'),
 			'bbb_default_url' => 'http://test-install.blindsidenetworks.com/bigbluebutton/',
 			'bbb_default_salt' => '8cd8ef52e8e101574e400365b55e11a6'
 		);
+
+		return $settings;
 	}
 
 	/**
-	 * Check for room server settings change requests
+	 * Check for room server settings change requests.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @return	Boolean	true|false	If the room servers have been changed or not.
 	 */
 	private function room_server_settings_change() {
 		if ( ! empty($_POST['action']) && $_POST['action'] == 'bbb_general_settings') {
