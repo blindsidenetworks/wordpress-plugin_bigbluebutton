@@ -15,6 +15,7 @@ msgstr ""
 "X-Poedit-SearchPath-0: admin/partials\n"
 "X-Poedit-SearchPath-1: public/partials\n"
 
+# Admin server settings
 msgid "Rooms"
 msgstr ""
 
@@ -27,7 +28,7 @@ msgstr ""
 msgid "The server settings explanation."
 msgstr ""
 
-msgid "Endpoint"
+msgid "EndPoint"
 msgstr ""
 
 msgid "Shared Secret"
@@ -42,4 +43,28 @@ msgstr ""
 ""
 
 msgid "Save server settings success message."
+msgstr ""
+
+# Admin Room settings
+msgid "Add New Room"
+msgstr ""
+
+msgid "All Rooms"
+msgstr ""
+
+msgid "New Room"
+msgstr ""
+
+msgid "Moderator Code"
+msgstr ""
+
+msgid "Viewer Code"
+msgstr ""
+
+# Room description
+msgid "Join"
+msgstr ""
+
+# Miscellaneous
+msgid "The form has expired or is invalid. Please try again."
 msgstr ""

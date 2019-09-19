@@ -122,6 +122,11 @@ class Bigbluebutton {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-bigbluebutton-public.php';
 
+		/**
+		 * Bigbluebutton API
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-bigbluebutton-api.php';
+
 		$this->loader = new Bigbluebutton_Loader();
 
 	}
@@ -156,7 +161,15 @@ class Bigbluebutton {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'admin_menu', $plugin_admin, 'room_server_settings' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'create_admin_menu' );
+		$this->loader->add_action( 'admin_post_create_room', $plugin_admin, 'create_room' );
+		$this->loader->add_action( 'admin_post_edit_room', $plugin_admin, 'save_room_edits' );
+		$this->loader->add_action( 'admin_post_create_category', $plugin_admin, 'create_category' );
+		$this->loader->add_action( 'admin_post_edit_category', $plugin_admin, 'save_category_edits' );
+
+		// register bbb-rooms and custom fields
+		$this->loader->add_action( 'init', $plugin_admin, 'bbb_room_as_post_type' );
+		$this->loader->add_action( 'init', $plugin_admin, 'bbb_room_category_as_taxonomy_type' );
 
 	}
 
@@ -174,6 +187,12 @@ class Bigbluebutton {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
+		// display join room form/button
+		$this->loader->add_filter( 'the_content', $plugin_public, 'bbb_room_join_form_content' );
+
+		// join room
+		$this->loader->add_action( 'admin_post_join_room', $plugin_public, 'bbb_user_join_room' );
+		$this->loader->add_action( 'admin_post_nopriv_join_room', $plugin_public, 'bbb_guest_join_room' );
 	}
 
 	/**
