@@ -46,7 +46,6 @@
 			} else {
 				$("#title-prompt-text").attr("class", "");
 			}
-			console.log(title);
 		});
 	 });
 })( jQuery );

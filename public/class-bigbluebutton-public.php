@@ -111,7 +111,7 @@ class Bigbluebutton_Public {
 	public function bbb_room_join_form_content($content) {
 		$room_id = get_the_ID();
 
-		if ($room_id == null || get_post($room_id)->post_type != 'bbb-room') {
+		if ($room_id === null || get_post($room_id)->post_type != 'bbb-room') {
 			return $content;
 		}
 		$meta_nonce = wp_create_nonce('bbb_join_room_meta_nonce');
@@ -126,12 +126,11 @@ class Bigbluebutton_Public {
 	 * @since 	3.0.0
 	 */
 	public function bbb_user_join_room() {
-		$join_url = '';
 		if ( ! empty($_POST['action']) && $_POST['action'] == 'join_room') {
 			if (wp_verify_nonce($_POST['bbb_join_room_meta_nonce'], 'bbb_join_room_meta_nonce')) {
 				$room_id = $_POST['room_id'];
 				$user = wp_get_current_user();
-				$entry_code = get_post_meta($room_id, 'bbb-room-moderator-code', true);
+				$entry_code = strval(get_post_meta($room_id, 'bbb-room-moderator-code', true));
 				$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, $user->display_name, $entry_code);
 				wp_redirect($join_url);
 			} else {
@@ -146,11 +145,10 @@ class Bigbluebutton_Public {
 	 * @since 	3.0.0
 	 */
 	public function bbb_guest_join_room() {
-		$join_url = '';
 		if ( ! empty($_POST['action']) && $_POST['action'] == 'join_room') {
 			if (wp_verify_nonce($_POST['bbb_join_room_meta_nonce'], 'bbb_join_room_meta_nonce')) {
 				$room_id = $_POST['room_id'];
-				$entry_code = get_post_meta($room_id, 'bbb-room-viewer-code', true);
+				$entry_code = strval(get_post_meta($room_id, 'bbb-room-viewer-code', true));
 				$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, 'Guest', $entry_code);
 				wp_redirect($join_url);
 			} else {
