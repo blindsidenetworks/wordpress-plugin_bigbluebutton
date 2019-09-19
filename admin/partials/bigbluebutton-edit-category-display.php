@@ -33,22 +33,22 @@
 							'name'             => 'parent',
 							'orderby'          => 'name',
 							'hierarchical'     => true,
-							'show_option_none' => __( 'None' ),
+							'show_option_none' => __('None'),
 							'selected' => $parent
 						);
 
 						/** This filter is documented in wp-admin/edit-tags.php */
-						$dropdown_args = apply_filters( 'taxonomy_parent_dropdown_args', $dropdown_args, 'bbb-room-category', 'edit' );
-						wp_dropdown_categories( $dropdown_args );
+						$dropdown_args = apply_filters('taxonomy_parent_dropdown_args', $dropdown_args, 'bbb-room-category', 'edit');
+						wp_dropdown_categories($dropdown_args);
 						?>
                         <p class="description">
-                            <?php _e( 'Assign a parent term to create a hierarchy. The term Jazz, for example, would be the parent of Bebop and Big Band.' ); ?>
+                            <?php _e('Assign a parent term to create a hierarchy. The term Jazz, for example, would be the parent of Bebop and Big Band.'); ?>
                         </p>
                     </td>
                 </tr>
                 <tr class="form-field term-description-wrap">
                     <th scope="row">
-                        <label for="description"><?php esc_html_e( 'Description' ); ?></label>
+                        <label for="description"><?php esc_html_e('Description'); ?></label>
                     </th>
                     <td>
                         <textarea name="description" id="description" rows="5" cols="50" class="large-text"><?php echo $description; ?></textarea>
