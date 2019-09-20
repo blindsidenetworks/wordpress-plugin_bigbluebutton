@@ -45,6 +45,9 @@ msgstr ""
 msgid "Save server settings success message."
 msgstr ""
 
+msgid "Save server settings bad url error message."
+msgstr ""
+
 # Admin Room settings
 msgid "Add New Room"
 msgstr ""

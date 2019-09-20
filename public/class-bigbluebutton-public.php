@@ -134,7 +134,7 @@ class Bigbluebutton_Public {
 				$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, $user->display_name, $entry_code);
 				wp_redirect($join_url);
 			} else {
-				wp_die('The form has expired or is invalid. Please try again.');
+				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
 	}
@@ -152,7 +152,7 @@ class Bigbluebutton_Public {
 				$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, 'Guest', $entry_code);
 				wp_redirect($join_url);
 			} else {
-				wp_die('The form has expired or is invalid. Please try again.');
+				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
 	}

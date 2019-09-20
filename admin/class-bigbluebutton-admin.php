@@ -553,7 +553,10 @@ class Bigbluebutton_Admin {
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @return	Boolean	true|false	If the room servers have been changed or not.
+	 * @return	Integer	1|2|3	If the room servers have been changed or not.
+	 * 							0 - failure
+	 * 							1 - success
+	 * 							2 - bad url format
 	 */
 	private function room_server_settings_change() {
 		if ( ! empty($_POST['action']) && $_POST['action'] == 'bbb_general_settings') {
@@ -562,12 +565,18 @@ class Bigbluebutton_Admin {
 				$bbb_url = sanitize_text_field($_POST['bbb_url']);
 				$bbb_salt = sanitize_text_field($_POST['bbb_salt']);
 			
+				$bbb_url .= (substr($bbb_url, -1) == '/' ? '' : '/');
+
+				if (substr_compare( $bbb_url, 'bigbluebutton/', strlen($bbb_url) - 14) !== 0) {
+					return 2;
+				}
+
 				update_option('bigbluebutton_endpoint_url', $bbb_url);
 				update_option('bigbluebutton_salt', $bbb_salt);
 
-				return true;
+				return 1;
 			}
 		}
-		return false;
+		return 0;
 	}
 }

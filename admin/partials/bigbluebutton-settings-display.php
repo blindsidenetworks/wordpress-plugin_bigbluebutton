@@ -24,9 +24,13 @@
         <?php if ($bbb_settings["bbb_url"] == $bbb_settings["bbb_default_url"]) { ?>
         <label><?php esc_html_e('Default server settings 1. Default server settings 2.', 'bigbluebutton') ?></label>
         <?php } ?>
-        <?php if ($change_success) { ?>
+        <?php if ($change_success == 1) { ?>
             <div class="updated">
                 <p><?php esc_html_e('Save server settings success message.', 'bigbluebutton') ?></p>
+            </div>
+        <?php } else if ($change_success == 2) { ?>
+            <div class="error">
+                <p><?php esc_html_e('Save server settings bad url error message.', 'bigbluebutton') ?></p>
             </div>
         <?php } ?>
         <br><br>

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2019-09-13 10:54-0400\n"
-"PO-Revision-Date: 2019-09-19 12:23-0400\n"
+"PO-Revision-Date: 2019-09-20 09:30-0400\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_CA\n"
@@ -43,6 +43,9 @@ msgstr ""
 
 msgid "Save server settings success message."
 msgstr "Success! Your room server settings have been saved."
+
+msgid "Save server settings bad url error message."
+msgstr "Error: the URL you have entered must end with '/bigbluebutton/' to be valid."
 
 msgid "Add New Room"
 msgstr "Add New Room"
