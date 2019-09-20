@@ -109,6 +109,12 @@ class Bigbluebutton_Public {
 	 * @return	String	$content	Post content as string.
 	 */
 	public function bbb_room_join_form_content($content) {
+		global $pagenow;
+
+		if ($pagenow == 'edit.php' || $pagenow == 'post.php') {
+			return $content;
+		}
+
 		$room_id = get_the_ID();
 
 		if ($room_id === null || !isset(get_post($room_id)->post_type) || get_post($room_id)->post_type != 'bbb-room') {

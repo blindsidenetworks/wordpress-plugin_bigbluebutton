@@ -159,17 +159,28 @@ class Bigbluebutton {
 
 		$plugin_admin = new Bigbluebutton_Admin($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
-		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
-		$this->loader->add_action('admin_menu', $plugin_admin, 'create_admin_menu');
-		$this->loader->add_action('admin_post_create_room', $plugin_admin, 'create_room');
-		$this->loader->add_action('admin_post_edit_room', $plugin_admin, 'save_room_edits');
-		$this->loader->add_action('admin_post_create_category', $plugin_admin, 'create_category');
-		$this->loader->add_action('admin_post_edit_category', $plugin_admin, 'save_category_edits');
-
 		// register bbb-rooms and custom fields
 		$this->loader->add_action('init', $plugin_admin, 'bbb_room_as_post_type');
 		$this->loader->add_action('init', $plugin_admin, 'bbb_room_category_as_taxonomy_type');
+
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+
+		// create admin menu
+		$this->loader->add_action('admin_menu', $plugin_admin, 'create_admin_menu');
+		$this->loader->add_filter('parent_file', $plugin_admin, 'bbb_set_current_menu');
+
+		// create moderator and viewer code
+		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'register_room_code_metaboxes');
+		$this->loader->add_action('save_post', $plugin_admin, 'save_room');
+
+		// show custom fields in rooms table
+		$this->loader->add_action('manage_posts_custom_column', $plugin_admin, 'bbb_room_custom_columns', 10, 2);
+		$this->loader->add_filter('manage_bbb-room_posts_columns', $plugin_admin, 'add_custom_room_column_to_list');
+
+		// $this->loader->add_action('admin_post_create_room', $plugin_admin, 'create_room');
+		// $this->loader->add_action('admin_post_create_category', $plugin_admin, 'create_category');
+		// $this->loader->add_action('admin_post_edit_category', $plugin_admin, 'save_category_edits');
 
 	}
 
