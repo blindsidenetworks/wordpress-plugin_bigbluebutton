@@ -73,6 +73,7 @@ class Bigbluebutton_Activator {
 					break;
 				case 'anonymous':
 					$role->add_cap('read_bbb_room');
+					$role->add_cap('join_with_access_code_bbb_room');
 					break;
 				default:
 					$role->add_cap('read_bbb_room');

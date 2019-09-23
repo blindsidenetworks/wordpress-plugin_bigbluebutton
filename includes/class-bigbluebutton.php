@@ -199,7 +199,7 @@ class Bigbluebutton {
 
 		// join room
 		$this->loader->add_action('admin_post_join_room', $plugin_public, 'bbb_user_join_room');
-		$this->loader->add_action('admin_post_nopriv_join_room', $plugin_public, 'bbb_guest_join_room');
+		$this->loader->add_action('admin_post_nopriv_join_room', $plugin_public, 'bbb_user_join_room');
 	}
 
 	/**
