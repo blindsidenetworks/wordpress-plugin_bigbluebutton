@@ -2,7 +2,7 @@
     <input type="hidden" name="action" value="join_room">
     <input type="hidden" name="room_id" value="<?php echo $room_id; ?>">
     <input type="hidden" id="bbb_join_room_meta_nonce" name="bbb_join_room_meta_nonce" value="<?php echo $meta_nonce; ?>">
-    <?php if ($access_using_code) { ?>
+    <?php if (!$access_as_moderator && !$access_as_viewer && $access_using_code) { ?>
         <div>
             <label>Access Code: </label>
             <input type="text" name="bbb_meeting_access_code" size=20>
