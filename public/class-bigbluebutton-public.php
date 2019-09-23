@@ -123,7 +123,7 @@ class Bigbluebutton_Public {
 		$access_as_moderator = (current_user_can('join_as_moderator_bbb_room') || get_current_user_id() == get_post($room_id)->post_author);
 		$access_as_viewer = current_user_can('join_as_viewer_bbb_room');
 
-		if ($room_id === null || !isset(get_post($room_id)->post_type) || get_post($room_id)->post_type != 'bbb-room') {
+		if ($room_id === null || ! isset(get_post($room_id)->post_type) || get_post($room_id)->post_type != 'bbb-room') {
 			return $content;
 		}
 
