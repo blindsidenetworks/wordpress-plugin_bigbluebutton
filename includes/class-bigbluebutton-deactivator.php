@@ -46,7 +46,7 @@ class Bigbluebutton_Deactivator {
 			$role = get_role($name);
 
 			foreach ($capabilities as $cap) {
-				if(strpos($cap, 'bbb_room') === false) {
+				if (strpos($cap, 'bbb_room') === false) {
 					continue;
 				}
 				if ($role->has_cap($cap)) {
