@@ -117,10 +117,12 @@ class Bigbluebutton_Admin {
 					'edit_item' => __('Edit Room', 'bigbluebutton'),
 				),
 				'taxonomies' => array('bbb-room-category'),
+				'capability_type' => 'bbb_room',
 				'has_archive' => true,
 				'supports' => array('title', 'editor'),
 				'rewrite' => array('slug' => 'bbb-room'),
 				'show_in_menu' => 'bbb_room',
+				'map_meta_cap' => true
 			)
 		);
 	}
@@ -194,13 +196,13 @@ class Bigbluebutton_Admin {
 	 * @since	3.0.0
 	 */
 	public function create_admin_menu() {
-		add_menu_page(__('Rooms', 'bigbluebutton'), __('Rooms', 'bigbluebutton'), 'manage_options', 'bbb_room', 
+		add_menu_page(__('Rooms', 'bigbluebutton'), __('Rooms', 'bigbluebutton'), 'view_bbb_room_list', 'bbb_room', 
 			'', 'dashicons-video-alt2');
 
-		add_submenu_page('bbb_room', __('Rooms', 'bigbluebutton'), __('Category', 'bigbluebutton'), 'manage_options', 
+		add_submenu_page('bbb_room', __('Rooms', 'bigbluebutton'), __('Categories'), 'view_bbb_room_list', 
 			'edit-tags.php?taxonomy=bbb-room-category', '');
 
-		add_submenu_page('bbb_room', __('Rooms', 'bigbluebutton'), __('Settings'), 'manage_options', 
+		add_submenu_page('bbb_room', __('Rooms', 'bigbluebutton'), __('Settings'), 'view_bbb_room_list', 
 			'bbb-room-server-settings', array($this, 'display_room_server_settings'));
 	}
 

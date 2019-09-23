@@ -79,7 +79,6 @@ class BigbluebuttonApi {
 
 		$url = self::build_url('join', $arr_params);
 
-		error_log($url);
 		return $url;
 	}
 

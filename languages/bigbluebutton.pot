@@ -66,6 +66,9 @@ msgstr ""
 msgid "Join"
 msgstr ""
 
-# Miscellaneous
+# Error messages
 msgid "The form has expired or is invalid. Please try again."
+msgstr ""
+
+msgid "You do not have permission to enter the room. Please request permission."
 msgstr ""

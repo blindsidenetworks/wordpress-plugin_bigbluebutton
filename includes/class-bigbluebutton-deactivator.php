@@ -23,14 +23,38 @@
 class Bigbluebutton_Deactivator {
 
 	/**
-	 * Short Description. (use period)
+	 * Remove all capabilities associated with this plugin.
 	 *
-	 * Long Description.
+	 * Remove capabilities for creating/editing/viewing rooms and joining as moderator/viewer.
 	 *
 	 * @since    3.0.0
 	 */
 	public static function deactivate() {
 
+		$args = get_post_type_object('bbb-room');
+		$args->capabilities = array(
+			'view_bbb_room_list',
+			'join_as_moderator_bbb_room',
+			'join_as_viewer_bbb_room'
+		);
+
+		$capabilities = get_object_vars(get_post_type_capabilities($args));
+		$roles = get_editable_roles();
+		$role_names = array_keys($roles);
+
+		foreach($role_names as $name) {
+			$role = get_role($name);
+
+			foreach($capabilities as $cap) {
+				if(strpos($cap, 'bbb_room') === false) {
+					continue;
+				}
+				if ($role->has_cap($cap)) {
+					$role->remove_cap($cap);
+				}
+			}
+			
+		}
 	}
 
 }

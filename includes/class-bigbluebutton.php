@@ -178,10 +178,6 @@ class Bigbluebutton {
 		$this->loader->add_action('manage_posts_custom_column', $plugin_admin, 'bbb_room_custom_columns', 10, 2);
 		$this->loader->add_filter('manage_bbb-room_posts_columns', $plugin_admin, 'add_custom_room_column_to_list');
 
-		// $this->loader->add_action('admin_post_create_room', $plugin_admin, 'create_room');
-		// $this->loader->add_action('admin_post_create_category', $plugin_admin, 'create_category');
-		// $this->loader->add_action('admin_post_edit_category', $plugin_admin, 'save_category_edits');
-
 	}
 
 	/**
