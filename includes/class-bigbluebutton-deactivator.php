@@ -42,10 +42,10 @@ class Bigbluebutton_Deactivator {
 		$roles = get_editable_roles();
 		$role_names = array_keys($roles);
 
-		foreach($role_names as $name) {
+		foreach ($role_names as $name) {
 			$role = get_role($name);
 
-			foreach($capabilities as $cap) {
+			foreach ($capabilities as $cap) {
 				if(strpos($cap, 'bbb_room') === false) {
 					continue;
 				}

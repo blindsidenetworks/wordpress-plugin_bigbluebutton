@@ -34,7 +34,7 @@ class Bigbluebutton_Activator {
 		$roles = get_editable_roles();
 		$role_names = array_keys($roles);
 
-		foreach($role_names as $name) {
+		foreach ($role_names as $name) {
 			$role = get_role($name);
 
 			switch ($name) {
@@ -59,7 +59,7 @@ class Bigbluebutton_Activator {
 					$role->add_cap('publish_bbb_rooms');
 					$role->add_cap('view_bbb_room_list');
 					$role->add_cap('join_as_viewer_bbb_room');
-					if(!$role->has_cap('manage_categories')) {
+					if( ! $role->has_cap('manage_categories')) {
 						$role->add_cap('manage_categories');
 					}
 					break;
