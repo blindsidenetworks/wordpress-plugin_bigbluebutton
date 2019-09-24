@@ -2,3 +2,39 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+ .bbb-settings-card { 
+    padding: 10px;
+    margin: 10px;
+    min-width: 22em;
+ }
+
+ .bbb-settings-card h1 {
+     font-weight: 400;
+ }
+ 
+ .bbb-settings-card p {
+    font-size: 1.1em;
+ }
+
+ .bbb-row {
+     display: flex;
+     flex-wrap: wrap;
+ }
+
+ .bbb-col-left {
+     flex: 20%;
+     max-width: 20%;
+     padding: 0 4px;
+ }
+
+ .bbb-col-right {
+    flex: 70%;
+    max-width: 70%;
+    padding: 0 4px;
+}
+
+.bbb-important-label {
+    font-weight: 900;
+    color: black;
+}
