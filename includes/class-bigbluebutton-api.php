@@ -24,13 +24,15 @@ class BigbluebuttonApi {
 		$name = get_the_title($rid);
 		$moderator_code = get_post_meta($rid, 'bbb-room-moderator-code', true);
 		$viewer_code = get_post_meta($rid, 'bbb-room-viewer-code', true);
+		$recordable = get_post_meta($rid, 'bbb-room-recordable', true);
 		$logout_url = get_permalink($rid);
 		$arr_params = array(
 			'name' => urlencode($name),
 			'meetingID' => urlencode('meeting-' . $rid),
 			'attendeePW' => urlencode($viewer_code),
 			'moderatorPW' => urlencode($moderator_code),
-			'logoutURL' => $logout_url
+			'logoutURL' => $logout_url,
+			'record' => $recordable
 		);
 
 		$url = self::build_url('create', $arr_params);
@@ -116,6 +118,40 @@ class BigbluebuttonApi {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get all recordings for selected room.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param   Integer     $room_id            Custom post id of a room.
+	 * @return	Array		$recordings			List of recordings for this room.
+	 */
+	public static function get_recordings($room_id) {
+		$rid = intval($room_id);
+		$recordings = [];
+
+		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
+			return $recordings;
+		}
+
+		$arr_params = array(
+			'meetingID' => urlencode('meeting-' . $rid),
+		);
+
+		$url = self::build_url('getRecordings', $arr_params);
+		$full_response = self::get_response( $url );
+		
+		if (is_wp_error($full_response)) {
+            return $recordings;
+		}
+
+		$response = new SimpleXMLElement(wp_remote_retrieve_body($full_response));
+		if(property_exists($response, 'recordings') && property_exists($response->recordings, 'recording')) {
+			$recordings = $response->recordings->recording;
+		}
+		return $recordings;
 	}
 
 	/**

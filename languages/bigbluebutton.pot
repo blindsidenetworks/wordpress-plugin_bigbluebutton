@@ -62,8 +62,24 @@ msgstr ""
 msgid "Viewer Code"
 msgstr ""
 
+msgid "Recordable"
+msgstr ""
+
+msgid "true"
+msgstr ""
+
+msgid "false"
+msgstr ""
+
 # Room description
 msgid "Join"
+msgstr ""
+
+# Recordings description
+msgid "Room"
+msgstr ""
+
+msgid "View"
 msgstr ""
 
 # Error messages
@@ -78,4 +94,7 @@ msgstr ""
 
 # Public strings
 msgid "Access Code"
+msgstr ""
+
+msgid "This room does not yet have any recordings."
 msgstr ""

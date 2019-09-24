@@ -170,8 +170,9 @@ class Bigbluebutton {
 		$this->loader->add_action('admin_menu', $plugin_admin, 'create_admin_menu');
 		$this->loader->add_filter('parent_file', $plugin_admin, 'bbb_set_current_menu');
 
-		// create moderator and viewer code
+		// add room metadata hooks
 		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'register_room_code_metaboxes');
+		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'register_record_room_metabox');
 		$this->loader->add_action('save_post', $plugin_admin, 'save_room');
 
 		// show custom fields in rooms table

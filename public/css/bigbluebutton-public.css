@@ -3,6 +3,31 @@
  * included in this file.
  */
  
+ #bbb-recordings-display {
+     margin: 5px 0px;
+ }
+
+ #recordings-list {
+     display: block;
+ }
+
  .error {
      color: red;
  }
+ 
+.table-container, .table-container > div {
+    box-sizing: border-box;
+ }
+
+.flex-table {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 33%);
+    border: solid 1px #d9d9d9;
+    padding: 5px;
+}
+
+.flex-table.header {
+    background: #1976D2;
+    color: white;
+    border-color: #1565C0;
+}

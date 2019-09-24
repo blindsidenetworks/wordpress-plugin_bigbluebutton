@@ -34,18 +34,6 @@
 		if ($(".updated").length) {
 			$(".updated").delay(2000).fadeOut();
 		}
-
-		// edit title of room
-		$( "#title" ).keyup(function() {
-			let title = $(this).val();
-			if (title.length > 0) {
-				$("#title-prompt-text").attr("class", "screen-reader-text");
-				let slug = title.replace(/\s+/g, '-').toLowerCase().replace(/[^A-Za-z0-9\-\_]/g,"");
-
-				$("#bbb-room-slug-text").val(slug);
-			} else {
-				$("#title-prompt-text").attr("class", "");
-			}
-		});
+		
 	 });
 })( jQuery );

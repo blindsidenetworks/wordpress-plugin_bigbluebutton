@@ -29,4 +29,18 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
+	$( window ).load(function() {
+		
+		// display/hide recordings
+		$("#bbb-recordings-display").click(function() {
+			if ($("#recordings-list").is(":visible")) {
+				$("#recordings-list").slideUp();
+				$(this).text(php_vars.view);
+			} else {
+				$("#recordings-list").slideDown();
+				$(this).text(php_vars.hide);
+			}
+		});
+		
+	 });
 })( jQuery );

@@ -96,8 +96,13 @@ class Bigbluebutton_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/bigbluebutton-public.js', array('jquery'), $this->version, false);
+		$translations = array(
+			'view' => __('View', 'bigbluebutton'),
+			'hide' => __('Hide')
+		);
 
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/bigbluebutton-public.js', array('jquery'), $this->version, false);
+		wp_localize_script($this->plugin_name, 'php_vars', $translations);
 	}
 
 	/**
@@ -127,7 +132,18 @@ class Bigbluebutton_Public {
 			return $content;
 		}
 
-		include('partials/bigbluebutton-join-display.php');
+		// add join form to post content
+		$html_form = $this->get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code);
+		$content .= $html_form;
+
+		// add recordings list to post content if the room is recordable
+		$room_can_record = get_post_meta($room_id, 'bbb-room-recordable', true);
+		if ($room_can_record == 'true') {
+			$recordings = BigbluebuttonApi::get_recordings($room_id);
+			$html_recordings = $this->get_optional_recordings_view_as_string($room_id, $recordings);
+			$content .= $html_recordings;
+		}
+		
 		return $content;
 	}
 	
@@ -177,5 +193,21 @@ class Bigbluebutton_Public {
 	private function get_meeting_username($user) {
 		$username = ($user && $user->display_name) ? $user->display_name : '';
 		return $username;
+	}
+
+	private function get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code) {
+		ob_start();
+		include('partials/bigbluebutton-join-display.php');
+		$form = ob_get_contents();
+		ob_end_clean();
+		return $form;
+	}
+
+	private function get_optional_recordings_view_as_string($room_id, $recordings) {
+		ob_start();
+		include('partials/bigbluebutton-optional-recordings-display.php');
+		$recordings = ob_get_contents();
+		ob_end_clean();
+		return $recordings;
 	}
 }
