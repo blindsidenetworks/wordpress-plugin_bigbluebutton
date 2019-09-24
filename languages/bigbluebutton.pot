@@ -28,7 +28,7 @@ msgstr ""
 msgid "The server settings explanation."
 msgstr ""
 
-msgid "EndPoint"
+msgid "Endpoint"
 msgstr ""
 
 msgid "Shared Secret"

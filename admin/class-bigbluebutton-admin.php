@@ -111,16 +111,18 @@ class Bigbluebutton_Admin {
 				'public' => true,
 				'show_ui' => true,
 				'labels' => array( 
-					'name' => __('All Rooms', 'bigbluebutton'),
+					'name' => __('Rooms', 'bigbluebutton'),
 					'add_new' => __('Add New', 'bigbluebutton'),
 					'add_new_item' => __('Add New Room', 'bigbluebutton'),
 					'edit_item' => __('Edit Room', 'bigbluebutton'),
 				),
 				'taxonomies' => array('bbb-room-category'),
+				'capability_type' => 'bbb_room',
 				'has_archive' => true,
 				'supports' => array('title', 'editor'),
 				'rewrite' => array('slug' => 'bbb-room'),
 				'show_in_menu' => 'bbb_room',
+				'map_meta_cap' => true
 			)
 		);
 	}
@@ -149,7 +151,7 @@ class Bigbluebutton_Admin {
 	/**
 	 * Create moderator and viewer code metaboxes on room creation and edit.
 	 * 
-	 * @since 3.0.0
+	 * @since	3.0.0
 	 */
 	public function register_room_code_metaboxes() {
 		add_meta_box('bbb-moderator-code', __('Moderator Code', 'bigbluebutton'), array($this, 'display_moderator_code_metabox'), 'bbb-room');
@@ -157,9 +159,20 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
+	 * Show recordable option in room creation to users who have the corresponding capability.
+	 * 
+	 * @since	3.0.0
+	 */
+	public function register_record_room_metabox() {
+		if (current_user_can('create_recordable_bbb_room')) {
+			add_meta_box('bbb-room-recordable', __('Recordable', 'bigbluebutton'), array($this, 'display_allow_record_metabox'), 'bbb-room');
+		}
+	}
+
+	/**
 	 * Display moderator code metabox.
 	 * 
-	 * @since 3.0.0
+	 * @since	3.0.0
 	 * 
 	 * @param	Object	$object		The object that has the room ID.
 	 */
@@ -175,7 +188,7 @@ class Bigbluebutton_Admin {
 	/**
 	 * Display viewer code metabox.
 	 * 
-	 * @since 3.0.0
+	 * @since	3.0.0
 	 * 
 	 * @param	Object	$object		The object that has the room ID.
 	 */
@@ -189,18 +202,32 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
+	 * Display recordable metabox.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	Object	$object		The object that has the room ID.
+	 */
+	public function display_allow_record_metabox($object) {
+		$existing_value = get_post_meta($object->ID, 'bbb-room-recordable', true);
+
+		wp_nonce_field('bbb-room-recordable-nonce', 'bbb-room-recordable-nonce');
+		require('partials/bigbluebutton-recordable-metabox-display.php');
+	}
+
+	/**
 	 * Add Rooms as its own menu item on the admin page.
 	 * 
 	 * @since	3.0.0
 	 */
 	public function create_admin_menu() {
-		add_menu_page(__('Rooms', 'bigbluebutton'), __('Rooms', 'bigbluebutton'), 'manage_options', 'bbb_room', 
+		add_menu_page(__('Rooms', 'bigbluebutton'), __('Rooms', 'bigbluebutton'), 'view_bbb_room_list', 'bbb_room', 
 			'', 'dashicons-video-alt2');
 
-		add_submenu_page('bbb_room', __('Rooms', 'bigbluebutton'), __('Category', 'bigbluebutton'), 'manage_options', 
+		add_submenu_page('bbb_room', __('Rooms', 'bigbluebutton'), __('Categories'), 'view_bbb_room_list', 
 			'edit-tags.php?taxonomy=bbb-room-category', '');
 
-		add_submenu_page('bbb_room', __('Rooms', 'bigbluebutton'), __('Settings'), 'manage_options', 
+		add_submenu_page('bbb_room', __('Rooms', 'bigbluebutton'), __('Settings'), 'view_bbb_room_list', 
 			'bbb-room-server-settings', array($this, 'display_room_server_settings'));
 	}
 
@@ -237,22 +264,42 @@ class Bigbluebutton_Admin {
 			return $post_id;
 		}
         
-		if ( isset($_POST['bbb-moderator-code']) &&
-			isset($_POST['bbb-viewer-code']) &&
-			isset($_POST['bbb-room-moderator-code-nonce']) && 
-			wp_verify_nonce($_POST['bbb-room-moderator-code-nonce'], 'bbb-room-moderator-code-nonce') &&
-			isset($_POST['bbb-room-viewer-code-nonce']) && 
-			wp_verify_nonce($_POST['bbb-room-viewer-code-nonce'], 'bbb-room-viewer-code-nonce') ) {
-
+		if ($this->can_save_room()) {
 			$moderator_code = sanitize_text_field($_POST['bbb-moderator-code']);
 			$viewer_code = sanitize_text_field($_POST['bbb-viewer-code']);
+			$recordable = (array_key_exists('bbb-room-recordable', $_POST) && 
+				sanitize_text_field($_POST['bbb-room-recordable']) == 'checked');
 
 			// add room codes to postmeta data
 			update_post_meta($post_id, 'bbb-room-moderator-code', $moderator_code);
 			update_post_meta($post_id, 'bbb-room-viewer-code', $viewer_code);
+
+			// update room recordable value
+			if ($recordable) {
+				update_post_meta($post_id, 'bbb-room-recordable', 'true');
+			} else {
+				update_post_meta($post_id, 'bbb-room-recordable', 'false');
+			}
+			
 		} else {
 			return $post_id;
 		}
+	}
+
+	/**
+	 * Helper function to check if metadata has been submitted with correct nonces.
+	 * 
+	 * @since 3.0.0
+	 */
+	private function can_save_room() {
+		return (isset($_POST['bbb-moderator-code']) &&
+			isset($_POST['bbb-viewer-code']) &&
+			isset($_POST['bbb-room-moderator-code-nonce']) && 
+			wp_verify_nonce($_POST['bbb-room-moderator-code-nonce'], 'bbb-room-moderator-code-nonce') &&
+			isset($_POST['bbb-room-viewer-code-nonce']) && 
+			wp_verify_nonce($_POST['bbb-room-viewer-code-nonce'], 'bbb-room-viewer-code-nonce') &
+			isset($_POST['bbb-room-recordable-nonce']) &&
+			wp_verify_nonce($_POST['bbb-room-recordable-nonce'], 'bbb-room-recordable-nonce'));
 	}
 
 	/**
