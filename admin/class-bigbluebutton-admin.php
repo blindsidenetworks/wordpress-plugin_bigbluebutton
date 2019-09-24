@@ -345,7 +345,7 @@ class Bigbluebutton_Admin {
 				echo get_the_author_meta('display_name', get_post($post_id)->post_author);
 				break;
 			case 'permalink' :
-				echo '<a>' . get_permalink($post_id) . '</a>';
+				echo '<a href="' . get_permalink($post_id) . '">' . get_permalink($post_id) . '</a>';
 				break;
 			case 'moderator-code' :
 				echo get_post_meta($post_id, 'bbb-room-moderator-code', true);
