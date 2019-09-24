@@ -29,6 +29,7 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
+	/** global: php_vars */
 	$( window ).load(function() {
 		
 		// display/hide recordings

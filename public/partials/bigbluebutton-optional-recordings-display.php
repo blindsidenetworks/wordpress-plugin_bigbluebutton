@@ -15,7 +15,7 @@
             <?php foreach($recordings as $recording) { ?>
                 <div class="flex-table row" role="rowgroup">
                     <div class="flex-row first" role="cell"><?php echo urldecode($recording->name); ?></div>
-                    <div class="flex-row" role="cell"><?php echo date_i18n(get_option( 'date_format' ), (int)$recording->startTime / 1000); ?></div>
+                    <div class="flex-row" role="cell"><?php echo date_i18n($date_format, (int)$recording->startTime / 1000); ?></div>
                     <div class="flex-row" role="cell"><a href="<?php echo $recording->playback->format->url; ?>"><?php esc_html_e('View', 'bigbluebutton'); ?></a></div>
                 </div>
             <?php } ?>

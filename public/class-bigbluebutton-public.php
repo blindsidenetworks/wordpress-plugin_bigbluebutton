@@ -205,6 +205,7 @@ class Bigbluebutton_Public {
 
 	private function get_optional_recordings_view_as_string($room_id, $recordings) {
 		ob_start();
+		$date_format = (get_option( 'date_format' ) ? get_option( 'date_format' ) : 'Y-m-d');
 		include('partials/bigbluebutton-optional-recordings-display.php');
 		$recordings = ob_get_contents();
 		ob_end_clean();
