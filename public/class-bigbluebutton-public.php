@@ -195,6 +195,19 @@ class Bigbluebutton_Public {
 		return $username;
 	}
 
+	/**
+	 * Get join meeting form as an HTML string.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	Integer		$room_id				Post ID of the room.
+	 * @param	String		$meta_nonce				Nonce for join meeting form.
+	 * @param	Boolean		$access_as_moderator	Check for if the current user can enter meetings as a moderator.
+	 * @param	Boolean		$access_as_viewer		Check for if the current user can enter meetings as a viewer.
+	 * @param	Boolean		$access_using_code		Check for if the current user can enter meetings using an access code.
+	 * 
+	 * @return	String		$form					Join meeting form stored in a variable.
+	 */
 	private function get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code) {
 		ob_start();
 		include('partials/bigbluebutton-join-display.php');
@@ -203,6 +216,14 @@ class Bigbluebutton_Public {
 		return $form;
 	}
 
+	/**
+	 * Get recordings with Show/Hide buttons as an HTML string.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	Integer		$room_id		Post ID of the room.
+	 * @param	Array		$recordings		List of recordings for the room.
+	 */
 	private function get_optional_recordings_view_as_string($room_id, $recordings) {
 		ob_start();
 		$date_format = (get_option('date_format') ? get_option('date_format') : 'Y-m-d');
