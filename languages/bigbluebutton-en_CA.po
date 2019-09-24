@@ -70,3 +70,9 @@ msgstr "The form has expired or is invalid. Please try again."
 
 msgid "You do not have permission to enter the room. Please request permission."
 msgstr "You do not have permission to enter the room. Please request permission."
+
+msgid "The access code you have entered is incorrect. Please try again."
+msgstr "The access code you have entered is incorrect. Please try again."
+
+msgid "Access Code"
+msgstr "Access Code"

@@ -72,3 +72,10 @@ msgstr ""
 
 msgid "You do not have permission to enter the room. Please request permission."
 msgstr ""
+
+msgid "The access code you have entered is incorrect. Please try again."
+msgstr ""
+
+# Public strings
+msgid "Access Code"
+msgstr ""
