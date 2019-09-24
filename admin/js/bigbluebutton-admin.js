@@ -34,6 +34,5 @@
 		if ($(".updated").length) {
 			$(".updated").delay(2000).fadeOut();
 		}
-		
 	 });
 })( jQuery );
