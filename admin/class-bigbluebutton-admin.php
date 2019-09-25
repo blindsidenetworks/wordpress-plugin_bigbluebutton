@@ -240,10 +240,10 @@ class Bigbluebutton_Admin {
 	 * @return	String	$parent_file	Custom menu slug.
 	 */
 	public function bbb_set_current_menu($parent_file) {
-        global $submenu_file, $current_screen, $pagenow;
+    	global $submenu_file, $current_screen, $pagenow;
 
 		# Set the submenu as active/current while anywhere in your Custom Post Type
-        if ( $current_screen->taxonomy == 'bbb-room-category' && $pagenow == 'edit-tags.php' ) {
+        if ($current_screen->taxonomy == 'bbb-room-category' && $pagenow == 'edit-tags.php') {
             $submenu_file = 'edit-tags.php?taxonomy=bbb-room-category';
 			$parent_file = 'bbb_room';
         }
@@ -260,7 +260,7 @@ class Bigbluebutton_Admin {
 	 */
 	public function save_room($post_id) {
 
-		if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+		if (defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
 			return $post_id;
 		}
         
@@ -334,7 +334,7 @@ class Bigbluebutton_Admin {
 	 * @param	Integer	$post_id	Room ID of the current room.
 	 */
 	public function bbb_room_custom_columns($column, $post_id) {
-		switch($column) {
+		switch ($column) {
 			case 'description' :
 				the_content();
 				break;
@@ -418,7 +418,7 @@ class Bigbluebutton_Admin {
 			
 				$bbb_url .= (substr($bbb_url, -1) == '/' ? '' : '/');
 
-				if (substr_compare( $bbb_url, 'bigbluebutton/', strlen($bbb_url) - 14) !== 0) {
+				if (substr_compare($bbb_url, 'bigbluebutton/', strlen($bbb_url) - 14) !== 0) {
 					return 2;
 				}
 

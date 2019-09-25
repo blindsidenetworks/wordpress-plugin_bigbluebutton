@@ -141,8 +141,7 @@ class Bigbluebutton_Public {
 		$room_can_record = get_post_meta($room_id, 'bbb-room-recordable', true);
 		$manage_recordings = current_user_can('manage_bbb_room_recordings');
 		if ($room_can_record == 'true') {
-			$recordings = ($manage_recordings ? BigbluebuttonApi::get_recordings($room_id, 'published,unpublished') : 
-				BigbluebuttonApi::get_recordings($room_id, 'published'));
+			$recordings = ($manage_recordings ? BigbluebuttonApi::get_recordings($room_id, 'published,unpublished') : BigbluebuttonApi::get_recordings($room_id, 'published'));
 			$html_recordings = $this->get_optional_recordings_view_as_string($room_id, $recordings, $manage_recordings);
 			$content .= $html_recordings;
 		}

@@ -14,7 +14,7 @@ class BigbluebuttonApi {
 	 * @param   Integer $room_id            Custom post id of the room the user is creating a meeting for.
 	 * @return  Integer $return_code|404    HTML response of the bigbluebutton server.
 	 */
-	public static function create_meeting( $room_id ) {
+	public static function create_meeting($room_id) {
 		$rid = intval($room_id);
 
 		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
@@ -39,7 +39,7 @@ class BigbluebuttonApi {
 
 		$response = self::get_response($url);
 
-        if (is_wp_error( $response )) {
+        if (is_wp_error($response)) {
             return 404;
         }
 
@@ -105,7 +105,7 @@ class BigbluebuttonApi {
 		);
 
 		$url = self::build_url('isMeetingRunning', $arr_params);
-        $full_response = self::get_response( $url );
+        $full_response = self::get_response($url);
 
         if (is_wp_error($full_response)) {
             return null;
@@ -144,14 +144,14 @@ class BigbluebuttonApi {
 		);
 
 		$url = self::build_url('getRecordings', $arr_params);
-		$full_response = self::get_response( $url );
+		$full_response = self::get_response($url);
 		
 		if (is_wp_error($full_response)) {
             return $recordings;
 		}
 
 		$response = new SimpleXMLElement(wp_remote_retrieve_body($full_response));
-		if(property_exists($response, 'recordings') && property_exists($response->recordings, 'recording')) {
+		if (property_exists($response, 'recordings') && property_exists($response->recordings, 'recording')) {
 			$recordings = $response->recordings->recording;
 		}
 		return $recordings;
@@ -180,7 +180,7 @@ class BigbluebuttonApi {
 		);
 
 		$url = self::build_url('publishRecordings', $arr_params);
-		$full_response = self::get_response( $url );
+		$full_response = self::get_response($url);
 
 		if (is_wp_error($full_response)) {
             return 404;
@@ -208,7 +208,7 @@ class BigbluebuttonApi {
 		);
 
 		$url = self::build_url('deleteRecordings', $arr_params);
-		$full_response = self::get_response( $url );
+		$full_response = self::get_response($url);
 
 		if (is_wp_error($full_response)) {
             return 404;

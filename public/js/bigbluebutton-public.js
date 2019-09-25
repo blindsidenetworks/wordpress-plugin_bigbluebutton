@@ -29,9 +29,9 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
-	/** global: php_vars */
 	$( window ).load(function() {
 		
+		/** global: php_vars */
 		// display/hide recordings
 		$("#bbb-recordings-display").click(function() {
 			if ($("#bbb-recordings-list").is(":visible")) {
@@ -43,6 +43,7 @@
 			}
 		});
 		
+		/** global: php_vars */
 		// publish/unpublish recordings
 		$(".bbb_published_recording").click(function() {
 			let current_icon = $(this);
@@ -84,6 +85,7 @@
 
 		});
 
+		/** global: php_vars */
 		// delete recording
 		$(".bbb_trash_recording").click(function() {
 			let recordID = $(this).data('record-id');
@@ -100,7 +102,6 @@
 				if (response['success']) {
 					$("#bbb-recording-" + recordID).remove();
 					// if there are no recordings left, remove the table
-					console.log($(".bbb-recording-row").length);
 					if ($(".bbb-recording-row").length == 0) {
 						$("#bbb-recordings-table").remove();
 						$("#bbb-no-recordings-msg").show();
