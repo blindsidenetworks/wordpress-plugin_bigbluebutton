@@ -34,14 +34,79 @@
 		
 		// display/hide recordings
 		$("#bbb-recordings-display").click(function() {
-			if ($("#recordings-list").is(":visible")) {
-				$("#recordings-list").slideUp();
+			if ($("#bbb-recordings-list").is(":visible")) {
+				$("#bbb-recordings-list").slideUp();
 				$(this).text(php_vars.view);
 			} else {
-				$("#recordings-list").slideDown();
+				$("#bbb-recordings-list").slideDown();
 				$(this).text(php_vars.hide);
 			}
 		});
 		
+		// publish/unpublish recordings
+		$(".bbb_published_recording").click(function() {
+			let current_icon = $(this);
+			let recordID = $(this).data('record-id');
+			let nonce = $(this).data('meta-nonce');
+			let curr_class, replace_class, curr_icon_class, replace_icon_class, title, value;
+
+			if ($(this).hasClass("is_published")) {
+				value = "false";
+				curr_class = "is_published";
+				replace_class = "not_published";
+				curr_icon_class = "fa-eye";
+				replace_icon_class = "fa-eye-slash";
+				title = "unpublished";
+			} else {
+				value = "true";
+				curr_class = "not_published";
+				replace_class = "is_published";
+				curr_icon_class = "fa-eye-slash";
+				replace_icon_class = "fa-eye";
+				title = "published";
+			}
+
+			let data = {
+				"action": "set_bbb_recording_publish_state",
+				"value" : value,
+				"post_type": "POST",
+				"meta_nonce": nonce,
+				"record_id": recordID
+			};
+			
+			jQuery.post(php_vars.ajax_url, data, function(response) {
+				if (response['success']) {
+					current_icon.removeClass(curr_icon_class).addClass(replace_icon_class);
+					current_icon.attr('title', title);
+					current_icon.removeClass(curr_class).addClass(replace_class);	
+				}
+			}, "json");
+
+		});
+
+		// delete recording
+		$(".bbb_trash_recording").click(function() {
+			let recordID = $(this).data('record-id');
+			let nonce = $(this).data('meta-nonce');
+
+			let data = {
+				"action": "trash_bbb_recording",
+				"post_type": "POST",
+				"meta_nonce": nonce,
+				"record_id": recordID
+			};
+
+			jQuery.post(php_vars.ajax_url, data, function(response) {
+				if (response['success']) {
+					$("#bbb-recording-" + recordID).remove();
+					// if there are no recordings left, remove the table
+					console.log($(".bbb-recording-row").length);
+					if ($(".bbb-recording-row").length == 0) {
+						$("#bbb-recordings-table").remove();
+						$("#bbb-no-recordings-msg").show();
+					}
+				}
+			}, "json");
+		});
 	 });
 })( jQuery );

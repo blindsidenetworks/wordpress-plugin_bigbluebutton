@@ -98,7 +98,8 @@ class Bigbluebutton_Public {
 
 		$translations = array(
 			'view' => __('View', 'bigbluebutton'),
-			'hide' => __('Hide')
+			'hide' => __('Hide'),
+			'ajax_url' => admin_url('admin-ajax.php')
 		);
 
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/bigbluebutton-public.js', array('jquery'), $this->version, false);
@@ -138,9 +139,11 @@ class Bigbluebutton_Public {
 
 		// add recordings list to post content if the room is recordable
 		$room_can_record = get_post_meta($room_id, 'bbb-room-recordable', true);
+		$manage_recordings = current_user_can('manage_bbb_room_recordings');
 		if ($room_can_record == 'true') {
-			$recordings = BigbluebuttonApi::get_recordings($room_id);
-			$html_recordings = $this->get_optional_recordings_view_as_string($room_id, $recordings);
+			$recordings = ($manage_recordings ? BigbluebuttonApi::get_recordings($room_id, 'published,unpublished') : 
+				BigbluebuttonApi::get_recordings($room_id, 'published'));
+			$html_recordings = $this->get_optional_recordings_view_as_string($room_id, $recordings, $manage_recordings);
 			$content .= $html_recordings;
 		}
 		
@@ -184,6 +187,59 @@ class Bigbluebutton_Public {
 	}
 
 	/**
+	 * Handle publishing/unpublishing a recording
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @return	String	$response	JSON response to changing a recording's publication status.
+	 */
+	public function set_bbb_recording_publish_state() {
+		$response = array();
+		$response['success'] = false;
+		if (current_user_can('manage_bbb_room_recordings')) {
+			if (array_key_exists('meta_nonce', $_POST) && array_key_exists('record_id', $_POST) && 
+				array_key_exists('value', $_POST) && 
+				(sanitize_text_field($_POST['value']) == 'true' || sanitize_text_field($_POST['value']) == 'false') &&
+				wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')) {
+
+				$record_id = sanitize_text_field($_POST['record_id']);
+				$value = sanitize_text_field($_POST['value']);
+				$return_code = BigbluebuttonApi::set_recording_publish_state($record_id, $value);
+
+				if ($return_code == 200) {
+					$response['success'] = true;
+				}	
+			}
+		}
+		wp_send_json($response);
+	}
+
+	/**
+	 * Handle deleting a recording.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @return	String	$response 	JSON response to deleting a recording.
+	 */
+	public function trash_bbb_recording() {
+		$response = array();
+		$response['success'] = false;
+		if (current_user_can('manage_bbb_room_recordings')) {
+			if (array_key_exists('meta_nonce', $_POST) && array_key_exists('record_id', $_POST) && 
+				wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')) {
+
+				$record_id = sanitize_text_field($_POST['record_id']);
+				$return_code = BigbluebuttonApi::delete_recording($record_id);
+
+				if ($return_code == 200) {
+					$response['success'] = true;
+				}	
+			}
+		}
+		wp_send_json($response);
+	}
+
+	/**
 	 * Get user's name for the meeting.
 	 * 
 	 * @since	3.0.0
@@ -221,11 +277,19 @@ class Bigbluebutton_Public {
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @param	Integer		$room_id		Post ID of the room.
-	 * @param	Array		$recordings		List of recordings for the room.
+	 * @param	Integer		$room_id				Post ID of the room.
+	 * @param	Array		$recordings				List of recordings for the room.
+	 * @param	Boolean		$manage_bbb_recordings	Recordings table stored in a variable.
+	 * 
+	 * @return	String		$recordings				Recordings table stored in a variable.
 	 */
-	private function get_optional_recordings_view_as_string($room_id, $recordings) {
+	private function get_optional_recordings_view_as_string($room_id, $recordings, $manage_bbb_recordings) {
+		$columns = 3;
+		if ($manage_bbb_recordings) {
+			$columns++;
+		}
 		ob_start();
+		$meta_nonce = wp_create_nonce('bbb_manage_recordings_nonce');
 		$date_format = (get_option('date_format') ? get_option('date_format') : 'Y-m-d');
 		include('partials/bigbluebutton-optional-recordings-display.php');
 		$recordings = ob_get_contents();

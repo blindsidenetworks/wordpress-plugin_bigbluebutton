@@ -37,7 +37,8 @@ class Bigbluebutton_Deactivator {
 			'join_as_moderator_bbb_room',
 			'join_as_viewer_bbb_room',
 			'join_with_access_code_bbb_room',
-			'create_recordable_bbb_room'
+			'create_recordable_bbb_room',
+			'manage_bbb_room_recordings'
 		);
 
 		if (property_exists($args, 'capabilities')) {

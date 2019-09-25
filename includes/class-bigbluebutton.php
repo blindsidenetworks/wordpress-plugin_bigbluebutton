@@ -201,6 +201,12 @@ class Bigbluebutton {
 		// join room
 		$this->loader->add_action('admin_post_join_room', $plugin_public, 'bbb_user_join_room');
 		$this->loader->add_action('admin_post_nopriv_join_room', $plugin_public, 'bbb_user_join_room');
+
+		// manage recording actions
+		$this->loader->add_action('wp_ajax_set_bbb_recording_publish_state', $plugin_public, 'set_bbb_recording_publish_state');
+		$this->loader->add_action('wp_ajax_nopriv_set_bbb_recording_publish_state', $plugin_public, 'set_bbb_recording_publish_state');
+		$this->loader->add_action('wp_ajax_trash_bbb_recording', $plugin_public, 'trash_bbb_recording');
+		$this->loader->add_action('wp_ajax_nopriv_trash_bbb_recording', $plugin_public, 'trash_bbb_recording');
 	}
 
 	/**

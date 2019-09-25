@@ -92,5 +92,5 @@ msgstr "The access code you have entered is incorrect. Please try again."
 msgid "Access Code"
 msgstr "Access Code"
 
-msgid "This room does not yet have any recordings."
-msgstr "This room does not yet have any recordings."
+msgid "This room does not currently have any recordings."
+msgstr "This room does not currently have any recordings."

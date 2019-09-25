@@ -96,5 +96,5 @@ msgstr ""
 msgid "Access Code"
 msgstr ""
 
-msgid "This room does not yet have any recordings."
+msgid "This room does not currently have any recordings."
 msgstr ""

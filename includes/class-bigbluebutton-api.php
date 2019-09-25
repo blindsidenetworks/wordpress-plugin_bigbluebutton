@@ -125,11 +125,13 @@ class BigbluebuttonApi {
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @param   Integer     $room_id            Custom post id of a room.
-	 * @return	Array		$recordings			List of recordings for this room.
+	 * @param   Integer     $room_id            	Custom post id of a room.
+	 * @param	String		$recording_state		State of recordings to get.
+	 * @return	Array		$recordings				List of recordings for this room.
 	 */
-	public static function get_recordings($room_id) {
+	public static function get_recordings($room_id, $recording_state = 'published') {
 		$rid = intval($room_id);
+		$state = sanitize_text_field($recording_state);
 		$recordings = [];
 
 		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
@@ -138,6 +140,7 @@ class BigbluebuttonApi {
 
 		$arr_params = array(
 			'meetingID' => urlencode('meeting-' . $rid),
+			'state' => $state
 		);
 
 		$url = self::build_url('getRecordings', $arr_params);
@@ -152,6 +155,70 @@ class BigbluebuttonApi {
 			$recordings = $response->recordings->recording;
 		}
 		return $recordings;
+	}
+
+	/**
+	 * Publish recording.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	String	$recording_id	The ID of the recording that will be published.
+	 * @param	String	$state			Set publishing state of the recording.	
+	 * 
+	 * @return	Integer	200|404|500		Status of the request.	
+	 */
+	public static function set_recording_publish_state($recording_id, $state) {
+		$record = sanitize_text_field($recording_id);
+
+		if ($state != 'true' && $state != 'false') {
+			return 404;
+		}
+
+		$arr_params = array(
+			'recordID' => urlencode($record),
+			'publish' => urlencode($state)
+		);
+
+		$url = self::build_url('publishRecordings', $arr_params);
+		$full_response = self::get_response( $url );
+
+		if (is_wp_error($full_response)) {
+            return 404;
+		}
+		$response = new SimpleXMLElement(wp_remote_retrieve_body($full_response));
+
+		if (property_exists($response, 'returncode') && $response->returncode == "SUCCESS") {
+			return 200;
+		}
+		return 500;
+	}
+
+	/**
+	 * Delete recording.
+	 * 
+	 * @since	3.0.0
+	 * @param	String		$recording_id	ID of the recording that will be deleted.
+	 * @return	Integer		200|404|500		Status of the request.
+	 */
+	public static function delete_recording($recording_id) {
+		$record = sanitize_text_field($recording_id);
+
+		$arr_params = array(
+			'recordID' => urlencode($record)
+		);
+
+		$url = self::build_url('deleteRecordings', $arr_params);
+		$full_response = self::get_response( $url );
+
+		if (is_wp_error($full_response)) {
+            return 404;
+		}
+		$response = new SimpleXMLElement(wp_remote_retrieve_body($full_response));
+
+		if (property_exists($response, 'returncode') && $response->returncode == "SUCCESS") {
+			return 200;
+		}
+		return 500;
 	}
 
 	/**
