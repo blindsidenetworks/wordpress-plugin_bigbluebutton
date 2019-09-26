@@ -24,7 +24,7 @@
                             <div id="bbb-recording-links-block-<?php echo $recording->recordID; ?>" style="<?php echo ($recording->published == 'false' ? 'display:none;' : ''); ?>">
                                 <?php foreach ($recording->playback->format as $format) { ?>
                                     <div>
-                                        <a href="<?php echo $format->url; ?>"><?php esc_html_e($format->type, 'bigbluebutton'); ?></a> 
+                                        <a href="<?php echo $format->url; ?>"><button class="bbb-link-button"><?php esc_html_e($format->type, 'bigbluebutton'); ?></button></a> 
                                     </div>
                                 <?php } ?>
                             </div>
