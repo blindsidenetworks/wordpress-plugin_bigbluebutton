@@ -106,7 +106,7 @@ class Bigbluebutton_Admin {
 	 * @since	3.0.0
 	 */
 	public function bbb_room_as_post_type() {
-		register_post_type('bbb-room',
+		register_post_type(BIGBLUEBUTTON_ROOM_ID,
 			array(
 				'public' => true,
 				'show_ui' => true,
@@ -116,11 +116,11 @@ class Bigbluebutton_Admin {
 					'add_new_item' => __('Add New Room', 'bigbluebutton'),
 					'edit_item' => __('Edit Room', 'bigbluebutton'),
 				),
-				'taxonomies' => array('bbb-room-category'),
+				'taxonomies' => array(BIGBLUEBUTTON_CATEGORY_ID),
 				'capability_type' => 'bbb_room',
 				'has_archive' => true,
 				'supports' => array('title', 'editor'),
-				'rewrite' => array('slug' => 'bbb-room'),
+				'rewrite' => array('slug' => BIGBLUEBUTTON_ROOM_ID),
 				'show_in_menu' => 'bbb_room',
 				'map_meta_cap' => true
 			)
@@ -133,8 +133,8 @@ class Bigbluebutton_Admin {
 	 * @since	3.0.0
 	 */
 	public function bbb_room_category_as_taxonomy_type() {
-		register_taxonomy('bbb-room-category',
-			array('bbb-room'),
+		register_taxonomy(BIGBLUEBUTTON_CATEGORY_ID,
+			array(BIGBLUEBUTTON_ROOM_ID),
 			array(
 				'labels' => array(
 					'name' => __('Categories'),
@@ -154,8 +154,8 @@ class Bigbluebutton_Admin {
 	 * @since	3.0.0
 	 */
 	public function register_room_code_metaboxes() {
-		add_meta_box('bbb-moderator-code', __('Moderator Code', 'bigbluebutton'), array($this, 'display_moderator_code_metabox'), 'bbb-room');
-		add_meta_box('bbb-viewer-code', __('Viewer Code', 'bigbluebutton'), array($this, 'display_viewer_code_metabox'), 'bbb-room');
+		add_meta_box('bbb-moderator-code', __('Moderator Code', 'bigbluebutton'), array($this, 'display_moderator_code_metabox'), BIGBLUEBUTTON_ROOM_ID);
+		add_meta_box('bbb-viewer-code', __('Viewer Code', 'bigbluebutton'), array($this, 'display_viewer_code_metabox'), BIGBLUEBUTTON_ROOM_ID);
 	}
 
 	/**
@@ -165,7 +165,7 @@ class Bigbluebutton_Admin {
 	 */
 	public function register_record_room_metabox() {
 		if (current_user_can('create_recordable_bbb_room')) {
-			add_meta_box('bbb-room-recordable', __('Recordable', 'bigbluebutton'), array($this, 'display_allow_record_metabox'), 'bbb-room');
+			add_meta_box('bbb-room-recordable', __('Recordable', 'bigbluebutton'), array($this, 'display_allow_record_metabox'), BIGBLUEBUTTON_ROOM_ID);
 		}
 	}
 
@@ -243,7 +243,7 @@ class Bigbluebutton_Admin {
     	global $submenu_file, $current_screen, $pagenow;
 
 		# Set the submenu as active/current while anywhere in your Custom Post Type
-        if ($current_screen->taxonomy == 'bbb-room-category' && $pagenow == 'edit-tags.php') {
+        if ($current_screen->taxonomy == BIGBLUEBUTTON_CATEGORY_ID && $pagenow == 'edit-tags.php') {
             $submenu_file = 'edit-tags.php?taxonomy=bbb-room-category';
 			$parent_file = 'bbb_room';
         }
@@ -339,7 +339,7 @@ class Bigbluebutton_Admin {
 				the_content();
 				break;
 			case 'category' :
-				echo implode(', ', wp_get_object_terms($post_id, 'bbb-room-category', array('fields' => 'names')));
+				echo implode(', ', wp_get_object_terms($post_id, BIGBLUEBUTTON_CATEGORY_ID, array('fields' => 'names')));
 				break;
 			case 'author' :
 				echo get_the_author_meta('display_name', get_post($post_id)->post_author);

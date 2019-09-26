@@ -42,3 +42,8 @@
 .icon {
     cursor: pointer;
 }
+
+.fa-disabled {
+    cursor: not-allowed;
+    opacity: .3;
+}

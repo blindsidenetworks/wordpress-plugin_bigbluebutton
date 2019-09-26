@@ -31,7 +31,7 @@ class Bigbluebutton_Deactivator {
 	 */
 	public static function deactivate() {
 
-		$args = get_post_type_object('bbb-room');
+		$args = get_post_type_object(BIGBLUEBUTTON_ROOM_ID);
 		$custom_capabilities = array(
 			'view_bbb_room_list',
 			'join_as_moderator_bbb_room',

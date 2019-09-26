@@ -39,6 +39,7 @@ msgstr ""
 
 msgid "Default server settings 1. "
 "Default server settings 2."
+msgstr ""
 
 msgid "Save server settings success message."
 msgstr ""
@@ -80,6 +81,21 @@ msgid "Room"
 msgstr ""
 
 msgid "View"
+msgstr ""
+
+msgid "statistics"
+msgstr ""
+
+msgid "presentation"
+msgstr ""
+
+msgid "video"
+msgstr ""
+
+msgid "Protected"
+msgstr ""
+
+msgid "Unprotected"
 msgstr ""
 
 # Error messages

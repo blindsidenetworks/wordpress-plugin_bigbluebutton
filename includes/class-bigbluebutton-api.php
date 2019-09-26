@@ -17,7 +17,7 @@ class BigbluebuttonApi {
 	public static function create_meeting($room_id) {
 		$rid = intval($room_id);
 
-		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
+		if (get_post($rid) === false || get_post_type($rid) != BIGBLUEBUTTON_ROOM_ID) {
 			return 404;
 		}
 
@@ -27,7 +27,7 @@ class BigbluebuttonApi {
 		$recordable = get_post_meta($rid, 'bbb-room-recordable', true);
 		$logout_url = get_permalink($rid);
 		$arr_params = array(
-			'name' => urlencode($name),
+			'name' => sanitize_text_field($name),
 			'meetingID' => urlencode('meeting-' . $rid),
 			'attendeePW' => urlencode($viewer_code),
 			'moderatorPW' => urlencode($moderator_code),
@@ -65,7 +65,7 @@ class BigbluebuttonApi {
 		$uname = sanitize_text_field($username);
 		$pword = sanitize_text_field($password);
 
-		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
+		if (get_post($rid) === false || get_post_type($rid) != BIGBLUEBUTTON_ROOM_ID) {
 			return null;
 		}
 
@@ -96,7 +96,7 @@ class BigbluebuttonApi {
 
 		$rid = intval($room_id);
 
-		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
+		if (get_post($rid) === false || get_post_type($rid) != BIGBLUEBUTTON_ROOM_ID) {
 			return null;
 		}
 
@@ -134,7 +134,7 @@ class BigbluebuttonApi {
 		$state = sanitize_text_field($recording_state);
 		$recordings = [];
 
-		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
+		if (get_post($rid) === false || get_post_type($rid) != BIGBLUEBUTTON_ROOM_ID) {
 			return $recordings;
 		}
 
@@ -158,13 +158,12 @@ class BigbluebuttonApi {
 	}
 
 	/**
-	 * Publish recording.
+	 * Publish/unpublish a recording.
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @param	String	$recording_id	The ID of the recording that will be published.
+	 * @param	String	$recording_id	The ID of the recording that will be published/unpublished.
 	 * @param	String	$state			Set publishing state of the recording.	
-	 * 
 	 * @return	Integer	200|404|500		Status of the request.	
 	 */
 	public static function set_recording_publish_state($recording_id, $state) {
@@ -194,9 +193,45 @@ class BigbluebuttonApi {
 	}
 
 	/**
+	 * Protect/unprotect a recording.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	String	$recording_id	The ID of the recording that will be protected/unprotected.
+	 * @param	String	$state			Set protected state of the recording.	
+	 * @return	Integer	200|404|500		Status of the request.	
+	 */
+	public static function set_recording_protect_state($recording_id, $state) {
+		$record = sanitize_text_field($recording_id);
+
+		if ($state != 'true' && $state != 'false') {
+			return 404;
+		}
+
+		$arr_params = array(
+			'recordID' => urlencode($record),
+			'protect' => urlencode($state)
+		);
+
+		$url = self::build_url('updateRecordings', $arr_params);
+		$full_response = self::get_response($url);
+
+		if (is_wp_error($full_response)) {
+            return 404;
+		}
+		$response = new SimpleXMLElement(wp_remote_retrieve_body($full_response));
+
+		if (property_exists($response, 'returncode') && $response->returncode == "SUCCESS") {
+			return 200;
+		}
+		return 500;
+	}
+
+	/**
 	 * Delete recording.
 	 * 
 	 * @since	3.0.0
+	 * 
 	 * @param	String		$recording_id	ID of the recording that will be deleted.
 	 * @return	Integer		200|404|500		Status of the request.
 	 */

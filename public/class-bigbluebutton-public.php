@@ -99,6 +99,10 @@ class Bigbluebutton_Public {
 		$translations = array(
 			'view' => __('View', 'bigbluebutton'),
 			'hide' => __('Hide'),
+			'published' => __('Published'),
+			'unpublished' => __('Unpublished'),
+			'protected' => __('Protected', 'bigbluebutton'),
+			'unprotected' => __('Unprotected', 'bigbluebutton'),
 			'ajax_url' => admin_url('admin-ajax.php')
 		);
 
@@ -129,7 +133,7 @@ class Bigbluebutton_Public {
 		$access_as_moderator = (current_user_can('join_as_moderator_bbb_room') || get_current_user_id() == get_post($room_id)->post_author);
 		$access_as_viewer = current_user_can('join_as_viewer_bbb_room');
 
-		if ($room_id === null || ! isset(get_post($room_id)->post_type) || get_post($room_id)->post_type != 'bbb-room') {
+		if ($room_id === null || ! isset(get_post($room_id)->post_type) || get_post($room_id)->post_type != BIGBLUEBUTTON_ROOM_ID) {
 			return $content;
 		}
 
@@ -214,6 +218,34 @@ class Bigbluebutton_Public {
 	}
 
 	/**
+	 * Handle protect/unprotect a recording
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @return	String	$response	JSON response to changing a recording's protection status.
+	 */
+	public function set_bbb_recording_protect_state() {
+		$response = array();
+		$response['success'] = false;
+		if (current_user_can('manage_bbb_room_recordings')) {
+			if (array_key_exists('meta_nonce', $_POST) && array_key_exists('record_id', $_POST) && 
+				array_key_exists('value', $_POST) && 
+				(sanitize_text_field($_POST['value']) == 'true' || sanitize_text_field($_POST['value']) == 'false') &&
+				wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')) {
+
+				$record_id = sanitize_text_field($_POST['record_id']);
+				$value = sanitize_text_field($_POST['value']);
+				$return_code = BigbluebuttonApi::set_recording_protect_state($record_id, $value);
+
+				if ($return_code == 200) {
+					$response['success'] = true;
+				}	
+			}
+		}
+		wp_send_json($response);
+	}
+
+	/**
 	 * Handle deleting a recording.
 	 * 
 	 * @since	3.0.0
@@ -243,7 +275,8 @@ class Bigbluebutton_Public {
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @param	User	$user	User object.
+	 * @param	User	$user		User object.
+	 * @return	String	$username	Display of the user for joining the meeting.
 	 */
 	private function get_meeting_username($user) {
 		$username = ($user && $user->display_name) ? $user->display_name : '';

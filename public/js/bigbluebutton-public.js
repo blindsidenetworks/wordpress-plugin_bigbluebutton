@@ -57,18 +57,62 @@
 				replace_class = "not_published";
 				curr_icon_class = "fa-eye";
 				replace_icon_class = "fa-eye-slash";
-				title = "unpublished";
+				title = php_vars.unpublished;
+				$('#bbb-recording-links-block-' + recordID).hide();
 			} else {
 				value = "true";
 				curr_class = "not_published";
 				replace_class = "is_published";
 				curr_icon_class = "fa-eye-slash";
 				replace_icon_class = "fa-eye";
-				title = "published";
+				title = php_vars.published;
+				$('#bbb-recording-links-block-' + recordID).show();
 			}
 
 			let data = {
 				"action": "set_bbb_recording_publish_state",
+				"value" : value,
+				"post_type": "POST",
+				"meta_nonce": nonce,
+				"record_id": recordID
+			};
+			
+			jQuery.post(php_vars.ajax_url, data, function(response) {
+				if (response['success']) {
+					current_icon.removeClass(curr_icon_class).addClass(replace_icon_class);
+					current_icon.attr('title', title);
+					current_icon.removeClass(curr_class).addClass(replace_class);	
+				}
+			}, "json");
+
+		});
+
+		/** global: php_vars */
+		// protect/unprotect recordings
+		$(".bbb_protected_recording").click(function() {
+			let current_icon = $(this);
+			let recordID = $(this).data('record-id');
+			let nonce = $(this).data('meta-nonce');
+			let curr_class, replace_class, curr_icon_class, replace_icon_class, title, value;
+
+			if ($(this).hasClass("is_protected")) {
+				value = "false";
+				curr_class = "is_protected";
+				replace_class = "not_protected";
+				curr_icon_class = "fa-lock";
+				replace_icon_class = "fa-unlock";
+				title = php_vars.unprotected;
+			} else {
+				value = "true";
+				curr_class = "not_protected";
+				replace_class = "is_protected";
+				curr_icon_class = "fa-unlock";
+				replace_icon_class = "fa-lock";
+				title = php_vars.protected;
+			}
+
+			let data = {
+				"action": "set_bbb_recording_protect_state",
 				"value" : value,
 				"post_type": "POST",
 				"meta_nonce": nonce,
