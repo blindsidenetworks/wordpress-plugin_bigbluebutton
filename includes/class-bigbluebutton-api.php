@@ -17,7 +17,7 @@ class BigbluebuttonApi {
 	public static function create_meeting($room_id) {
 		$rid = intval($room_id);
 
-		if (get_post($rid) === false || get_post_type($rid) != BIGBLUEBUTTON_ROOM_ID) {
+		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
 			return 404;
 		}
 
@@ -65,7 +65,7 @@ class BigbluebuttonApi {
 		$uname = sanitize_text_field($username);
 		$pword = sanitize_text_field($password);
 
-		if (get_post($rid) === false || get_post_type($rid) != BIGBLUEBUTTON_ROOM_ID) {
+		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
 			return null;
 		}
 
@@ -96,7 +96,7 @@ class BigbluebuttonApi {
 
 		$rid = intval($room_id);
 
-		if (get_post($rid) === false || get_post_type($rid) != BIGBLUEBUTTON_ROOM_ID) {
+		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
 			return null;
 		}
 
@@ -134,7 +134,7 @@ class BigbluebuttonApi {
 		$state = sanitize_text_field($recording_state);
 		$recordings = [];
 
-		if (get_post($rid) === false || get_post_type($rid) != BIGBLUEBUTTON_ROOM_ID) {
+		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
 			return $recordings;
 		}
 

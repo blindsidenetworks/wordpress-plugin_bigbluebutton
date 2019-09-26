@@ -22,7 +22,7 @@
                         <div class="flex-row" role="cell"><?php echo date_i18n($date_format, (int) $recording->startTime / 1000); ?></div>
                         <div class="flex-row" role="cell">
                             <div id="bbb-recording-links-block-<?php echo $recording->recordID; ?>" style="<?php echo ($recording->published == 'false' ? 'display:none;' : ''); ?>">
-                                <?php foreach($recording->playback->format as $format) { ?>
+                                <?php foreach ($recording->playback->format as $format) { ?>
                                     <div>
                                         <a href="<?php echo $format->url; ?>"><?php esc_html_e($format->type, 'bigbluebutton'); ?></a> 
                                     </div>
@@ -31,7 +31,7 @@
                         </div>
                         <?php if ($manage_bbb_recordings) { ?>
                             <div class="flex-row" role="cell">
-                                <?php if (!isset($recording->protected)) { ?>
+                                <?php if ( ! isset($recording->protected)) { ?>
                                     <i data-record-id="<?php echo $recording->recordID; ?>" 
                                         data-meta-nonce="<?php echo $meta_nonce; ?>"
                                         class="fa fa-unlock fa-disabled" title="<?php esc_html_e('Unprotected', 'bigbluebutton'); ?>"></i>

@@ -75,7 +75,6 @@ class Bigbluebutton {
 		$this->plugin_name = 'bigbluebutton';
 
 		$this->load_dependencies();
-		$this->define_constants();
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
@@ -128,23 +127,8 @@ class Bigbluebutton {
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-api.php';
 
-		/**
-		 * Bigbluebutton Constants
-		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-constants.php';
-
 		$this->loader = new Bigbluebutton_Loader();
 
-	}
-
-	/**
-	 * Define the constants for this plugin.
-	 * 
-	 * @since	3.0.0
-	 * @access	private
-	 */
-	private function define_constants() {
-		BigbluebuttonConstants::define();
 	}
 
 	/**
