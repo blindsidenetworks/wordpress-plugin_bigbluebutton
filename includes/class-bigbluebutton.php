@@ -216,6 +216,10 @@ class Bigbluebutton {
 		$this->loader->add_action('wp_ajax_nopriv_set_bbb_recording_protect_state', $plugin_public_api, 'set_bbb_recording_protect_state');
 		$this->loader->add_action('wp_ajax_trash_bbb_recording', $plugin_public_api, 'trash_bbb_recording');
 		$this->loader->add_action('wp_ajax_nopriv_trash_bbb_recording', $plugin_public_api, 'trash_bbb_recording');
+
+		// edit recording actions
+		$this->loader->add_action('wp_ajax_set_bbb_recording_edits', $plugin_public_api, 'set_bbb_recording_edits');
+		$this->loader->add_action('wp_ajax_nopriv_set_bbb_recording_edits', $plugin_public_api, 'set_bbb_recording_edits');
 	}
 
 	/**

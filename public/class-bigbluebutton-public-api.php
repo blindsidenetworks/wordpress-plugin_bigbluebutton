@@ -167,7 +167,40 @@ class Bigbluebutton_Public_Api {
 			}
 		}
 		wp_send_json($response);
-	}
+    }
+    
+    /**
+     * Send recording metadata to Bigbluebutton API.
+     * 
+     * @since   3.0.0
+     * 
+     * @return  String  $response   JSON response to editing a recording's metadata.
+     */
+    public function set_bbb_recording_edits() {
+        $response = array();
+		$response['success'] = false;
+
+		if (current_user_can('manage_bbb_room_recordings')) {
+            if (array_key_exists('meta_nonce', $_POST) && 
+                array_key_exists('record_id', $_POST) && 
+                array_key_exists('type', $_POST) && 
+                array_key_exists('value', $_POST) &&
+                wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')
+                ) {
+
+				$record_id = sanitize_text_field($_POST['record_id']);
+                $type = sanitize_text_field($_POST['type']);
+                $value = wp_unslash(sanitize_text_field($_POST['value']));
+
+				$return_code = BigbluebuttonApi::set_recording_edits($record_id, $type, $value);
+
+				if ($return_code == 200) {
+					$response['success'] = true;
+				}	
+			}
+		}
+		wp_send_json($response);
+    }
     
     /**
 	 * Get user's name for the meeting.

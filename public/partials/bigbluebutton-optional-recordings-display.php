@@ -7,18 +7,42 @@
             <p id="bbb-no-recordings-msg"><?php esc_html_e('This room does not currently have any recordings.', 'bigbluebutton'); ?></p>
         <?php } else { ?>
             <p id="bbb-no-recordings-msg" style="display:none;"><?php esc_html_e('This room does not currently have any recordings.', 'bigbluebutton'); ?></p>
-            <div id="bbb-recordings-table" class="table-container" role="table" aria-label="Destinations">
+            <div id="bbb-recordings-table" class="table-container" role="table">
                 <div class="flex-table flex-table-<?php echo $columns; ?> header" role="rowgroup">
-                    <div class="flex-row flex-row-<?php echo $columns; ?> first" role="columnheader"><?php esc_html_e('Room', 'bigbluebutton'); ?></div>
+                    <div class="flex-row flex-row-<?php echo $columns; ?> first" role="columnheader"><?php esc_html_e('Meeting', 'bigbluebutton'); ?></div>
+                    <div class="flex-row flex-row-<?php echo $columns; ?>" role="columnheader"><?php esc_html_e('Recording', 'bigbluebutton'); ?></div>
+                    <div class="flex-row flex-row-<?php echo $columns; ?>" role="columnheader"><?php esc_html_e('Description'); ?></div>
                     <div class="flex-row flex-row-<?php echo $columns; ?>" role="columnheader"><?php esc_html_e('Date'); ?></div>
                     <div class="flex-row flex-row-<?php echo $columns; ?>" role="columnheader"><?php esc_html_e('Link'); ?></div>
                     <?php if ($manage_bbb_recordings) { ?>
-                        <div class="flex-row flex-row-<?php echo $columns; ?>" role="columnheader"><?php esc_html_e('Manage'); ?></div>
+                        <div class="flex-row flex-row-<?php echo $columns; ?>" role="columnheader"><?php esc_html_e('Manage', 'bigbluebutton'); ?></div>
                     <?php } ?>
                 </div>
                 <?php foreach ($recordings as $recording) { ?>
                     <div id="bbb-recording-<?php echo $recording->recordID; ?>" class="flex-table flex-table-<?php echo $columns; ?> row bbb-recording-row" role="rowgroup">
                         <div class="flex-row flex-row-<?php echo $columns; ?> first" role="cell"><?php echo urldecode($recording->name); ?></div>
+                        <div id="bbb-recording-name-<?php echo $recording->recordID; ?>" class="flex-row flex-row-<?php echo $columns; ?>" role="cell">
+                            <?php echo urldecode($recording->metadata->{'recording-name'}); ?>
+                            <?php if ($manage_bbb_recordings) { ?>
+                                <i id="edit-recording-name-<?php echo $recording->recordID; ?>" title="<?php esc_html_e("Edit"); ?>"
+                                    data-record-id="<?php echo $recording->recordID; ?>" 
+                                    data-record-value="<?php echo urldecode($recording->metadata->{'recording-name'}); ?>"
+                                    data-record-type="name"
+                                    data-meta-nonce="<?php echo $meta_nonce; ?>"
+                                    class="fa fa-edit bbb-icon bbb_edit_recording_data"></i>
+                            <?php } ?>
+                        </div>
+                        <div id="bbb-recording-description-<?php echo $recording->recordID; ?>" class="flex-row flex-row-<?php echo $columns; ?>" role="cell">
+                            <?php echo urldecode($recording->metadata->{'recording-description'}); ?>
+                            <?php if ($manage_bbb_recordings) { ?>
+                                <i id="edit-recording-description-<?php echo $recording->recordID; ?>" title="<?php esc_html_e("Edit"); ?>"
+                                    data-record-id="<?php echo $recording->recordID; ?>" 
+                                    data-record-value="<?php echo urldecode($recording->metadata->{'recording-description'}); ?>"
+                                    data-record-type="description"
+                                    data-meta-nonce="<?php echo $meta_nonce; ?>"
+                                    class="fa fa-edit bbb-icon bbb_edit_recording_data"></i>
+                            <?php } ?>
+                        </div>
                         <div class="flex-row flex-row-<?php echo $columns; ?>" role="cell"><?php echo date_i18n($date_format, (int) $recording->startTime / 1000); ?></div>
                         <div class="flex-row flex-row-<?php echo $columns; ?>" role="cell">
                             <div id="bbb-recording-links-block-<?php echo $recording->recordID; ?>" class="bbb-recording-link-block" style="<?php echo ($recording->published == 'false' ? 'display:none;' : ''); ?>">

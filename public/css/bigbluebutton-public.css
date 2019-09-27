@@ -51,12 +51,12 @@
     border-color: #1565C0;
 }
 
-.flex-row-3 {
-    width: calc(100%/3);
+.flex-row-5 {
+    width: calc(100%/5);
 }
 
-.flex-row-4 {
-    width: calc(100%/4);
+.flex-row-6 {
+    width: calc(100%/6);
 }
 
 .flex-row {
@@ -66,7 +66,7 @@
     border-bottom: solid 1px #d9d9d9;
 }
 
-@media all and (max-width: 450px) {
+@media all and (max-width: 1200px) {
     
     .flex-table > .flex-row {
         border-bottom: solid 1px #d9d9d9;
@@ -88,6 +88,7 @@
 
 .bbb-icon {
     cursor: pointer;
+    color: #1976D2;
 }
 
 .fa-disabled {

@@ -99,6 +99,7 @@ class Bigbluebutton_Public {
 		$translations = array(
 			'view' => __('View', 'bigbluebutton'),
 			'hide' => __('Hide'),
+			'edit' => __('Edit'),
 			'published' => __('Published'),
 			'unpublished' => __('Unpublished'),
 			'protected' => __('Protected', 'bigbluebutton'),
@@ -199,7 +200,7 @@ class Bigbluebutton_Public {
 	 * @return	String		$recordings				Recordings table stored in a variable.
 	 */
 	private function get_optional_recordings_view_as_string($room_id, $recordings, $manage_bbb_recordings, $view_extended_recording_formats) {
-		$columns = 3;
+		$columns = 5;
 		if ($manage_bbb_recordings) {
 			$columns++;
 		}
@@ -218,6 +219,7 @@ class Bigbluebutton_Public {
 	 * 
 	 * Assign icon classes and title based on recording published and protected status.
 	 * If the user cannot manage recordings, hide them.
+	 * Get recording name and description from metadata.
 	 * 
 	 * @since	3.0.0
 	 * 
@@ -227,6 +229,12 @@ class Bigbluebutton_Public {
 	private function filter_recordings($recordings, $manage_recordings) {
 		$filtered_recordings = array();
 		foreach($recordings as $recording) {
+			if (!isset($recording->metadata->{'recording-name'})) {
+				$recording->metadata->{'recording-name'} = $recording->name;
+			}
+			if (!isset($recording->metadata->{'recording-description'})) {
+				$recording->metadata->{'recording-description'} = "";
+			}
 			if ($manage_recordings) {
 				$recording = $this->filter_managed_recording($recording);
 				array_push($filtered_recordings, $recording);

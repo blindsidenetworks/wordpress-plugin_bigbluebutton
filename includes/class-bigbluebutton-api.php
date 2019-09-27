@@ -27,7 +27,7 @@ class BigbluebuttonApi {
 		$recordable = get_post_meta($rid, 'bbb-room-recordable', true);
 		$logout_url = get_permalink($rid);
 		$arr_params = array(
-			'name' => sanitize_text_field($name),
+			'name' => urlencode($name),
 			'meetingID' => urlencode('meeting-' . $rid),
 			'attendeePW' => urlencode($viewer_code),
 			'moderatorPW' => urlencode($moderator_code),
@@ -254,6 +254,42 @@ class BigbluebuttonApi {
 		if (property_exists($response, 'returncode') && $response->returncode == "SUCCESS") {
 			return 200;
 		}
+		return 500;
+	}
+
+	/**
+	 * Change recording meta fields.
+	 * 
+	 * @param	String		$recording_id	ID of the recording that will be edited.
+	 * @param	String		$type			Type of meta field that will be changed.
+	 * @param	String		$value			Value of the meta field.
+	 * 
+	 * @return	Integer		200|404|500		Status of the request.
+	 */
+	public static function set_recording_edits($recording_id, $type, $value) {
+		$record = sanitize_text_field($recording_id);
+		$recording_type = sanitize_text_field($type);
+		$new_value = sanitize_text_field($value);
+		$meta_key = "meta_recording-" . $recording_type;
+
+		$arr_params = array(
+			'recordID' => urlencode($record),
+			$meta_key => urlencode($new_value)
+		);
+
+		$url = self::build_url('updateRecordings', $arr_params);
+		$full_response = self::get_response($url);
+
+		if (is_wp_error($full_response)) {
+            return 404;
+		}
+
+		$response = new SimpleXMLElement(wp_remote_retrieve_body($full_response));
+
+		if (property_exists($response, 'returncode') && $response->returncode == "SUCCESS") {
+			return 200;
+		}
+
 		return 500;
 	}
 

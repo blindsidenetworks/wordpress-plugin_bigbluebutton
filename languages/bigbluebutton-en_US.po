@@ -78,8 +78,14 @@ msgid "Join"
 msgstr "Join"
 
 # Recordings description
-msgid "Room"
-msgstr "Room"
+msgid "Meeting"
+msgstr "Meeting"
+
+msgid "Recording"
+msgstr "Recording"
+
+msgid "Manage"
+msgstr "Manage"
 
 msgid "View"
 msgstr "View"
