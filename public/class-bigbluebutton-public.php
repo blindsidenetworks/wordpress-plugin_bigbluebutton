@@ -372,8 +372,8 @@ class Bigbluebutton_Public {
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @param	XMLObject	$recording	A recording to be inspected.
-	 * @return	XMLObject	$recording	A recording that has been inspected.
+	 * @param	SimpleXMLElement	$recording	A recording to be inspected.
+	 * @return	SimpleXMLElement	$recording	A recording that has been inspected.
 	 */
 	private function filter_managed_recording($recording) {
 		if ($recording->protected == 'true') {

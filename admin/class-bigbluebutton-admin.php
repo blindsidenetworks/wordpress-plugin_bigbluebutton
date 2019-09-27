@@ -339,19 +339,22 @@ class Bigbluebutton_Admin {
 				the_content();
 				break;
 			case 'category' :
-				echo implode(', ', wp_get_object_terms($post_id, 'bbb-room-category', array('fields' => 'names')));
+				$categories = wp_get_object_terms($post_id, 'bbb-room-category', array('fields' => 'names'));
+				if (!is_wp_error($categories)) {
+					echo implode(', ', wp_get_object_terms($post_id, 'bbb-room-category', array('fields' => 'names')));
+				}
 				break;
 			case 'author' :
-				echo get_the_author_meta('display_name', get_post($post_id)->post_author);
+				echo get_the_author_meta('display_name', (int) get_post($post_id)->post_author);
 				break;
 			case 'permalink' :
-				echo '<a>' . get_permalink($post_id) . '</a>';
+				echo '<a>' . (get_permalink($post_id) ? get_permalink($post_id) : '') . '</a>';
 				break;
 			case 'moderator-code' :
-				echo get_post_meta($post_id, 'bbb-room-moderator-code', true);
+				echo (string) get_post_meta($post_id, 'bbb-room-moderator-code', true);
 				break;
 			case 'viewer-code' :
-				echo get_post_meta($post_id, 'bbb-room-viewer-code', true);
+				echo (string) get_post_meta($post_id, 'bbb-room-viewer-code', true);
 				break;
 		}
 	}

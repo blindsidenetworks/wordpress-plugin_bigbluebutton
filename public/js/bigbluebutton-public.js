@@ -30,10 +30,10 @@
 	 */
 
 	$( window ).load(function() {
-		
-		/** global: php_vars */
+	
 		// display/hide recordings
 		$("#bbb-recordings-display").click(function() {
+			/** global: php_vars */
 			if ($("#bbb-recordings-list").is(":visible")) {
 				$("#bbb-recordings-list").slideUp();
 				$(this).text(php_vars.view);
@@ -43,9 +43,9 @@
 			}
 		});
 		
-		/** global: php_vars */
 		// publish/unpublish recordings
 		$(".bbb_published_recording").click(function() {
+			/** global: php_vars */
 			let current_icon = $(this);
 			let recordID = $(this).data('record-id');
 			let nonce = $(this).data('meta-nonce');
@@ -87,9 +87,9 @@
 
 		});
 
-		/** global: php_vars */
 		// protect/unprotect recordings
 		$(".bbb_protected_recording").click(function() {
+			/** global: php_vars */
 			let current_icon = $(this);
 			let recordID = $(this).data('record-id');
 			let nonce = $(this).data('meta-nonce');
@@ -129,9 +129,9 @@
 
 		});
 
-		/** global: php_vars */
 		// delete recording
 		$(".bbb_trash_recording").click(function() {
+			/** global: php_vars */
 			let recordID = $(this).data('record-id');
 			let nonce = $(this).data('meta-nonce');
 
