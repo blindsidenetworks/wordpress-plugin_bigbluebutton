@@ -20,7 +20,7 @@
  * @author     Blindside Networks <contact@blindsidenetworks.com>
  */
 class Bigbluebutton_Public_Api {
-/**
+    /**
 	 * The ID of this plugin.
 	 *
 	 * @since    3.0.0
