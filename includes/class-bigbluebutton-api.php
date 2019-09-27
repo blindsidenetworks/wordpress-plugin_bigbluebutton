@@ -152,7 +152,7 @@ class BigbluebuttonApi {
 
 		$response = new SimpleXMLElement(wp_remote_retrieve_body($full_response));
 		if (property_exists($response, 'recordings') && property_exists($response->recordings, 'recording')) {
-			$recordings = (array) $response->recordings->recording;
+			$recordings = $response->recordings->recording;
 		}
 
 		return $recordings;

@@ -123,6 +123,11 @@ class Bigbluebutton {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-bigbluebutton-public.php';
 
 		/**
+		 * Public facing plugin API
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-bigbluebutton-public-api.php';
+
+		/**
 		 * Bigbluebutton API
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-api.php';
@@ -182,7 +187,7 @@ class Bigbluebutton {
 	}
 
 	/**
-	 * Register all of the hooks related to the public-facing functionality
+	 * Register all of the hooks related tBigbluebutton_Public the public-facing functionality
 	 * of the plugin.
 	 *
 	 * @since    3.0.0
@@ -191,6 +196,7 @@ class Bigbluebutton {
 	private function define_public_hooks() {
 
 		$plugin_public = new Bigbluebutton_Public($this->get_plugin_name(), $this->get_version());
+		$plugin_public_api = new Bigbluebutton_Public_Api($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_font_awesome_icons');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
@@ -200,16 +206,16 @@ class Bigbluebutton {
 		$this->loader->add_filter('the_content', $plugin_public, 'bbb_room_join_form_content');
 
 		// join room
-		$this->loader->add_action('admin_post_join_room', $plugin_public, 'bbb_user_join_room');
-		$this->loader->add_action('admin_post_nopriv_join_room', $plugin_public, 'bbb_user_join_room');
+		$this->loader->add_action('admin_post_join_room', $plugin_public_api, 'bbb_user_join_room');
+		$this->loader->add_action('admin_post_nopriv_join_room', $plugin_public_api, 'bbb_user_join_room');
 
 		// manage recording actions
-		$this->loader->add_action('wp_ajax_set_bbb_recording_publish_state', $plugin_public, 'set_bbb_recording_publish_state');
-		$this->loader->add_action('wp_ajax_nopriv_set_bbb_recording_publish_state', $plugin_public, 'set_bbb_recording_publish_state');
-		$this->loader->add_action('wp_ajax_set_bbb_recording_protect_state', $plugin_public, 'set_bbb_recording_protect_state');
-		$this->loader->add_action('wp_ajax_nopriv_set_bbb_recording_protect_state', $plugin_public, 'set_bbb_recording_protect_state');
-		$this->loader->add_action('wp_ajax_trash_bbb_recording', $plugin_public, 'trash_bbb_recording');
-		$this->loader->add_action('wp_ajax_nopriv_trash_bbb_recording', $plugin_public, 'trash_bbb_recording');
+		$this->loader->add_action('wp_ajax_set_bbb_recording_publish_state', $plugin_public_api, 'set_bbb_recording_publish_state');
+		$this->loader->add_action('wp_ajax_nopriv_set_bbb_recording_publish_state', $plugin_public_api, 'set_bbb_recording_publish_state');
+		$this->loader->add_action('wp_ajax_set_bbb_recording_protect_state', $plugin_public_api, 'set_bbb_recording_protect_state');
+		$this->loader->add_action('wp_ajax_nopriv_set_bbb_recording_protect_state', $plugin_public_api, 'set_bbb_recording_protect_state');
+		$this->loader->add_action('wp_ajax_trash_bbb_recording', $plugin_public_api, 'trash_bbb_recording');
+		$this->loader->add_action('wp_ajax_nopriv_trash_bbb_recording', $plugin_public_api, 'trash_bbb_recording');
 	}
 
 	/**
