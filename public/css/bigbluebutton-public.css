@@ -7,10 +7,6 @@
      margin: 5px 0px;
  }
 
- #recordings-list {
-     display: block;
- }
-
  .error {
      color: red;
  }
@@ -20,9 +16,25 @@
  }
 
 .flex-table {
-    display: grid;
-    border: solid 1px #d9d9d9;
-    padding: 5px;
+    display: flex;
+    flex-flow: row wrap;
+    border-left: solid 1px #d9d9d9;
+    transition: 0.5s;
+}
+
+.flex-table:first-of-type {
+    border-top: solid 1px #1565C0;
+    border-left: solid 1px #1565C0;
+}
+
+.flex-table:first-of-type .flex-row {
+    background: #1976D2;
+    color: white;
+    border-color: #1565C0;
+}
+
+.flex-table:nth-child(even) .flex-row {
+    background: #f4f2f1;
 }
 
 .flex-table-3 {
@@ -39,11 +51,84 @@
     border-color: #1565C0;
 }
 
-.icon {
+.flex-row-3 {
+    width: calc(100%/3);
+}
+
+.flex-row-4 {
+    width: calc(100%/4);
+}
+
+.flex-row {
+    text-align: center;
+    padding: 0.5em 0.5em;
+    border-right: solid 1px #d9d9d9;
+    border-bottom: solid 1px #d9d9d9;
+}
+
+@media all and (max-width: 450px) {
+    
+    .flex-table > .flex-row {
+        border-bottom: solid 1px #d9d9d9;
+    }
+    
+    .header > .flex-row {
+        border-bottom: solid 1px;
+    }
+    
+    .flex-row {
+      width: 100%;
+    }
+
+    .flex-row:first {
+        width: 100%;
+        border-bottom: solid 1px #d9d9d9;
+    }
+}
+
+.bbb-icon {
     cursor: pointer;
 }
 
 .fa-disabled {
     cursor: not-allowed;
     opacity: .3;
+}
+
+.bbb-recording-link-block {
+    display: inline-block;
+}
+
+.bbb-recording-link {
+    background-color: #007acc;
+    color: white;
+    max-width: 7em;
+    padding: 0.2em 0.3em;
+    margin: 0.2em 0.1em;
+}
+
+.bbb-button {
+    background-color: #007acc !important;
+    color: white !important;
+}
+
+.bbb-recording-link:hover,
+.bbb-recording-link:focus,
+.bbb-recording-link:active,
+.bbb-button:hover,
+.bbb-button:focus,
+.bbb-button:active {
+    background-color: #0a9ed4 !important;
+    border-color: #006799 !important;
+}
+
+.bbb-recording-link > a {
+    color: white;
+    box-shadow: none !important;
+}
+
+.bbb-recording-link > a:hover,
+.bbb-recording-link > a:focus,
+.bbb-recording-link > a:active {
+    color: white;
 }

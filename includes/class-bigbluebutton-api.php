@@ -154,6 +154,7 @@ class BigbluebuttonApi {
 		if (property_exists($response, 'recordings') && property_exists($response->recordings, 'recording')) {
 			$recordings = $response->recordings->recording;
 		}
+		error_log(print_r($recordings, true));
 		return $recordings;
 	}
 

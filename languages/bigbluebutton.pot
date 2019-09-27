@@ -83,13 +83,13 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-msgid "statistics"
+msgid "Statistics"
 msgstr ""
 
-msgid "presentation"
+msgid "Presentation"
 msgstr ""
 
-msgid "video"
+msgid "Video"
 msgstr ""
 
 msgid "Protected"

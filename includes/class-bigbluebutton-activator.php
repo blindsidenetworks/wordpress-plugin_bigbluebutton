@@ -48,6 +48,7 @@ class Bigbluebutton_Activator {
 					$role->add_cap('join_as_moderator_bbb_room');
 					$role->add_cap('create_recordable_bbb_room');
 					$role->add_cap('manage_bbb_room_recordings');
+					$role->add_cap('view_extended_bbb_room_recording_formats');
 					break;
 				case 'editor':
 					$role->add_cap('read_bbb_room');

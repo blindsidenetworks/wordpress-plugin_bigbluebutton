@@ -12,7 +12,7 @@
                 <label><?php esc_html_e('The access code you have entered is incorrect. Please try again.', 'bigbluebutton') ?></label>
             </div>
         <?php } ?>
+        <br>
     <?php } ?>
-    <br>
-    <input type="submit" class="button button-primary" value="<?php esc_html_e('Join', 'bigbluebutton'); ?>">
+    <input class="bbb-button" type="submit" class="button button-primary" value="<?php esc_html_e('Join', 'bigbluebutton'); ?>">
 </form>

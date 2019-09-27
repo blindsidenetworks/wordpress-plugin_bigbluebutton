@@ -111,6 +111,15 @@ class Bigbluebutton_Public {
 	}
 
 	/**
+	 * Add font awesome icons.
+	 * 
+	 * @since	3.0.0
+	 */
+	public function enqueue_font_awesome_icons() {
+    	wp_enqueue_style( 'fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css', array(), '4.2.0' );
+	}
+
+	/**
 	 * Display join room button in the bbb-room post.
 	 * 
 	 * @since	3.0.0
@@ -145,9 +154,12 @@ class Bigbluebutton_Public {
 		// add recordings list to post content if the room is recordable
 		$room_can_record = get_post_meta($room_id, 'bbb-room-recordable', true);
 		$manage_recordings = current_user_can('manage_bbb_room_recordings');
+		$view_extended_recording_formats = current_user_can('view_extended_bbb_room_recording_formats');
+
 		if ($room_can_record == 'true') {
 			$recordings = ($manage_recordings ? BigbluebuttonApi::get_recordings($room_id, 'published,unpublished') : BigbluebuttonApi::get_recordings($room_id, 'published'));
-			$html_recordings = $this->get_optional_recordings_view_as_string($room_id, $recordings, $manage_recordings);
+			$filtered_recordings = $this->filter_recordings($recordings, $manage_recordings);
+			$html_recordings = $this->get_optional_recordings_view_as_string($room_id, $filtered_recordings, $manage_recordings, $view_extended_recording_formats);
 			$content .= $html_recordings;
 		}
 		
@@ -316,7 +328,7 @@ class Bigbluebutton_Public {
 	 * 
 	 * @return	String		$recordings				Recordings table stored in a variable.
 	 */
-	private function get_optional_recordings_view_as_string($room_id, $recordings, $manage_bbb_recordings) {
+	private function get_optional_recordings_view_as_string($room_id, $recordings, $manage_bbb_recordings, $view_extended_recording_formats) {
 		$columns = 3;
 		if ($manage_bbb_recordings) {
 			$columns++;
@@ -324,9 +336,61 @@ class Bigbluebutton_Public {
 		ob_start();
 		$meta_nonce = wp_create_nonce('bbb_manage_recordings_nonce');
 		$date_format = (get_option('date_format') ? get_option('date_format') : 'Y-m-d');
+		$default_bbb_recording_format = 'presentation';
 		include('partials/bigbluebutton-optional-recordings-display.php');
 		$recordings = ob_get_contents();
 		ob_end_clean();
 		return $recordings;
+	}
+
+	/**
+	 * Filter recordings based on whether the user can manage them or not.
+	 * 
+	 * Assign icon classes and title based on recording published and protected status.
+	 * If the user cannot manage recordings, hide them.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	Array	$recordings		List of recordings.
+	 * @return	Array	$recordings		List of recordings with classes and titles for manage recording icons.
+	 */
+	private function filter_recordings($recordings, $manage_recordings) {
+		$filtered_recordings = array();
+		foreach($recordings as $recording) {
+			if ($manage_recordings) {
+				$recording = $this->filter_managed_recording($recording);
+				array_push($filtered_recordings, $recording);
+			} else if ($recording->published == 'true') {
+				array_push($filtered_recordings, $recording);
+			}
+		}
+		return $filtered_recordings;
+	}
+
+	/**
+	 * Assign classes and title for the icon based on the recording's publish and protect status.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	XMLObject	$recording	A recording to be inspected.
+	 * @return	XMLObject	$recording	A recording that has been inspected.
+	 */
+	private function filter_managed_recording($recording) {
+		if ($recording->protected == 'true') {
+			$recording->protected_icon_classes = "fa fa-lock fa-icon bbb-icon bbb_protected_recording is_protected";
+			$recording->protected_icon_title = __('Protected', 'bigbluebutton');
+		} else if ($recording->protected == 'false') {
+			$recording->protected_icon_classes = "fa fa-unlock fa-icon bbb-icon bbb_protected_recording not_protected";
+			$recording->protected_icon_title = __('Unprotected', 'bigbluebutton');
+		}
+
+		if ($recording->published == 'true') {
+			$recording->published_icon_classes = "fa fa-eye fa-icon bbb-icon bbb_published_recording is_published";
+			$recording->published_icon_title = __('Published');
+		} else {
+			$recording->published_icon_classes = "fa fa-eye-slash fa-icon bbb-icon bbb_published_recording not_published";
+			$recording->published_icon_title = __('Unpublished');
+		}
+		return $recording;
 	}
 }
