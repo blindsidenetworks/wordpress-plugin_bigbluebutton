@@ -117,7 +117,7 @@ class Bigbluebutton_Public {
 	 * @since	3.0.0
 	 */
 	public function enqueue_font_awesome_icons() {
-    	wp_enqueue_style( 'fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css', array(), '4.2.0' );
+    	wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css', array(), '4.2.0');
 	}
 
 	/**
@@ -228,11 +228,11 @@ class Bigbluebutton_Public {
 	 */
 	private function filter_recordings($recordings, $manage_recordings) {
 		$filtered_recordings = array();
-		foreach($recordings as $recording) {
-			if (!isset($recording->metadata->{'recording-name'})) {
+		foreach ($recordings as $recording) {
+			if ( ! isset($recording->metadata->{'recording-name'})) {
 				$recording->metadata->{'recording-name'} = $recording->name;
 			}
-			if (!isset($recording->metadata->{'recording-description'})) {
+			if ( ! isset($recording->metadata->{'recording-description'})) {
 				$recording->metadata->{'recording-description'} = "";
 			}
 			if ($manage_recordings) {
