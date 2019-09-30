@@ -35,7 +35,7 @@ class BigbluebuttonRecordingHelper {
      * 
      * @since   3.0.0
      * 
-     * @return  SimpleXMLObject     $recordings     List of recordings.
+     * @return  Array   $recordings     List of recordings.
      */
     public function get_recordings_based_on_capability($room_id) {
         $manage_recordings = current_user_can('manage_bbb_room_recordings');
@@ -100,7 +100,7 @@ class BigbluebuttonRecordingHelper {
 			$recording->published_icon_title = __('Published');
 		} else {
 			$recording->published_icon_classes = "fa fa-eye-slash fa-icon bbb-icon bbb_published_recording not_published";
-			$recording->published_icoset_order_by_classesn_title = __('Unpublished');
+			$recording->published_icon_title = __('Unpublished');
 		}
 		return $recording;
     }

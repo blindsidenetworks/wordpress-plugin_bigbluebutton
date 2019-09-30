@@ -117,7 +117,7 @@ class Bigbluebutton_Public {
 	 * @since	3.0.0
 	 */
 	public function enqueue_font_awesome_icons() {
-		if(!wp_style_is('fontawesome', 'enqueued') && !wp_style_is('font-awesome', 'enqueued')) {
+		if( ! wp_style_is('fontawesome', 'enqueued') && ! wp_style_is('font-awesome', 'enqueued')) {
 			wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css', array(), '4.2.0');
 		}
 	}
@@ -256,8 +256,8 @@ class Bigbluebutton_Public {
 			$selected_field = sanitize_text_field($_GET['orderby']);
 		}
 
-		foreach($custom_sort_fields as $field => $values) {
-			if (isset($selected_field) && $field == $selected_field) {
+		foreach ($custom_sort_fields as $field => $values) {
+			if (isset($new_direction) && isset($new_sort_classes) && isset($selected_field) && $field == $selected_field) {
 				$custom_sort_fields[$field] = (object) array(
 					'url' => '?orderby=' . $field . '&order=' . $new_direction,
 					'classes' => $new_sort_classes,

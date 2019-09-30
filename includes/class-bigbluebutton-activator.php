@@ -36,7 +36,7 @@ class Bigbluebutton_Activator {
 	}
 
 	public static function suggest_font_awesome() {
-		if (!is_plugin_active('font-awesome/font-awesome.php')) {
+		if ( ! is_plugin_active('font-awesome/font-awesome.php')) {
 			error_log("please install font awesome");
 		}
 	}
