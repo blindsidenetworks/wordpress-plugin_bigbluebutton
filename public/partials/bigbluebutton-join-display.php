@@ -8,7 +8,7 @@
             <input type="text" name="bbb_meeting_access_code" size=20 aria-labelledby="bbb_meeting_access_code_label">
         </div>
         <?php if (isset($_REQUEST['password_error'])) { ?>
-            <div class="error">
+            <div class="bbb-error">
                 <label><?php esc_html_e('The access code you have entered is incorrect. Please try again.', 'bigbluebutton') ?></label>
             </div>
         <?php } ?>

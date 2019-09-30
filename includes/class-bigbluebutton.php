@@ -169,6 +169,11 @@ class Bigbluebutton {
 
 		$plugin_admin = new Bigbluebutton_Admin($this->get_plugin_name(), $this->get_version());
 
+		// suggest installing font awesome plugin
+		if ( ! is_plugin_active('font-awesome/font-awesome.php')) {
+			$this->loader->add_action('admin_notices', $plugin_admin, 'missing_font_awesome_admin_notice');
+		}
+	
 		// register bbb-rooms and custom fields
 		$this->loader->add_action('init', $plugin_admin, 'bbb_room_as_post_type');
 		$this->loader->add_action('init', $plugin_admin, 'bbb_room_category_as_taxonomy_type');

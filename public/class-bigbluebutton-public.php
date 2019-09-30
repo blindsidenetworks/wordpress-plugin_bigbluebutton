@@ -112,7 +112,7 @@ class Bigbluebutton_Public {
 	}
 
 	/**
-	 * Add font awesome icons.
+	 * Add font awesome icons if not already installed.
 	 * 
 	 * @since	3.0.0
 	 */
