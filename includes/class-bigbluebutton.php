@@ -132,6 +132,11 @@ class Bigbluebutton {
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-api.php';
 
+		/**
+		 * Bigbluebutton Recordings helper
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/helpers/class-bigbluebutton-recording-helper.php';
+
 		$this->loader = new Bigbluebutton_Loader();
 
 	}

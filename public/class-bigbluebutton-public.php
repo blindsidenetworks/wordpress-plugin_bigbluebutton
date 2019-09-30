@@ -97,8 +97,8 @@ class Bigbluebutton_Public {
 		 */
 
 		$translations = array(
-			'view' => __('View', 'bigbluebutton'),
-			'hide' => __('Hide'),
+			'expand_recordings' => __('Expand recordings', 'bigbluebutton'),
+			'collapse_recordings' => __('Collapse recordings', 'bigbluebutotn'),
 			'edit' => __('Edit'),
 			'published' => __('Published'),
 			'unpublished' => __('Unpublished'),
@@ -117,7 +117,9 @@ class Bigbluebutton_Public {
 	 * @since	3.0.0
 	 */
 	public function enqueue_font_awesome_icons() {
-    	wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css', array(), '4.2.0');
+		if(!wp_style_is('fontawesome', 'enqueued') && !wp_style_is('font-awesome', 'enqueued')) {
+			wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css', array(), '4.2.0');
+		}
 	}
 
 	/**
@@ -158,9 +160,9 @@ class Bigbluebutton_Public {
 		$view_extended_recording_formats = current_user_can('view_extended_bbb_room_recording_formats');
 
 		if ($room_can_record == 'true') {
-			$recordings = ($manage_recordings ? BigbluebuttonApi::get_recordings($room_id, 'published,unpublished') : BigbluebuttonApi::get_recordings($room_id, 'published'));
-			$filtered_recordings = $this->filter_recordings($recordings, $manage_recordings);
-			$html_recordings = $this->get_optional_recordings_view_as_string($room_id, $filtered_recordings, $manage_recordings, $view_extended_recording_formats);
+			$recordings = $this->get_recordings($room_id);
+			$sort_fields = $this->set_order_by_field();
+			$html_recordings = $this->get_optional_recordings_view_as_string($room_id, $recordings, $sort_fields, $manage_recordings, $view_extended_recording_formats);
 			$content .= $html_recordings;
 		}
 		
@@ -193,13 +195,15 @@ class Bigbluebutton_Public {
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @param	Integer		$room_id				Post ID of the room.
-	 * @param	Array		$recordings				List of recordings for the room.
-	 * @param	Boolean		$manage_bbb_recordings	Recordings table stored in a variable.
+	 * @param	Integer		$room_id							Post ID of the room.
+	 * @param	Array		$recordings							List of recordings for the room.
+	 * @param	Array		$sort_fields						Array of properties for the sort icons in the recordings table header.
+	 * @param	Boolean		$manage_bbb_recordings				User capability to manage recordings.
+	 * @param	Boolean		$view_extended_recording_formats	User capability to view extended recording formats.
 	 * 
-	 * @return	String		$recordings				Recordings table stored in a variable.
+	 * @return	String		$recordings							Recordings table stored in a variable.
 	 */
-	private function get_optional_recordings_view_as_string($room_id, $recordings, $manage_bbb_recordings, $view_extended_recording_formats) {
+	private function get_optional_recordings_view_as_string($room_id, $recordings, $sort_fields, $manage_bbb_recordings, $view_extended_recording_formats) {
 		$columns = 5;
 		if ($manage_bbb_recordings) {
 			$columns++;
@@ -215,60 +219,59 @@ class Bigbluebutton_Public {
 	}
 
 	/**
-	 * Filter recordings based on whether the user can manage them or not.
-	 * 
-	 * Assign icon classes and title based on recording published and protected status.
-	 * If the user cannot manage recordings, hide them.
-	 * Get recording name and description from metadata.
+	 * Get recordings from recording helper.
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @param	Array	$recordings		List of recordings.
-	 * @return	Array	$recordings		List of recordings with classes and titles for manage recording icons.
+	 * @param	Integer							$room_id			Room ID to get recordings of.
 	 */
-	private function filter_recordings($recordings, $manage_recordings) {
-		$filtered_recordings = array();
-		foreach ($recordings as $recording) {
-			if ( ! isset($recording->metadata->{'recording-name'})) {
-				$recording->metadata->{'recording-name'} = $recording->name;
-			}
-			if ( ! isset($recording->metadata->{'recording-description'})) {
-				$recording->metadata->{'recording-description'} = "";
-			}
-			if ($manage_recordings) {
-				$recording = $this->filter_managed_recording($recording);
-				array_push($filtered_recordings, $recording);
-			} else if ($recording->published == 'true') {
-				array_push($filtered_recordings, $recording);
-			}
+	private function get_recordings($room_id) {
+		$recording_helper = new BigbluebuttonRecordingHelper();
+
+		if (isset($_GET['order']) && isset($_GET['orderby'])) {
+			$order = sanitize_text_field($_GET['order']);
+			$orderby = sanitize_text_field($_GET['orderby']);
+			return $recording_helper->get_filtered_and_ordered_recordings_based_on_capability($room_id, $order, $orderby);
+		} else {
+			return $recording_helper->get_filtered_and_ordered_recordings_based_on_capability($room_id);
 		}
-		return $filtered_recordings;
 	}
 
 	/**
-	 * Assign classes and title for the icon based on the recording's publish and protect status.
+	 * Create url and classes for new sorting indicators.
+	 * Use big arrow to show currently sorted order and triangles to show potential sorting order.
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @param	SimpleXMLElement	$recording	A recording to be inspected.
-	 * @return	SimpleXMLElement	$recording	A recording that has been inspected.
+	 * @return	Array	$custom_sort_fields		Array of sortable fields for recordings.
 	 */
-	private function filter_managed_recording($recording) {
-		if ($recording->protected == 'true') {
-			$recording->protected_icon_classes = "fa fa-lock fa-icon bbb-icon bbb_protected_recording is_protected";
-			$recording->protected_icon_title = __('Protected', 'bigbluebutton');
-		} else if ($recording->protected == 'false') {
-			$recording->protected_icon_classes = "fa fa-unlock fa-icon bbb-icon bbb_protected_recording not_protected";
-			$recording->protected_icon_title = __('Unprotected', 'bigbluebutton');
+	private function set_order_by_field() {
+		$sort_asc_classes = 'fa fa-sort-up bbb-header-icon';
+		$sort_desc_classes = 'fa fa-sort-down bbb-header-icon';
+		$custom_sort_fields = array('name' => NULL, 'description' => NULL, 'date' => NULL);
+
+		if (isset($_GET['order']) && isset($_GET['orderby'])) {
+			$new_direction = (sanitize_text_field($_GET['order']) == 'asc' ? 'desc' : 'asc');
+			$new_sort_classes = ($new_direction == 'asc' ? $sort_desc_classes : $sort_asc_classes) . ' bbb-current-sort-icon';
+			$selected_field = sanitize_text_field($_GET['orderby']);
 		}
 
-		if ($recording->published == 'true') {
-			$recording->published_icon_classes = "fa fa-eye fa-icon bbb-icon bbb_published_recording is_published";
-			$recording->published_icon_title = __('Published');
-		} else {
-			$recording->published_icon_classes = "fa fa-eye-slash fa-icon bbb-icon bbb_published_recording not_published";
-			$recording->published_icon_title = __('Unpublished');
+		foreach($custom_sort_fields as $field => $values) {
+			if (isset($selected_field) && $field == $selected_field) {
+				$custom_sort_fields[$field] = (object) array(
+					'url' => '?orderby=' . $field . '&order=' . $new_direction,
+					'classes' => $new_sort_classes,
+					'header_classes' => 'bbb-column-header-highlight'
+				);
+			} else {
+				$custom_sort_fields[$field] = (object) array(
+					'url' => '?orderby=' . $field . '&order=asc',
+					'classes' => $sort_asc_classes . ' bbb-hidden',
+					'header_classes' => 'bbb-recordings-unselected-sortable-column'
+				);
+			}
 		}
-		return $recording;
+
+		return $custom_sort_fields;
 	}
 }

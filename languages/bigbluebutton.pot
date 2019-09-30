@@ -86,7 +86,10 @@ msgstr ""
 msgid "Manage"
 msgstr ""
 
-msgid "View"
+msgid "Expand recordings"
+msgstr ""
+
+msgid "Collapse recordings"
 msgstr ""
 
 msgid "Statistics"

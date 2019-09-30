@@ -31,6 +31,17 @@ class Bigbluebutton_Activator {
 	 * @since    3.0.0
 	 */
 	public static function activate() {
+		self::suggest_font_awesome();
+		self::set_default_roles();
+	}
+
+	public static function suggest_font_awesome() {
+		if (!is_plugin_active('font-awesome/font-awesome.php')) {
+			error_log("please install font awesome");
+		}
+	}
+
+	public static function set_default_roles() {
 		$roles = get_editable_roles();
 		$role_names = array_keys($roles);
 
@@ -84,5 +95,4 @@ class Bigbluebutton_Activator {
 			}
 		}
 	}
-
 }

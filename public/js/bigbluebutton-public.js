@@ -36,11 +36,20 @@
 			/** global: php_vars */
 			if ($("#bbb-recordings-list").is(":visible")) {
 				$("#bbb-recordings-list").slideUp();
-				$(this).text(php_vars.view);
+				$(this).children("i").removeClass("fa-angle-down").addClass("fa-angle-right");
+				$(this).children('.bbb-expandable-header').text(php_vars.expand_recordings);
 			} else {
 				$("#bbb-recordings-list").slideDown();
-				$(this).text(php_vars.hide);
+				$(this).children("i").removeClass("fa-angle-right").addClass("fa-angle-down");
+				$(this).children('.bbb-expandable-header').text(php_vars.collapse_recordings);
 			}
+		});
+
+		// show sorting indicator on hover and hide on mouse away
+		$(".bbb-recordings-unselected-sortable-column").hover(function() {
+			$(this).children("i").removeClass('bbb-hidden');
+		}, function() {
+			$(this).children("i").addClass('bbb-hidden');
 		});
 		
 		// publish/unpublish recordings

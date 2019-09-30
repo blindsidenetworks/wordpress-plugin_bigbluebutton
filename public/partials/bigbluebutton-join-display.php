@@ -4,8 +4,8 @@
     <input type="hidden" id="bbb_join_room_meta_nonce" name="bbb_join_room_meta_nonce" value="<?php echo $meta_nonce; ?>">
     <?php if ( ! $access_as_moderator && ! $access_as_viewer && $access_using_code) { ?>
         <div>
-            <label><?php esc_html_e('Access Code', 'bigbluebutton'); ?>: </label>
-            <input type="text" name="bbb_meeting_access_code" size=20>
+            <label id="bbb_meeting_access_code_label"><?php esc_html_e('Access Code', 'bigbluebutton'); ?>: </label>
+            <input type="text" name="bbb_meeting_access_code" size=20 aria-labelledby="bbb_meeting_access_code_label">
         </div>
         <?php if (isset($_REQUEST['password_error'])) { ?>
             <div class="error">
