@@ -440,7 +440,6 @@ class Bigbluebutton_Admin {
 	 * @since	3.0.0
 	 */
 	public function missing_font_awesome_admin_notice() {
-		error_log("runs missing font awesome error method");
 		$bbb_admin_error_message = __(ucfirst($this->plugin_name) . " depends on the font awesome plugin. Please install and activate it.", 'bigbluebutton');
 		require_once 'partials/bigbluebutton-error-admin-notice-display.php';
 	}
