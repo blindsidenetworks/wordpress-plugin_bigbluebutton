@@ -32,16 +32,21 @@
 	$( window ).load(function() {
 	
 		// display/hide recordings
-		$("#bbb-recordings-display").click(function() {
+		$(".bbb-recordings-display").click(function() {
+			let room_id = $(this)[0].id.substring(23);
 			/** global: php_vars */
-			if ($("#bbb-recordings-list").is(":visible")) {
-				$("#bbb-recordings-list").slideUp();
+			if ($("#bbb-recordings-list-" + room_id).is(":visible")) {
+				$("#bbb-recordings-list-" + room_id).slideUp();
 				$(this).children("i").removeClass("fa-angle-down").addClass("fa-angle-right");
-				$(this).children('.bbb-expandable-header').text(php_vars.expand_recordings);
+				if (!$(this).hasClass('bbb-recordings-shortcode')) {
+					$(this).children('.bbb-expandable-header').text(php_vars.expand_recordings);
+				}
 			} else {
-				$("#bbb-recordings-list").slideDown();
+				$("#bbb-recordings-list-" + room_id).slideDown();
 				$(this).children("i").removeClass("fa-angle-right").addClass("fa-angle-down");
-				$(this).children('.bbb-expandable-header').text(php_vars.collapse_recordings);
+				if (!$(this).hasClass('bbb-recordings-shortcode')) {
+					$(this).children('.bbb-expandable-header').text(php_vars.collapse_recordings);
+				}
 			}
 		});
 
@@ -52,6 +57,28 @@
 			$(this).children("i").addClass('bbb-hidden');
 		});
 		
+		// update join room form with new room id and access code input, if necessary
+		$(".bbb-room-selection").change(function() {
+			let self = this;
+			let room_id = this.value;
+			let data = {
+				action: "view_join_form",
+				room_id: room_id,
+				post_type: "POST",
+			};
+			jQuery.post(php_vars.ajax_url, data, function(response) {
+				if (response["success"]) {
+					$(self).siblings("#joinroom").children("#bbb_join_room_id").val(room_id)
+
+					if (response["hide_access_code_input"]) {
+						$(self).siblings("#joinroom").children("#bbb_join_with_password").hide();
+					} else {
+						$(self).siblings("#joinroom").children("#bbb_join_with_password").show();
+					}
+				}
+			}, "json");
+		});
+
 		// publish/unpublish recordings
 		$(".bbb_published_recording").click(function() {
 			/** global: php_vars */

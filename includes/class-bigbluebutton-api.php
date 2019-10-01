@@ -25,10 +25,11 @@ class BigbluebuttonApi {
 		$moderator_code = get_post_meta($rid, 'bbb-room-moderator-code', true);
 		$viewer_code = get_post_meta($rid, 'bbb-room-viewer-code', true);
 		$recordable = get_post_meta($rid, 'bbb-room-recordable', true);
+		$entry_token = get_post_meta($rid, 'bbb-room-token', true);
 		$logout_url = get_permalink($rid);
 		$arr_params = array(
 			'name' => urlencode($name),
-			'meetingID' => urlencode('meeting-' . $rid),
+			'meetingID' => urlencode($entry_token),
 			'attendeePW' => urlencode($viewer_code),
 			'moderatorPW' => urlencode($moderator_code),
 			'logoutURL' => $logout_url,
@@ -73,8 +74,9 @@ class BigbluebuttonApi {
 			self::create_meeting($rid);
 		}
 
+		$entry_token = get_post_meta($rid, 'bbb-room-token', true);
 		$arr_params = array(
-			'meetingID' => urlencode('meeting-' . $rid),
+			'meetingID' => urlencode($entry_token),
 			'fullName' => urlencode($uname),
 			'password' => urlencode($pword),
 		);
@@ -100,8 +102,9 @@ class BigbluebuttonApi {
 			return null;
 		}
 
+		$entry_token = get_post_meta($rid, 'bbb-room-token', true);
 		$arr_params = array(
-			'meetingID' => urlencode('meeting-' . $rid),
+			'meetingID' => urlencode($entry_token),
 		);
 
 		$url = self::build_url('isMeetingRunning', $arr_params);
@@ -125,21 +128,23 @@ class BigbluebuttonApi {
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @param   Integer     $room_id            	Custom post id of a room.
+	 * @param   Array     	$room_ids            	List of custom post ids for rooms.
 	 * @param	String		$recording_state		State of recordings to get.
 	 * @return	Array		$recordings				List of recordings for this room.
 	 */
-	public static function get_recordings($room_id, $recording_state = 'published') {
-		$rid = intval($room_id);
+	public static function get_recordings($room_ids, $recording_state = 'published') {
 		$state = sanitize_text_field($recording_state);
 		$recordings = [];
+		$entry_token = "";
 
-		if (get_post($rid) === false || get_post_type($rid) != 'bbb-room') {
-			return $recordings;
+		foreach($room_ids as $rid) {
+			$entry_token .= get_post_meta(sanitize_text_field($rid), 'bbb-room-token', true) . ',';
 		}
 
+		substr_replace($entry_token ,"", -1);
+		
 		$arr_params = array(
-			'meetingID' => urlencode('meeting-' . $rid),
+			'meetingID' => $entry_token,
 			'state' => $state
 		);
 

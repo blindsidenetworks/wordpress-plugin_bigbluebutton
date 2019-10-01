@@ -251,7 +251,7 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Save moderator and viewer code to the room.
+	 * Save custom post meta to the room.
 	 * 
 	 * @since	3.0.0
 	 * 
@@ -273,6 +273,7 @@ class Bigbluebutton_Admin {
 			// add room codes to postmeta data
 			update_post_meta($post_id, 'bbb-room-moderator-code', $moderator_code);
 			update_post_meta($post_id, 'bbb-room-viewer-code', $viewer_code);
+			update_post_meta($post_id, 'bbb-room-token', 'meeting-' . $post_id);
 
 			// update room recordable value
 			if ($recordable) {
@@ -312,10 +313,10 @@ class Bigbluebutton_Admin {
 	 */
 	public function add_custom_room_column_to_list($columns) {
 		$custom_columns = array(
-			'description' => __('Description'), 
 			'category' => __('Category'), 
 			'author' => __('Author'), 
 			'permalink' => __('Permalink'), 
+			'token' => __('Token', 'bigbluebutton'),
 			'moderator-code' => __('Moderator Code', 'bigbluebutton'), 
 			'viewer-code' => __('Viewer Code', 'bigbluebutton')
 		);
@@ -335,9 +336,6 @@ class Bigbluebutton_Admin {
 	 */
 	public function bbb_room_custom_columns($column, $post_id) {
 		switch ($column) {
-			case 'description' :
-				the_content();
-				break;
 			case 'category' :
 				$categories = wp_get_object_terms($post_id, 'bbb-room-category', array('fields' => 'names'));
 				if (!is_wp_error($categories)) {
@@ -350,6 +348,9 @@ class Bigbluebutton_Admin {
 			case 'permalink' :
 				echo '<a>' . (get_permalink($post_id) ? get_permalink($post_id) : '') . '</a>';
 				break;
+			case 'token':
+				echo (string) get_post_meta($post_id, 'bbb-room-token', true);
+				break;
 			case 'moderator-code' :
 				echo (string) get_post_meta($post_id, 'bbb-room-moderator-code', true);
 				break;
@@ -360,15 +361,16 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Generate default code for moderators/viewers to enter a room.
+	 * Generate random alphanumeric string.
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @return	String	$default_code	A default entry code into a bigbluebutton meeting.
+	 * @param	Integer	$length			Length of random string.
+	 * @return	String	$default_code	The resulting random string.
 	 */
-	public function generate_random_code() {
+	public function generate_random_code($length = 10) {
 		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		$default_code = substr(str_shuffle($permitted_chars), 0, 10);
+		$default_code = substr(str_shuffle($permitted_chars), 0, $length);
 		return $default_code;
 	}
 

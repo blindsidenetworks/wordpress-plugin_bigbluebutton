@@ -128,6 +128,11 @@ class Bigbluebutton {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-bigbluebutton-public-api.php';
 
 		/**
+		 * Shortcodes
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-bigbluebutton-public-shortcode.php';
+
+		/**
 		 * Bigbluebutton API
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-api.php';
@@ -136,6 +141,11 @@ class Bigbluebutton {
 		 * Bigbluebutton Recordings helper
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/helpers/class-bigbluebutton-recording-helper.php';
+
+		/**
+		 * Bigbluebutton public view helper
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/helpers/class-bigbluebutton-display-helper.php';
 
 		$this->loader = new Bigbluebutton_Loader();
 
@@ -206,6 +216,7 @@ class Bigbluebutton {
 	private function define_public_hooks() {
 
 		$plugin_public = new Bigbluebutton_Public($this->get_plugin_name(), $this->get_version());
+		$plugin_public_shortcode = new Bigbluebutton_Public_Shortcode();
 		$plugin_public_api = new Bigbluebutton_Public_Api($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_font_awesome_icons');
@@ -230,6 +241,11 @@ class Bigbluebutton {
 		// edit recording actions
 		$this->loader->add_action('wp_ajax_set_bbb_recording_edits', $plugin_public_api, 'set_bbb_recording_edits');
 		$this->loader->add_action('wp_ajax_nopriv_set_bbb_recording_edits', $plugin_public_api, 'set_bbb_recording_edits');
+
+		// manage shortcodes
+		$this->loader->add_action('init', $plugin_public_shortcode, 'register_shortcodes');
+		$this->loader->add_action('wp_ajax_view_join_form', $plugin_public_api, 'get_join_form');
+		$this->loader->add_action('wp_ajax_nopriv_view_join_form', $plugin_public_api, 'get_join_form');
 	}
 
 	/**

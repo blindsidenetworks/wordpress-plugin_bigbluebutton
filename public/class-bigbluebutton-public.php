@@ -151,7 +151,8 @@ class Bigbluebutton_Public {
 		}
 
 		// add join form to post content
-		$html_form = $this->get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code);
+		$display_helper = new BigbluebuttonDisplayHelper(plugin_dir_path(__FILE__));
+		$html_form = $display_helper->get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code);
 		$content .= $html_form;
 
 		// add recordings list to post content if the room is recordable
@@ -160,9 +161,8 @@ class Bigbluebutton_Public {
 		$view_extended_recording_formats = current_user_can('view_extended_bbb_room_recording_formats');
 
 		if ($room_can_record == 'true') {
-			$recordings = $this->get_recordings($room_id);
-			$sort_fields = $this->set_order_by_field();
-			$html_recordings = $this->get_optional_recordings_view_as_string($room_id, $recordings, $sort_fields, $manage_recordings, $view_extended_recording_formats);
+			$recordings = $this->get_recordings(array($room_id));
+			$html_recordings = $display_helper->get_optional_recordings_view_as_string($room_id, $recordings, $manage_recordings, $view_extended_recording_formats);
 			$content .= $html_recordings;
 		}
 		
@@ -170,108 +170,21 @@ class Bigbluebutton_Public {
 	}
 
 	/**
-	 * Get join meeting form as an HTML string.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @param	Integer		$room_id				Post ID of the room.
-	 * @param	String		$meta_nonce				Nonce for join meeting form.
-	 * @param	Boolean		$access_as_moderator	Check for if the current user can enter meetings as a moderator.
-	 * @param	Boolean		$access_as_viewer		Check for if the current user can enter meetings as a viewer.
-	 * @param	Boolean		$access_using_code		Check for if the current user can enter meetings using an access code.
-	 * 
-	 * @return	String		$form					Join meeting form stored in a variable.
-	 */
-	private function get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code) {
-		ob_start();
-		include('partials/bigbluebutton-join-display.php');
-		$form = ob_get_contents();
-		ob_end_clean();
-		return $form;
-	}
-
-	/**
-	 * Get recordings with Show/Hide buttons as an HTML string.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @param	Integer		$room_id							Post ID of the room.
-	 * @param	Array		$recordings							List of recordings for the room.
-	 * @param	Array		$sort_fields						Array of properties for the sort icons in the recordings table header.
-	 * @param	Boolean		$manage_bbb_recordings				User capability to manage recordings.
-	 * @param	Boolean		$view_extended_recording_formats	User capability to view extended recording formats.
-	 * 
-	 * @return	String		$recordings							Recordings table stored in a variable.
-	 */
-	private function get_optional_recordings_view_as_string($room_id, $recordings, $sort_fields, $manage_bbb_recordings, $view_extended_recording_formats) {
-		$columns = 5;
-		if ($manage_bbb_recordings) {
-			$columns++;
-		}
-		ob_start();
-		$meta_nonce = wp_create_nonce('bbb_manage_recordings_nonce');
-		$date_format = (get_option('date_format') ? get_option('date_format') : 'Y-m-d');
-		$default_bbb_recording_format = 'presentation';
-		include('partials/bigbluebutton-optional-recordings-display.php');
-		$recordings = ob_get_contents();
-		ob_end_clean();
-		return $recordings;
-	}
-
-	/**
 	 * Get recordings from recording helper.
 	 * 
 	 * @since	3.0.0
 	 * 
-	 * @param	Integer							$room_id			Room ID to get recordings of.
+	 * @param	Integer		$room_id			Room ID to get recordings of.
 	 */
-	private function get_recordings($room_id) {
+	private function get_recordings($room_ids) {
 		$recording_helper = new BigbluebuttonRecordingHelper();
 
 		if (isset($_GET['order']) && isset($_GET['orderby'])) {
 			$order = sanitize_text_field($_GET['order']);
 			$orderby = sanitize_text_field($_GET['orderby']);
-			return $recording_helper->get_filtered_and_ordered_recordings_based_on_capability($room_id, $order, $orderby);
+			return $recording_helper->get_filtered_and_ordered_recordings_based_on_capability($room_ids, $order, $orderby);
 		} else {
-			return $recording_helper->get_filtered_and_ordered_recordings_based_on_capability($room_id);
+			return $recording_helper->get_filtered_and_ordered_recordings_based_on_capability($room_ids);
 		}
-	}
-
-	/**
-	 * Create url and classes for new sorting indicators.
-	 * Use big arrow to show currently sorted order and triangles to show potential sorting order.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @return	Array	$custom_sort_fields		Array of sortable fields for recordings.
-	 */
-	private function set_order_by_field() {
-		$sort_asc_classes = 'fa fa-sort-up bbb-header-icon';
-		$sort_desc_classes = 'fa fa-sort-down bbb-header-icon';
-		$custom_sort_fields = array('name' => NULL, 'description' => NULL, 'date' => NULL);
-
-		if (isset($_GET['order']) && isset($_GET['orderby'])) {
-			$new_direction = (sanitize_text_field($_GET['order']) == 'asc' ? 'desc' : 'asc');
-			$new_sort_classes = ($new_direction == 'asc' ? $sort_desc_classes : $sort_asc_classes) . ' bbb-current-sort-icon';
-			$selected_field = sanitize_text_field($_GET['orderby']);
-		}
-
-		foreach ($custom_sort_fields as $field => $values) {
-			if (isset($new_direction) && isset($new_sort_classes) && isset($selected_field) && $field == $selected_field) {
-				$custom_sort_fields[$field] = (object) array(
-					'url' => '?orderby=' . $field . '&order=' . $new_direction,
-					'classes' => $new_sort_classes,
-					'header_classes' => 'bbb-column-header-highlight'
-				);
-			} else {
-				$custom_sort_fields[$field] = (object) array(
-					'url' => '?orderby=' . $field . '&order=asc',
-					'classes' => $sort_asc_classes . ' bbb-hidden',
-					'header_classes' => 'bbb-recordings-unselected-sortable-column'
-				);
-			}
-		}
-
-		return $custom_sort_fields;
 	}
 }

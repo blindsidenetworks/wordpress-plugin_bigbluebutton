@@ -3,14 +3,11 @@
  * included in this file.
  */
 
-#bbb-recording-optional-display {
-    margin: 0.5em 0;
-    border-top: groove;
-    border-bottom: groove;
-}
-
-#bbb-recordings-display {
-    cursor: pointer;
+.bbb-room-selection {
+    display: inline-block;
+    background: white;
+    min-width: 10em;
+    margin-bottom: 2em;
 }
 
 .bbb-error {
@@ -108,7 +105,7 @@
     opacity: .3;
 }
 
-.bbb-recording-link-block {
+.bbb-inline-block {
     display: inline-block;
 }
 
@@ -164,4 +161,14 @@
     font-weight: 400;
     font-size: 1.2em;
     margin-bottom: auto;
+}
+
+.bbb-recordings-display {
+    cursor: pointer;
+}
+
+.bbb-recording-display-block {
+    margin: 0.5em 0;
+    border-top: groove;
+    border-bottom: groove;
 }

@@ -44,8 +44,10 @@ class Bigbluebutton_Activator {
 			switch ($name) {
 				case 'administrator':
 					$role->add_cap('edit_bbb_rooms');
+					$role->add_cap('edit_others_bbb_rooms');
 					$role->add_cap('edit_published_bbb_rooms');
 					$role->add_cap('delete_bbb_rooms');
+					$role->add_cap('delete_others_bbb_rooms');
 					$role->add_cap('delete_published_bbb_rooms');
 					$role->add_cap('publish_bbb_rooms');
 					$role->add_cap('view_bbb_room_list');

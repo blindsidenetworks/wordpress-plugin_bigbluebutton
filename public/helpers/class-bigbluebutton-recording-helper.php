@@ -23,8 +23,8 @@ class BigbluebuttonRecordingHelper {
      * @param   Integer $room_id        Room ID for the list of recordings.
      * @return  Array   $recordings     List of filtered and sorted recordings.
      */
-    public function get_filtered_and_ordered_recordings_based_on_capability($room_id, $order = '', $orderby = '') {
-        $this->get_recordings_based_on_capability($room_id);
+    public function get_filtered_and_ordered_recordings_based_on_capability($room_ids, $order = '', $orderby = '') {
+        $this->get_recordings_based_on_capability($room_ids);
         $this->filter_recordings();
         $this->order_recordings($order, $orderby);
         return $this->recordings;
@@ -37,13 +37,13 @@ class BigbluebuttonRecordingHelper {
      * 
      * @return  Array   $recordings     List of recordings.
      */
-    public function get_recordings_based_on_capability($room_id) {
+    public function get_recordings_based_on_capability($room_ids) {
         $manage_recordings = current_user_can('manage_bbb_room_recordings');
         if ($manage_recordings) {
-            $this->recordings = BigbluebuttonApi::get_recordings($room_id, 'published,unpublished');
+            $this->recordings = BigbluebuttonApi::get_recordings($room_ids, 'published,unpublished');
         } else {
-            $this->recordings = BigbluebuttonApi::get_recordings($room_id, 'published');
-        }
+            $this->recordings = BigbluebuttonApi::get_recordings($room_ids, 'published');
+		}
         return $this->recordings;
     }
 

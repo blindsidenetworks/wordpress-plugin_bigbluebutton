@@ -200,7 +200,28 @@ class Bigbluebutton_Public_Api {
 			}
 		}
 		wp_send_json($response);
-    }
+	}
+	
+	/**
+	 * Update the join room form on the front end with the room ID and whether the access code input should be shown or not.
+	 * 
+	 * @since	3.0.0
+	 */
+	public function get_join_form() {
+		$response = array();
+		$response['success'] = false;
+		
+		if (array_key_exists('room_id', $_POST)) {
+			$access_using_code = current_user_can('join_with_access_code_bbb_room');
+			$access_as_moderator = (current_user_can('join_as_moderator_bbb_room') || (get_current_user_id() == get_post($_POST['room_id'])->post_author));
+			$access_as_viewer = current_user_can('join_as_viewer_bbb_room');
+
+			$response["success"] = true;
+			$response["hide_access_code_input"] = $access_as_moderator || $access_as_viewer || !$access_using_code;
+		}
+
+		wp_send_json($response);
+	}
     
     /**
 	 * Get user's name for the meeting.
