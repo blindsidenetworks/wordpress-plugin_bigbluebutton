@@ -123,14 +123,14 @@ class Bigbluebutton_Public {
 	}
 
 	/**
-	 * Display join room button in the bbb-room post.
+	 * Display join room button and recordings in the bbb-room post.
 	 * 
 	 * @since	3.0.0
 	 * 
 	 * @param	String	$content	Post content as string.
 	 * @return	String	$content	Post content as string.
 	 */
-	public function bbb_room_join_form_content($content) {
+	public function bbb_room_content($content) {
 		global $pagenow;
 
 		if ($pagenow == 'edit.php' || $pagenow == 'post.php') {
@@ -162,11 +162,20 @@ class Bigbluebutton_Public {
 
 		if ($room_can_record == 'true') {
 			$recordings = $this->get_recordings(array($room_id));
-			$html_recordings = $display_helper->get_optional_recordings_view_as_string($room_id, $recordings, $manage_recordings, $view_extended_recording_formats);
+			$html_recordings = $display_helper->get_collapsable_recordings_view_as_string($room_id, $recordings, $manage_recordings, $view_extended_recording_formats);
 			$content .= $html_recordings;
 		}
 		
 		return $content;
+	}
+
+	/**
+	 * Register bigbluebutton widget.
+	 * 
+	 * @since	3.0.0
+	 */
+	public function register_widget() {
+		register_widget('Bigbluebutton_Public_Widget');
 	}
 
 	/**

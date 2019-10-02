@@ -83,6 +83,9 @@ msgstr ""
 msgid "Recording"
 msgstr ""
 
+msgid "Recordings"
+msgstr ""
+
 msgid "Manage"
 msgstr ""
 
@@ -125,4 +128,14 @@ msgid "Access Code"
 msgstr ""
 
 msgid "This room does not currently have any recordings."
+msgstr ""
+
+# Widget strings
+msgid "Room selection"
+msgstr ""
+
+msgid "Displays a BigBlueButton login form."
+msgstr ""
+
+msgid "There are no rooms in the selection."
 msgstr ""

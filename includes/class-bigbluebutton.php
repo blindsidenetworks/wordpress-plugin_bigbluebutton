@@ -133,6 +133,11 @@ class Bigbluebutton {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-bigbluebutton-public-shortcode.php';
 
 		/**
+		 * Widget
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-bigbluebutton-public-widget.php';
+
+		/**
 		 * Bigbluebutton API
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-api.php';
@@ -207,7 +212,7 @@ class Bigbluebutton {
 	}
 
 	/**
-	 * Register all of the hooks related tBigbluebutton_Public the public-facing functionality
+	 * Register all of the hooks related to Bigbluebutton_Public the public-facing functionality
 	 * of the plugin.
 	 *
 	 * @since    3.0.0
@@ -224,7 +229,7 @@ class Bigbluebutton {
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 
 		// display join room form/button
-		$this->loader->add_filter('the_content', $plugin_public, 'bbb_room_join_form_content');
+		$this->loader->add_filter('the_content', $plugin_public, 'bbb_room_content');
 
 		// join room
 		$this->loader->add_action('admin_post_join_room', $plugin_public_api, 'bbb_user_join_room');
@@ -246,6 +251,9 @@ class Bigbluebutton {
 		$this->loader->add_action('init', $plugin_public_shortcode, 'register_shortcodes');
 		$this->loader->add_action('wp_ajax_view_join_form', $plugin_public_api, 'get_join_form');
 		$this->loader->add_action('wp_ajax_nopriv_view_join_form', $plugin_public_api, 'get_join_form');
+
+		// register widget
+		$this->loader->add_action('widgets_init', $plugin_public, 'register_widget');
 	}
 
 	/**

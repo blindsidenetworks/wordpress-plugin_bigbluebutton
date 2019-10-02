@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2019-09-13 10:54-0400\n"
-"PO-Revision-Date: 2019-09-30 17:19-0400\n"
+"PO-Revision-Date: 2019-10-02 15:02-0400\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,7 +26,9 @@ msgid "Server"
 msgstr "Server"
 
 msgid "The server settings explanation."
-msgstr "The settings listed below determine the BigBlueButton server that will be used for the live sessions."
+msgstr ""
+"The settings listed below determine the BigBlueButton server that will "
+"be used for the live sessions."
 
 msgid "EndPoint"
 msgstr "EndPoint"
@@ -39,8 +41,9 @@ msgstr "Example"
 
 msgid "Default server settings 1. Default server settings 2."
 msgstr ""
-"Note that the values included by default are using a FREE BigBlueButton server provided by Blindside Networks. "
-"They have to be replaced with the parameters obtained from a server better suited for production."
+"Note that the values included by default are using a FREE BigBlueButton "
+"server provided by Blindside Networks. They have to be replaced with "
+"the parameters obtained from a server better suited for production."
 
 msgid "Save server settings success message."
 msgstr "Success! Your room server settings have been saved."
@@ -84,6 +87,9 @@ msgstr "Meeting"
 msgid "Recording"
 msgstr "Recording"
 
+msgid "Recordings"
+msgstr "Recordings"
+
 msgid "Manage"
 msgstr "Manage"
 
@@ -112,14 +118,20 @@ msgstr "Unprotected"
 msgid "The form has expired or is invalid. Please try again."
 msgstr "The form has expired or is invalid. Please try again."
 
-msgid "You do not have permission to enter the room. Please request permission."
-msgstr "You do not have permission to enter the room. Please request permission."
+msgid ""
+"You do not have permission to enter the room. Please request permission."
+msgstr ""
+"You do not have permission to enter the room. Please request permission."
 
 msgid "The access code you have entered is incorrect. Please try again."
 msgstr "The access code you have entered is incorrect. Please try again."
 
-msgid "Bigbluebutton depends on the font awesome plugin. Please install and activate it."
-msgstr "Bigbluebutton depends on the font awesome plugin. Please install and activate it."
+msgid ""
+"Bigbluebutton depends on the font awesome plugin. Please install and "
+"activate it."
+msgstr ""
+"Bigbluebutton depends on the font awesome plugin. Please install and "
+"activate it."
 
 # Public strings
 msgid "Access Code"
@@ -127,3 +139,13 @@ msgstr "Access Code"
 
 msgid "This room does not currently have any recordings."
 msgstr "This room does not currently have any recordings."
+
+# Widget strings
+msgid "Room selection"
+msgstr "Room Selection"
+
+msgid "Displays a BigBlueButton login form."
+msgstr "Displays a BigBlueButton login form."
+
+msgid "There are no rooms in the selection."
+msgstr "There are no rooms in the selection."

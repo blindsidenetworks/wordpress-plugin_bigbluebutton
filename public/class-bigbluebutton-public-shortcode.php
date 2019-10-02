@@ -83,7 +83,7 @@ class Bigbluebutton_Public_Shortcode {
             if ($type == 'recording') {
                 $room_ids = array_column($rooms, 'room_id');
                 $recordings = $this->get_recordings($room_ids);
-                $content .= $display_helper->get_shortcode_recordings_as_string($room_ids[0], $recordings, $manage_recordings, $view_extended_recording_formats);
+                $content .= $display_helper->get_collapsable_recordings_view_as_string($room_ids[0], $recordings, $manage_recordings, $view_extended_recording_formats);
             } else if ($type == 'room') {
                 $join_form = $display_helper->get_join_form_as_string($rooms[0]->room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code);
                 if (sizeof($rooms) > 1) {

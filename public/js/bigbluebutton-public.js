@@ -38,15 +38,11 @@
 			if ($("#bbb-recordings-list-" + room_id).is(":visible")) {
 				$("#bbb-recordings-list-" + room_id).slideUp();
 				$(this).children("i").removeClass("fa-angle-down").addClass("fa-angle-right");
-				if (!$(this).hasClass('bbb-recordings-shortcode')) {
-					$(this).children('.bbb-expandable-header').text(php_vars.expand_recordings);
-				}
+				$(this).children('.bbb-expandable-header').text(php_vars.expand_recordings);
 			} else {
 				$("#bbb-recordings-list-" + room_id).slideDown();
 				$(this).children("i").removeClass("fa-angle-right").addClass("fa-angle-down");
-				if (!$(this).hasClass('bbb-recordings-shortcode')) {
-					$(this).children('.bbb-expandable-header').text(php_vars.collapse_recordings);
-				}
+				$(this).children('.bbb-expandable-header').text(php_vars.collapse_recordings);
 			}
 		});
 

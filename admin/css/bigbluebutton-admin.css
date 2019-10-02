@@ -38,3 +38,20 @@
     font-weight: 900;
     color: black;
 }
+
+.bbb-width-30 {
+    min-width: 30%;
+}
+
+.bbb-width-60 {
+    min-width: 60%;
+}
+
+.bbb-inline-block {
+    display: inline-block;
+}
+
+.bbb-top-bottom-margin {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}

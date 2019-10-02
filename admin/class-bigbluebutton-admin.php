@@ -122,7 +122,10 @@ class Bigbluebutton_Admin {
 				'supports' => array('title', 'editor'),
 				'rewrite' => array('slug' => 'bbb-room'),
 				'show_in_menu' => 'bbb_room',
-				'map_meta_cap' => true
+				'map_meta_cap' => true,
+				// enables block editing in the rooms editor
+				'show_in_rest' => true,
+				'supports' => array('editor')
 			)
 		);
 	}

@@ -35,28 +35,7 @@ class BigbluebuttonDisplayHelper {
     }
     
     /**
-     * Get recordings list for short code as an HTML string.
-     * 
-     * @since   3.0.0
-     * 
-     * @param   Integer     $room_id                            Post ID of the first room.
-     * @param	Array		$recordings							List of recordings for the room.
-	 * @param	Boolean		$manage_bbb_recordings				User capability to manage recordings.
-	 * @param	Boolean		$view_extended_recording_formats	User capability to view extended recording formats.
-	 * 
-	 * @return	String		$shortcode_recordings				Recordings table stored in a variable.
-	 */
-    public function get_shortcode_recordings_as_string($room_id, $recordings, $manage_bbb_recordings, $view_extended_recording_formats) {
-		$html_recordings = $this->get_recordings_as_string($room_id, $recordings, $manage_bbb_recordings, $view_extended_recording_formats);
-		ob_start();
-		include($this->file . 'partials/bigbluebutton-room-recordings-display.php');
-		$shortcode_recordings = ob_get_contents();
-		ob_end_clean();
-		return $shortcode_recordings;
-    }
-    
-    /**
-	 * Get recordings with for room as an HTML string.
+	 * Get recordings with for as an HTML string.
 	 * 
 	 * @since	3.0.0
 	 * 
@@ -67,10 +46,10 @@ class BigbluebuttonDisplayHelper {
 	 * 
 	 * @return	String		$optional_recordings				Recordings table stored in a variable.
 	 */
-	public function get_optional_recordings_view_as_string($room_id, $recordings, $manage_bbb_recordings, $view_extended_recording_formats) {
+	public function get_collapsable_recordings_view_as_string($room_id, $recordings, $manage_bbb_recordings, $view_extended_recording_formats) {
 		$html_recordings = $this->get_recordings_as_string($room_id, $recordings, $manage_bbb_recordings, $view_extended_recording_formats);
 		ob_start();
-		include($this->file . 'partials/bigbluebutton-optional-recordings-display.php');
+		include($this->file . 'partials/bigbluebutton-collapsable-recordings-display.php');
 		$optional_recordings = ob_get_contents();
 		ob_end_clean();
 		return $optional_recordings;
