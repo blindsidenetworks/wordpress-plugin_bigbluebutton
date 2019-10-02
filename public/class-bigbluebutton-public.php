@@ -117,7 +117,7 @@ class Bigbluebutton_Public {
 	 * @since	3.0.0
 	 */
 	public function enqueue_font_awesome_icons() {
-		if( ! wp_style_is('fontawesome', 'enqueued') && ! wp_style_is('font-awesome', 'enqueued')) {
+		if ( ! wp_style_is('fontawesome', 'enqueued') && ! wp_style_is('font-awesome', 'enqueued')) {
 			wp_enqueue_style('fontawesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css', array(), '4.2.0');
 		}
 	}

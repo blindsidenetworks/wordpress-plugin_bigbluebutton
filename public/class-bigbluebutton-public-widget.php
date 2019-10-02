@@ -46,7 +46,7 @@ class Bigbluebutton_Public_Widget extends WP_Widget {
         echo $before_widget;
 
         if ($room_args[0] == "CATEGORY") {
-            $category_id = $room_args[1];
+            $category_id = (int) $room_args[1];
             $rooms = $this->find_rooms_by_category($category_id, $author);
             if (sizeof($rooms) > 0) {
                 $html_form = $display_helper->get_join_form_as_string($rooms[0]->room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code);
@@ -56,12 +56,12 @@ class Bigbluebutton_Public_Widget extends WP_Widget {
             }
             
         } else if ($room_args[0] == "ROOM") {
-            $room_id = $room_args[1];
+            $room_id = (int) $room_args[1];
             $room = get_post($room_id);
             if ($room === false || $room->post_type != 'bbb-room') {
                 return;
             }
-            if (!$access_as_moderator) {
+            if ( ! $access_as_moderator) {
                 $access_as_moderator = ($room->author == get_current_user_id());
             }
             echo $display_helper->get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code);
@@ -104,8 +104,8 @@ class Bigbluebutton_Public_Widget extends WP_Widget {
         }
 
         $query = new WP_Query($args);
-        if ($query->posts) {
-            foreach($query->posts as $sql_room) {
+        if ( ! empty($query->posts)) {
+            foreach ($query->posts as $sql_room) {
                 $room = (object) array (
                     'value' => $sql_room->ID,
                     'name' => $sql_room->post_title
@@ -129,8 +129,8 @@ class Bigbluebutton_Public_Widget extends WP_Widget {
      */
     public function update($new_instance, $old_instance) {
         $instance = $old_instance;
-        $instance['select'] = isset( $new_instance['select'] ) ? wp_strip_all_tags( $new_instance['select'] ) : '';
-        $instance['author'] = isset( $old_instance['author'] ) ? $old_instance['author'] : get_current_user_id();
+        $instance['select'] = isset($new_instance['select']) ? wp_strip_all_tags( $new_instance['select'] ) : '';
+        $instance['author'] = isset($old_instance['author']) ? $old_instance['author'] : get_current_user_id();
         return $instance;
     }
 
@@ -166,8 +166,8 @@ class Bigbluebutton_Public_Widget extends WP_Widget {
 
 		$rooms = array();
 		$query = new WP_Query($args);
-		if ($query->posts) {
-			foreach($query->posts as $key => $room_id) {
+		if ( ! empty($query->posts)) {
+			foreach ($query->posts as $key => $room_id) {
 				$room = (object) array(
 					'room_id' => $room_id,
 					'room_name' => get_the_title($room_id)

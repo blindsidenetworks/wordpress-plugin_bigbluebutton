@@ -137,7 +137,7 @@ class BigbluebuttonApi {
 		$recordings = [];
 		$entry_token = "";
 
-		foreach($room_ids as $rid) {
+		foreach ($room_ids as $rid) {
 			$entry_token .= get_post_meta(sanitize_text_field($rid), 'bbb-room-token', true) . ',';
 		}
 

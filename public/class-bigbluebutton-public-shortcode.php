@@ -27,7 +27,7 @@ class Bigbluebutton_Public_Shortcode {
 		$type = 'room';
         $author = get_the_author_meta('ID');
 
-		foreach($atts as $key => $param) {
+		foreach ($atts as $key => $param) {
 			if ($key == 'type' && $param == 'recording') {
 				$type = 'recording';
 			} else if ($key == 'token') {
@@ -76,7 +76,7 @@ class Bigbluebutton_Public_Shortcode {
         $content = "";
 
         if (sizeof($rooms) > 0) {
-            if(!$access_as_moderator) {
+            if ( ! $access_as_moderator) {
                 $access_as_moderator = (get_current_user_id() == get_post($rooms[0]->room_id)->post_author);
             }
 
@@ -128,8 +128,8 @@ class Bigbluebutton_Public_Shortcode {
 
 		$rooms = array();
 		$query = new WP_Query($args);
-		if ($query->posts) {
-			foreach($query->posts as $key => $room_id) {
+		if ( ! empty($query->posts)) {
+			foreach ($query->posts as $key => $room_id) {
 				$room = (object) array(
 					'room_id' => $room_id,
 					'room_name' => get_the_title($room_id)
@@ -183,8 +183,8 @@ class Bigbluebutton_Public_Shortcode {
             }
 
 			$query = new WP_Query($args);
-			if ($query->posts) {
-				foreach($query->posts as $key => $room_id) {
+			if ( ! empty($query->posts)) {
+				foreach ($query->posts as $key => $room_id) {
 					return $room_id;
 				}
 			}

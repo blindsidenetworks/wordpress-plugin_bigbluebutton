@@ -343,7 +343,7 @@ class Bigbluebutton_Admin {
 		switch ($column) {
 			case 'category' :
 				$categories = wp_get_object_terms($post_id, 'bbb-room-category', array('fields' => 'names'));
-				if (!is_wp_error($categories)) {
+				if ( ! is_wp_error($categories)) {
 					echo implode(', ', wp_get_object_terms($post_id, 'bbb-room-category', array('fields' => 'names')));
 				}
 				break;
