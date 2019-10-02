@@ -28,7 +28,7 @@ class BigbluebuttonApi {
 		$entry_token = get_post_meta($rid, 'bbb-room-token', true);
 		$logout_url = get_permalink($rid);
 		$arr_params = array(
-			'name' => urlencode($name),
+			'name' => $name,
 			'meetingID' => urlencode($entry_token),
 			'attendeePW' => urlencode($viewer_code),
 			'moderatorPW' => urlencode($moderator_code),

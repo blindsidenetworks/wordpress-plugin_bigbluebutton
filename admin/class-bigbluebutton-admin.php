@@ -298,9 +298,11 @@ class Bigbluebutton_Admin {
 			isset($_POST['bbb-room-moderator-code-nonce']) && 
 			wp_verify_nonce($_POST['bbb-room-moderator-code-nonce'], 'bbb-room-moderator-code-nonce') &&
 			isset($_POST['bbb-room-viewer-code-nonce']) && 
-			wp_verify_nonce($_POST['bbb-room-viewer-code-nonce'], 'bbb-room-viewer-code-nonce') &
-			isset($_POST['bbb-room-recordable-nonce']) &&
-			wp_verify_nonce($_POST['bbb-room-recordable-nonce'], 'bbb-room-recordable-nonce'));
+			wp_verify_nonce($_POST['bbb-room-viewer-code-nonce'], 'bbb-room-viewer-code-nonce') &&
+			(!current_user_can('create_recordable_bbb_room') || 
+				(isset($_POST['bbb-room-recordable-nonce']) &&
+				wp_verify_nonce($_POST['bbb-room-recordable-nonce'], 'bbb-room-recordable-nonce')))
+			);
 	}
 
 	/**

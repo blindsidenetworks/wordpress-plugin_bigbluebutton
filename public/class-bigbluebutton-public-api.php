@@ -206,6 +206,8 @@ class Bigbluebutton_Public_Api {
 	 * Update the join room form on the front end with the room ID and whether the access code input should be shown or not.
 	 * 
 	 * @since	3.0.0
+	 * 
+	 * @return	String	$response	JSON response to changing room for the join form.
 	 */
 	public function get_join_form() {
 		$response = array();

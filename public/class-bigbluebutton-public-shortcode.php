@@ -66,7 +66,6 @@ class Bigbluebutton_Public_Shortcode {
      * @return  String  $content    The content of the shortcode. 
      */
     private function generate_shortcode_content($rooms, $type) {
-        $content = "<div>";
         $meta_nonce = wp_create_nonce('bbb_join_room_meta_nonce');
 		$access_using_code = current_user_can('join_with_access_code_bbb_room');
 		$access_as_moderator = current_user_can('join_as_moderator_bbb_room');
@@ -74,23 +73,26 @@ class Bigbluebutton_Public_Shortcode {
 		$manage_recordings = current_user_can('manage_bbb_room_recordings');
         $view_extended_recording_formats = current_user_can('view_extended_bbb_room_recording_formats');
         $display_helper = new BigbluebuttonDisplayHelper(plugin_dir_path(__FILE__));
+        $content = "";
 
-        $content .= "<div>";
-		if (sizeof($rooms) > 1 && $type == 'room') {
-			$content .= $display_helper->get_room_list_dropdown_as_string($rooms);
-		}
-
-		if (sizeof($rooms) > 0 && $type == 'room') {
+        if (sizeof($rooms) > 0) {
             if(!$access_as_moderator) {
                 $access_as_moderator = (get_current_user_id() == get_post($rooms[0]->room_id)->post_author);
             }
-			$content .= $display_helper->get_join_form_as_string($rooms[0]->room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code);
-		} else if (sizeof($rooms) > 0 && $type == 'recording') {
-			$room_ids = array_column($rooms, 'room_id');
-			$recordings = $this->get_recordings($room_ids);
-			$content .= $display_helper->get_shortcode_recordings_as_string($room_ids[0], $recordings, $manage_recordings, $view_extended_recording_formats);
+
+            if ($type == 'recording') {
+                $room_ids = array_column($rooms, 'room_id');
+                $recordings = $this->get_recordings($room_ids);
+                $content .= $display_helper->get_shortcode_recordings_as_string($room_ids[0], $recordings, $manage_recordings, $view_extended_recording_formats);
+            } else if ($type == 'room') {
+                $join_form = $display_helper->get_join_form_as_string($rooms[0]->room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code);
+                if (sizeof($rooms) > 1) {
+                    $join_form = $display_helper->get_room_list_dropdown_as_string($rooms, $join_form);
+                }
+                $content .= $join_form;
+            }
         }
-        $content .= "</div>";
+
         return $content;
     }
     
