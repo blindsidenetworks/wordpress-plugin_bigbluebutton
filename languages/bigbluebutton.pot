@@ -48,13 +48,67 @@ msgid "Save server settings bad url error message."
 msgstr ""
 
 # Admin Room settings
+msgid "Add New"
+msgstr ""
+
 msgid "Add New Room"
+msgstr ""
+
+msgid "Edit Room"
+msgstr ""
+
+msgid "View Room"
+msgstr ""
+
+msgid "View Rooms"
+msgstr ""
+
+msgid "Search Rooms"
+msgstr ""
+
+msgid "No rooms found"
+msgstr ""
+
+msgid "No rooms found in trash"
 msgstr ""
 
 msgid "All Rooms"
 msgstr ""
 
 msgid "New Room"
+msgstr ""
+
+msgid "Room Archives"
+msgstr ""
+
+msgid "Insert into room"
+msgstr ""
+
+msgid "Uploaded to this room"
+msgstr ""
+
+msgid "Filter rooms list"
+msgstr ""
+
+msgid "Rooms list navigation"
+msgstr ""
+
+msgid "Rooms list"
+msgstr ""
+
+msgid "Room published"
+msgstr ""
+
+msgid "Room published privately"
+msgstr ""
+
+msgid "Room reverted to draft"
+msgstr ""
+
+msgid "Room scheduled"
+msgstr ""
+
+msgid "Room updated"
 msgstr ""
 
 msgid "Moderator Code"
@@ -74,6 +128,9 @@ msgstr ""
 
 # Room description
 msgid "Join"
+msgstr ""
+
+msgid "Wait for Moderator"
 msgstr ""
 
 # Recordings description
@@ -123,11 +180,17 @@ msgstr ""
 msgid "Bigbluebutton depends on the font awesome plugin. Please install and activate it."
 msgstr ""
 
+msgid "Bigbluebutton depends on the heartbeat API. Please enable it."
+msgstr ""
+
 # Public strings
 msgid "Access Code"
 msgstr ""
 
 msgid "This room does not currently have any recordings."
+msgstr ""
+
+msgid "The meeting has not started yet. You will be automatically redirected to the meeting when it starts."
 msgstr ""
 
 # Widget strings

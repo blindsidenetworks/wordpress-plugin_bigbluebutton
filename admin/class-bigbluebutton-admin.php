@@ -115,6 +115,25 @@ class Bigbluebutton_Admin {
 					'add_new' => __('Add New', 'bigbluebutton'),
 					'add_new_item' => __('Add New Room', 'bigbluebutton'),
 					'edit_item' => __('Edit Room', 'bigbluebutton'),
+					'new_item' => __('New Room', 'bigbluebutton'),
+					'view_item' => __('View Room', 'bigbluebutton'),
+					'view_items' => __('View Rooms', 'bigbluebutton'),
+					'search_items' => __('Search Rooms', 'bigbluebutton'),
+					'not_found' => __('No rooms found', 'bigbluebutton'),
+					'not_found_in_trash' => __('No rooms found in trash', 'bigbluebutton'),
+					'all_items' => __('All Rooms', 'bigbluebutton'),
+					'archives' => __('Room Archives', 'bigbluebutton'),
+					'attributes' => __('Room Attributes', 'bigbluebutton'),
+					'insert_into_item' => __('Insert into room', 'bigbluebutton'),
+					'uploaded_to_this_item' => __('Uploaded to this room', 'bigbluebutton'),
+					'filter_items_list' => __('Filter rooms list', 'bigbluebutton'),
+					'items_list_navigation' => __('Rooms list navigation', 'bigbluebutton'),
+					'items_list' => __('Rooms list', 'bigbluebutton'),
+					'item_published' => __('Room published', 'bigbluebutton'),
+					'item_published_privately' => __('Room published privately', 'bigbluebutton'),
+					'item_reverted_to_draft' => __('Room reverted to draft', 'bigbluebutton'),
+					'item_scheduled' => __('Room scheduled', 'bigbluebutton'),
+					'item_updated' => __('Room updated', 'bigbluebutton')
 				),
 				'taxonomies' => array('bbb-room-category'),
 				'capability_type' => 'bbb_room',
@@ -125,7 +144,7 @@ class Bigbluebutton_Admin {
 				'map_meta_cap' => true,
 				// enables block editing in the rooms editor
 				'show_in_rest' => true,
-				'supports' => array('editor')
+				'supports' => array('title', 'editor', 'author')
 			)
 		);
 	}
@@ -173,6 +192,15 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
+	 * Show wait for moderator option in room creation.
+	 * 
+	 * @since	3.0.0
+	 */
+	public function register_wait_for_moderator_metabox() {
+		add_meta_box('bbb-room-wait-for-moderator', __('Wait for Moderator', 'bigbluebutton'), array($this, 'display_wait_for_mod_metabox'), 'bbb-room');
+	}
+
+	/**
 	 * Display moderator code metabox.
 	 * 
 	 * @since	3.0.0
@@ -202,6 +230,19 @@ class Bigbluebutton_Admin {
 		$existing_value = get_post_meta($object->ID, 'bbb-room-viewer-code', true);
 		wp_nonce_field('bbb-room-viewer-code-nonce', 'bbb-room-viewer-code-nonce');
 		require('partials/bigbluebutton-room-code-metabox-display.php');
+	}
+
+	/**
+	 * Display wait for moderator metabox.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	Object	$object		The object that has the room ID.
+	 */
+	public function display_wait_for_mod_metabox($object) {
+		$existing_value = get_post_meta($object->ID, 'bbb-room-wait-for-moderator', true);
+		wp_nonce_field('bbb-room-wait-for-moderator-nonce', 'bbb-room-wait-for-moderator-nonce');
+		require('partials/bigbluebutton-wait-for-mod-metabox-display.php');
 	}
 
 	/**
@@ -254,61 +295,6 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Save custom post meta to the room.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @param	Integer		$post_id	Post ID of the new room.
-	 * @return	Integer		$post_id	Post ID of the new room.
-	 */
-	public function save_room($post_id) {
-
-		if (defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
-			return $post_id;
-		}
-        
-		if ($this->can_save_room()) {
-			$moderator_code = sanitize_text_field($_POST['bbb-moderator-code']);
-			$viewer_code = sanitize_text_field($_POST['bbb-viewer-code']);
-			$recordable = (array_key_exists('bbb-room-recordable', $_POST) && 
-				sanitize_text_field($_POST['bbb-room-recordable']) == 'checked');
-
-			// add room codes to postmeta data
-			update_post_meta($post_id, 'bbb-room-moderator-code', $moderator_code);
-			update_post_meta($post_id, 'bbb-room-viewer-code', $viewer_code);
-			update_post_meta($post_id, 'bbb-room-token', 'meeting-' . $post_id);
-
-			// update room recordable value
-			if ($recordable) {
-				update_post_meta($post_id, 'bbb-room-recordable', 'true');
-			} else {
-				update_post_meta($post_id, 'bbb-room-recordable', 'false');
-			}
-			
-		} else {
-			return $post_id;
-		}
-	}
-
-	/**
-	 * Helper function to check if metadata has been submitted with correct nonces.
-	 * 
-	 * @since 3.0.0
-	 */
-	private function can_save_room() {
-		return (isset($_POST['bbb-moderator-code']) &&
-			isset($_POST['bbb-viewer-code']) &&
-			isset($_POST['bbb-room-moderator-code-nonce']) && 
-			wp_verify_nonce($_POST['bbb-room-moderator-code-nonce'], 'bbb-room-moderator-code-nonce') &&
-			isset($_POST['bbb-room-viewer-code-nonce']) && 
-			wp_verify_nonce($_POST['bbb-room-viewer-code-nonce'], 'bbb-room-viewer-code-nonce') &&
-			(!current_user_can('create_recordable_bbb_room') || 
-				(isset($_POST['bbb-room-recordable-nonce']) &&
-				wp_verify_nonce($_POST['bbb-room-recordable-nonce'], 'bbb-room-recordable-nonce')))
-			);
-	}
-
-	/**
 	 * Add custom room column headers to rooms list table. 
 	 * 
 	 * @since	3.0.0
@@ -318,8 +304,7 @@ class Bigbluebutton_Admin {
 	 */
 	public function add_custom_room_column_to_list($columns) {
 		$custom_columns = array(
-			'category' => __('Category'), 
-			'author' => __('Author'), 
+			'category' => __('Category'),
 			'permalink' => __('Permalink'), 
 			'token' => __('Token', 'bigbluebutton'),
 			'moderator-code' => __('Moderator Code', 'bigbluebutton'), 
@@ -346,9 +331,6 @@ class Bigbluebutton_Admin {
 				if ( ! is_wp_error($categories)) {
 					echo implode(', ', wp_get_object_terms($post_id, 'bbb-room-category', array('fields' => 'names')));
 				}
-				break;
-			case 'author' :
-				echo get_the_author_meta('display_name', (int) get_post($post_id)->post_author);
 				break;
 			case 'permalink' :
 				echo '<a>' . (get_permalink($post_id) ? get_permalink($post_id) : '') . '</a>';
@@ -449,5 +431,17 @@ class Bigbluebutton_Admin {
 	public function missing_font_awesome_admin_notice() {
 		$bbb_admin_error_message = __(ucfirst($this->plugin_name) . " depends on the font awesome plugin. Please install and activate it.", 'bigbluebutton');
 		require_once 'partials/bigbluebutton-error-admin-notice-display.php';
+	}
+
+	/**
+	 * Generate missing heartbeat API if missing
+	 * 
+	 * @since	3.0.0
+	 */
+	public function check_for_heartbeat_script() {
+		if ( ! wp_script_is('heartbeat', 'registered')) {
+			$bbb_admin_error_message = __(ucfirst($this->plugin_name) . " depends on the heartbeat API. Please enable it.", 'bigbluebutton');
+			require_once 'partials/bigbluebutton-error-admin-notice-display.php';
+		}
 	}
 }

@@ -123,6 +123,26 @@ class Bigbluebutton_Public {
 	}
 
 	/**
+	 * Enqueue heartbeat API for viewers to wait for moderator to join the meeting.
+	 * 
+	 * @since	3.0.0
+	 */
+	public function enqueue_heartbeat() {
+		if (get_query_var('wait_for_mod')) {
+			wp_enqueue_script('heartbeat');
+		}
+	}
+
+	/**
+	 * Add query vars for conditions.
+	 * 
+	 * @since	3.0.0
+	 */
+	public function add_query_vars($vars) {
+		$vars[] = 'wait_for_mod';
+		return $vars;
+	}
+	/**
 	 * Display join room button and recordings in the bbb-room post.
 	 * 
 	 * @since	3.0.0
@@ -152,7 +172,7 @@ class Bigbluebutton_Public {
 
 		// add join form to post content
 		$display_helper = new BigbluebuttonDisplayHelper(plugin_dir_path(__FILE__));
-		$html_form = $display_helper->get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code);
+		$html_form = $display_helper->get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code, true);
 		$content .= $html_form;
 
 		// add recordings list to post content if the room is recordable

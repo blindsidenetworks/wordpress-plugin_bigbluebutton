@@ -15,7 +15,7 @@
 
 /**
  * The core plugin class.
- *
+ *register_widget
  * This is used to define internationalization, admin-specific hooks, and
  * public-facing site hooks.
  *
@@ -117,6 +117,11 @@ class Bigbluebutton {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-bigbluebutton-admin.php';
 
 		/**
+		 * Admin area API
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-bigbluebutton-admin-api.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
@@ -152,6 +157,10 @@ class Bigbluebutton {
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/helpers/class-bigbluebutton-display-helper.php';
 
+		if( !function_exists('is_plugin_active') ) {
+			include_once( ABSPATH . 'wp-admin/includes/plugin.php' );	
+		}
+
 		$this->loader = new Bigbluebutton_Loader();
 
 	}
@@ -183,11 +192,15 @@ class Bigbluebutton {
 	private function define_admin_hooks() {
 
 		$plugin_admin = new Bigbluebutton_Admin($this->get_plugin_name(), $this->get_version());
+		$plugin_admin_api = new Bigbluebutton_Admin_Api();
 
 		// suggest installing font awesome plugin
 		if ( ! is_plugin_active('font-awesome/font-awesome.php')) {
 			$this->loader->add_action('admin_notices', $plugin_admin, 'missing_font_awesome_admin_notice');
 		}
+
+		// suggest not disabling heartbeat
+		$this->loader->add_action('admin_notices', $plugin_admin, 'check_for_heartbeat_script');
 	
 		// register bbb-rooms and custom fields
 		$this->loader->add_action('init', $plugin_admin, 'bbb_room_as_post_type');
@@ -203,7 +216,8 @@ class Bigbluebutton {
 		// add room metadata hooks
 		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'register_room_code_metaboxes');
 		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'register_record_room_metabox');
-		$this->loader->add_action('save_post', $plugin_admin, 'save_room');
+		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'register_wait_for_moderator_metabox');
+		$this->loader->add_action('save_post', $plugin_admin_api, 'save_room');
 
 		// show custom fields in rooms table
 		$this->loader->add_action('manage_posts_custom_column', $plugin_admin, 'bbb_room_custom_columns', 10, 2);
@@ -231,9 +245,15 @@ class Bigbluebutton {
 		// display join room form/button
 		$this->loader->add_filter('the_content', $plugin_public, 'bbb_room_content');
 
+		// wait for moderator heartbeat
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_heartbeat');
+		$this->loader->add_filter('query_vars', $plugin_public, 'add_query_vars');
+
 		// join room
 		$this->loader->add_action('admin_post_join_room', $plugin_public_api, 'bbb_user_join_room');
 		$this->loader->add_action('admin_post_nopriv_join_room', $plugin_public_api, 'bbb_user_join_room');
+		$this->loader->add_filter('heartbeat_received', $plugin_public_api, 'bbb_check_meeting_state', 10, 2);
+		$this->loader->add_filter('heartbeat_nopriv_received', $plugin_public_api, 'bbb_check_meeting_state', 10, 2);
 
 		// manage recording actions
 		$this->loader->add_action('wp_ajax_set_bbb_recording_publish_state', $plugin_public_api, 'set_bbb_recording_publish_state');

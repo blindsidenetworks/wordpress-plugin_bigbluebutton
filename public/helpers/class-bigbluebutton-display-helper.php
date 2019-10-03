@@ -27,7 +27,9 @@ class BigbluebuttonDisplayHelper {
 	 * @return	String		$form					Join meeting form stored in a variable.
 	 */
 	public function get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code) {
-        ob_start();
+		global $wp;
+		$current_url = home_url(add_query_arg(array(), $wp->request));
+		ob_start();
 		include($this->file . 'partials/bigbluebutton-join-display.php');
 		$form = ob_get_contents();
 		ob_end_clean();

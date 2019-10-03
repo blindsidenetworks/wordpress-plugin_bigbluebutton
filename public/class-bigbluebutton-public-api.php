@@ -66,6 +66,8 @@ class Bigbluebutton_Public_Api {
 				$username = $this->get_meeting_username($user);
 				$moderator_code = strval(get_post_meta($room_id, 'bbb-room-moderator-code', true));
 				$viewer_code = strval(get_post_meta($room_id, 'bbb-room-viewer-code', true));
+				$wait_for_mod = get_post_meta($room_id, 'bbb-room-wait-for-moderator', true);
+				$return_url = esc_url($_POST['REQUEST_URI']);
 
 				if (current_user_can('join_as_moderator_bbb_room') || $user->ID == get_post($room_id)->post_author) {
 					$entry_code = $moderator_code;
@@ -74,14 +76,37 @@ class Bigbluebutton_Public_Api {
 				} else if (current_user_can('join_with_access_code_bbb_room') && isset($_POST['bbb_meeting_access_code'])) {
 					$entry_code = sanitize_text_field($_POST['bbb_meeting_access_code']);
 					if ($entry_code != $moderator_code && $entry_code != $viewer_code) {
-						wp_redirect(esc_url(add_query_arg('password_error', '1', get_post_permalink($room_id))));
+						$query = array(
+							'password_error' => true,
+							'room_id' => $room_id
+						);
+						wp_redirect(add_query_arg($query, $return_url));
 						return;
 					}
 				} else {
 					wp_die(_('You do not have permission to enter the room. Please request permission.', 'bigbluebutton'));
 				}
+
 				$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, $username, $entry_code);
-				wp_redirect($join_url);
+
+				if ($entry_code == $viewer_code && $wait_for_mod == "true") {
+					if (BigbluebuttonApi::is_meeting_running($room_id)) {
+						wp_redirect($join_url);
+					} else {
+						$query = array(
+							'wait_for_mod' => true,
+							'room_id' => $room_id
+						);
+						// make user wait for moderator to join room
+						if (!current_user_can('join_as_viewer_bbb_room')) {
+							$send_entry_code = $viewer_code;
+							$query['entry_code'] = $entry_code;
+						}
+						wp_redirect(add_query_arg($query, $return_url));
+					}
+				} else {
+					wp_redirect($join_url);
+				}
 			} else {
 				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
@@ -224,7 +249,43 @@ class Bigbluebutton_Public_Api {
 
 		wp_send_json($response);
 	}
-    
+
+	/**
+	 * Check if the moderator has entered the room yet.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	Array	$response	Empty response without meaningful data.
+	 * @param	Array	$data		Request data for checking if the moderator has entered the meeting yet.
+	 * 
+	 * @return	Array	$response 	Response that says if the admin has entered the meeting or not.
+	 */
+	public function bbb_check_meeting_state($response, $data = []) {
+		if(empty($data['check_bigbluebutton_meeting_state']) || empty($data['bigbluebutton_room_id'])) {
+			return $response;
+		}
+
+		$username = $this->get_meeting_username(wp_get_current_user());
+		$room_id = (int) $data['bigbluebutton_room_id'];
+		$entry_code = "";
+		$response["bigbluebutton_admin_has_entered"] = false;
+
+		if (current_user_can('join_as_viewer_bbb_room')) {
+			$entry_code = strval(get_post_meta($room_id, 'bbb-room-viewer-code', true));
+		} else {
+			$entry_code = sanitize_text_field($data['bigbluebutton_room_code']);
+		}
+
+		$join_url = BigbluebuttonApi::get_join_meeting_url($room_id, $username, $entry_code);
+
+		if (BigbluebuttonApi::is_meeting_running($room_id)) {
+			$response["bigbluebutton_admin_has_entered"] = true;
+			$response["bigbluebutton_join_url"] = $join_url;
+		}
+
+		return $response;
+	}
+
     /**
 	 * Get user's name for the meeting.
 	 * 

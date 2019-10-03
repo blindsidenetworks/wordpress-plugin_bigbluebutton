@@ -116,7 +116,7 @@ class BigbluebuttonApi {
 
 		$response = new SimpleXMLElement(wp_remote_retrieve_body($full_response));
 
-		if (array_key_exists('running', $response) && $response['running'] == "true") {
+		if (property_exists($response, 'running') && $response->running == "true") {
 			return true;
 		}
 

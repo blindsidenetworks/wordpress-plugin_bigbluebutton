@@ -53,6 +53,25 @@
 			$(this).children("i").addClass('bbb-hidden');
 		});
 		
+		// check if moderator has entered the meeting yet
+		jQuery(document).on('heartbeat-send', function(event, data) {
+			if ($("#bbb-wait-for-mod-msg").length > 0) {
+				data.check_bigbluebutton_meeting_state = true;
+				data.bigbluebutton_room_id = $("#bbb-wait-for-mod-msg").data("room-id");
+				if ($("#bbb-wait-for-mod-msg").data("room-code")) {
+					data.bigbluebutton_room_code = $("#bbb-wait-for-mod-msg").data("room-code");
+				}
+			}
+		});
+
+		// handle response to checking if moderator has entered the meeting yet
+		jQuery(document).on('heartbeat-tick', function(event, data) {
+			if (! data.bigbluebutton_admin_has_entered) {
+				return;
+			}
+			window.location.replace(data.bigbluebutton_join_url);
+		});
+
 		// update join room form with new room id and access code input, if necessary
 		$(".bbb-room-selection").change(function() {
 			let self = this;
