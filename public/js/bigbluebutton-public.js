@@ -66,7 +66,7 @@
 
 		// handle response to checking if moderator has entered the meeting yet
 		jQuery(document).on('heartbeat-tick', function(event, data) {
-			if (! data.bigbluebutton_admin_has_entered) {
+			if ( ! data.bigbluebutton_admin_has_entered) {
 				return;
 			}
 			window.location.replace(data.bigbluebutton_join_url);

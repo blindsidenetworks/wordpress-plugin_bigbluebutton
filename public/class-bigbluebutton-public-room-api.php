@@ -19,7 +19,7 @@
  * @subpackage Bigbluebutton/public
  * @author     Blindside Networks <contact@blindsidenetworks.com>
  */
-class Bigbluebutton_Public_Api {
+class Bigbluebutton_Public_Room_Api {
     /**
 	 * The ID of this plugin.
 	 *
@@ -87,145 +87,12 @@ class Bigbluebutton_Public_Api {
 					wp_die(_('You do not have permission to enter the room. Please request permission.', 'bigbluebutton'));
 				}
 
-				$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, $username, $entry_code);
-
-				if ($entry_code == $viewer_code && $wait_for_mod == "true") {
-					if (BigbluebuttonApi::is_meeting_running($room_id)) {
-						wp_redirect($join_url);
-					} else {
-						$query = array(
-							'wait_for_mod' => true,
-							'room_id' => $room_id
-						);
-						// make user wait for moderator to join room
-						if (!current_user_can('join_as_viewer_bbb_room')) {
-							$send_entry_code = $viewer_code;
-							$query['entry_code'] = $entry_code;
-						}
-						wp_redirect(add_query_arg($query, $return_url));
-					}
-				} else {
-					wp_redirect($join_url);
-				}
+				$this->join_meeting($room_id, $username, $entry_code, $viewer_code, $wait_for_mod);
 			} else {
 				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
 		}
     }
-
-    /**
-	 * Handle publishing/unpublishing a recording
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @return	String	$response	JSON response to changing a recording's publication status.
-	 */
-	public function set_bbb_recording_publish_state() {
-		$response = array();
-		$response['success'] = false;
-		if (current_user_can('manage_bbb_room_recordings')) {
-			if (array_key_exists('meta_nonce', $_POST) && array_key_exists('record_id', $_POST) && 
-				array_key_exists('value', $_POST) && 
-				(sanitize_text_field($_POST['value']) == 'true' || sanitize_text_field($_POST['value']) == 'false') &&
-				wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')) {
-
-				$record_id = sanitize_text_field($_POST['record_id']);
-				$value = sanitize_text_field($_POST['value']);
-				$return_code = BigbluebuttonApi::set_recording_publish_state($record_id, $value);
-
-				if ($return_code == 200) {
-					$response['success'] = true;
-				}	
-			}
-		}
-		wp_send_json($response);
-	}
-    
-    /**
-	 * Handle protect/unprotect a recording
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @return	String	$response	JSON response to changing a recording's protection status.
-	 */
-	public function set_bbb_recording_protect_state() {
-		$response = array();
-		$response['success'] = false;
-		if (current_user_can('manage_bbb_room_recordings')) {
-			if (array_key_exists('meta_nonce', $_POST) && array_key_exists('record_id', $_POST) && 
-				array_key_exists('value', $_POST) && 
-				(sanitize_text_field($_POST['value']) == 'true' || sanitize_text_field($_POST['value']) == 'false') &&
-				wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')) {
-
-				$record_id = sanitize_text_field($_POST['record_id']);
-				$value = sanitize_text_field($_POST['value']);
-				$return_code = BigbluebuttonApi::set_recording_protect_state($record_id, $value);
-
-				if ($return_code == 200) {
-					$response['success'] = true;
-				}	
-			}
-		}
-		wp_send_json($response);
-    }
-
-    /**
-	 * Handle deleting a recording.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @return	String	$response 	JSON response to deleting a recording.
-	 */
-	public function trash_bbb_recording() {
-		$response = array();
-		$response['success'] = false;
-		if (current_user_can('manage_bbb_room_recordings')) {
-			if (array_key_exists('meta_nonce', $_POST) && array_key_exists('record_id', $_POST) && 
-				wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')) {
-
-				$record_id = sanitize_text_field($_POST['record_id']);
-				$return_code = BigbluebuttonApi::delete_recording($record_id);
-
-				if ($return_code == 200) {
-					$response['success'] = true;
-				}	
-			}
-		}
-		wp_send_json($response);
-    }
-    
-    /**
-     * Send recording metadata to Bigbluebutton API.
-     * 
-     * @since   3.0.0
-     * 
-     * @return  String  $response   JSON response to editing a recording's metadata.
-     */
-    public function set_bbb_recording_edits() {
-        $response = array();
-		$response['success'] = false;
-
-		if (current_user_can('manage_bbb_room_recordings')) {
-            if (array_key_exists('meta_nonce', $_POST) && 
-                array_key_exists('record_id', $_POST) && 
-                array_key_exists('type', $_POST) && 
-                array_key_exists('value', $_POST) &&
-                wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')
-                ) {
-
-				$record_id = sanitize_text_field($_POST['record_id']);
-                $type = sanitize_text_field($_POST['type']);
-                $value = wp_unslash(sanitize_text_field($_POST['value']));
-
-				$return_code = BigbluebuttonApi::set_recording_edits($record_id, $type, $value);
-
-				if ($return_code == 200) {
-					$response['success'] = true;
-				}	
-			}
-		}
-		wp_send_json($response);
-	}
 	
 	/**
 	 * Update the join room form on the front end with the room ID and whether the access code input should be shown or not.
@@ -244,7 +111,7 @@ class Bigbluebutton_Public_Api {
 			$access_as_viewer = current_user_can('join_as_viewer_bbb_room');
 
 			$response["success"] = true;
-			$response["hide_access_code_input"] = $access_as_moderator || $access_as_viewer || !$access_using_code;
+			$response["hide_access_code_input"] = $access_as_moderator || $access_as_viewer || ! $access_using_code;
 		}
 
 		wp_send_json($response);
@@ -261,7 +128,7 @@ class Bigbluebutton_Public_Api {
 	 * @return	Array	$response 	Response that says if the admin has entered the meeting or not.
 	 */
 	public function bbb_check_meeting_state($response, $data = []) {
-		if(empty($data['check_bigbluebutton_meeting_state']) || empty($data['bigbluebutton_room_id'])) {
+		if (empty($data['check_bigbluebutton_meeting_state']) || empty($data['bigbluebutton_room_id'])) {
 			return $response;
 		}
 
@@ -284,6 +151,40 @@ class Bigbluebutton_Public_Api {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Join meeting if possible.
+	 * 
+	 * @since	3.0.0
+	 * 
+	 * @param	Integer		$room_id		ID of the room to join.
+	 * @param	String		$username		The name of the user who wants to enter the meeting.
+	 * @param	String		$entry_code		The entry code the user is attempting to join with.
+	 * @param	String		$viewer_code	The entry code for viewers.
+	 * @param	String		$wait_for_mod	Boolean value for if the room requires a moderator to join before any viewers.
+	 */
+	private function join_meeting($room_id, $username, $entry_code, $viewer_code, $wait_for_mod) {
+		$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, $username, $entry_code);
+
+		if ($entry_code == $viewer_code && $wait_for_mod == "true") {
+			if (BigbluebuttonApi::is_meeting_running($room_id)) {
+				wp_redirect($join_url);
+			} else {
+				$query = array(
+					'wait_for_mod' => true,
+					'room_id' => $room_id
+				);
+				// make user wait for moderator to join room
+				if ( ! current_user_can('join_as_viewer_bbb_room')) {
+					$send_entry_code = $viewer_code;
+					$query['entry_code'] = $entry_code;
+				}
+				wp_redirect(add_query_arg($query, $return_url));
+			}
+		} else {
+			wp_redirect($join_url);
+		}
 	}
 
     /**
