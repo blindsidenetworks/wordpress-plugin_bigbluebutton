@@ -87,7 +87,7 @@ class Bigbluebutton_Public_Room_Api {
 					wp_die(_('You do not have permission to enter the room. Please request permission.', 'bigbluebutton'));
 				}
 
-				$this->join_meeting($room_id, $username, $entry_code, $viewer_code, $wait_for_mod);
+				$this->join_meeting($return_url, $room_id, $username, $entry_code, $viewer_code, $wait_for_mod);
 			} else {
 				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
 			}
@@ -158,13 +158,14 @@ class Bigbluebutton_Public_Room_Api {
 	 * 
 	 * @since	3.0.0
 	 * 
+	 * @param	String		$return_url		URL of the page the request was made from.
 	 * @param	Integer		$room_id		ID of the room to join.
 	 * @param	String		$username		The name of the user who wants to enter the meeting.
 	 * @param	String		$entry_code		The entry code the user is attempting to join with.
 	 * @param	String		$viewer_code	The entry code for viewers.
-	 * @param	String		$wait_for_mod	Boolean value for if the room requires a moderator to join before any viewers.
+	 * @param	Boolean		$wait_for_mod	Boolean value for if the room requires a moderator to join before any viewers.
 	 */
-	private function join_meeting($room_id, $username, $entry_code, $viewer_code, $wait_for_mod) {
+	private function join_meeting($return_url, $room_id, $username, $entry_code, $viewer_code, $wait_for_mod) {
 		$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, $username, $entry_code);
 
 		if ($entry_code == $viewer_code && $wait_for_mod == "true") {
