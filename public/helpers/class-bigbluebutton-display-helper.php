@@ -29,6 +29,7 @@ class BigbluebuttonDisplayHelper {
 	public function get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code) {
 		global $wp;
 		$current_url = home_url(add_query_arg(array(), $wp->request));
+		$heartbeat_available = wp_script_is('heartbeat', 'registered');
 		ob_start();
 		include($this->file . 'partials/bigbluebutton-join-display.php');
 		$form = ob_get_contents();

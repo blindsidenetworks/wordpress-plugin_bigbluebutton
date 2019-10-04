@@ -193,6 +193,9 @@ msgstr ""
 msgid "The meeting has not started yet. You will be automatically redirected to the meeting when it starts."
 msgstr ""
 
+msgid "The meeting has not started yet. Please wait for a moderator to start the meeting before joining."
+msgstr ""
+
 # Widget strings
 msgid "Room selection"
 msgstr ""

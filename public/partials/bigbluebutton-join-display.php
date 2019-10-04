@@ -24,7 +24,11 @@
                 <?php if (isset($_REQUEST['entry_code'])) { ?>
                     data-room-code="<?php echo $_REQUEST['entry_code']; ?>"
                 <?php } ?>>
-                <?php esc_html_e('The meeting has not started yet. You will be automatically redirected to the meeting when it starts.', 'bigbluebutton') ?>
+                <?php if ($heartbeat_available) { ?>
+                    <?php esc_html_e('The meeting has not started yet. You will be automatically redirected to the meeting when it starts.', 'bigbluebutton'); ?>
+                <?php } else { ?>
+                    <?php esc_html_e('The meeting has not started yet. Please wait for a moderator to start the meeting before joining.', 'bigbluebutton'); ?>
+                <?php } ?>
             </label>
         </div>
     <?php } ?>
