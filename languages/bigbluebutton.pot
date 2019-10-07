@@ -177,6 +177,9 @@ msgstr ""
 msgid "The access code you have entered is incorrect. Please try again."
 msgstr ""
 
+msgid "It is currently not possible to create rooms on the server. Please contact support for help."
+msgstr ""
+
 msgid "Bigbluebutton depends on the font awesome plugin. Please install and activate it."
 msgstr ""
 

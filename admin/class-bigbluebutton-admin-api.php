@@ -31,7 +31,7 @@ class Bigbluebutton_Admin_Api {
 			// add room codes to postmeta data
 			update_post_meta($post_id, 'bbb-room-moderator-code', $moderator_code);
 			update_post_meta($post_id, 'bbb-room-viewer-code', $viewer_code);
-			update_post_meta($post_id, 'bbb-room-token', 'meeting-' . $post_id);
+			update_post_meta($post_id, 'bbb-room-token', 'meeting' . $post_id);
 
 			// update room recordable value
 			update_post_meta($post_id, 'bbb-room-recordable', ($recordable ? 'true' : 'false'));

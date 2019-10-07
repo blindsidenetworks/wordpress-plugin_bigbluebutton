@@ -71,7 +71,10 @@ class BigbluebuttonApi {
 		}
 
 		if ( ! self::is_meeting_running($rid)) {
-			self::create_meeting($rid);
+			$code = self::create_meeting($rid);
+			if ($code != 200) {
+				wp_die(esc_html__('It is currently not possible to create rooms on the server. Please contact support for help.', 'bigbluebutton'));
+			}
 		}
 
 		$entry_token = get_post_meta($rid, 'bbb-room-token', true);

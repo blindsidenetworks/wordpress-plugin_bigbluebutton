@@ -165,7 +165,8 @@ class Bigbluebutton_Admin {
 				'hierarchical' => true,
 				'query_var'    => true,
 				'show_in_ui' => true,
-				'show_in_menu' => 'bbb_room'
+				'show_in_menu' => 'bbb_room',
+				'show_in_rest' => true
 			)
 		);
 	}

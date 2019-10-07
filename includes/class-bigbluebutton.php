@@ -158,6 +158,11 @@ class Bigbluebutton {
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/helpers/class-bigbluebutton-display-helper.php';
 
+		/**
+		 * Bigbluebutton tokens helper
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/helpers/class-bigbluebutton-tokens-helper.php';
+		
 		if( ! function_exists('is_plugin_active') ) {
 			include_once( ABSPATH . 'wp-admin/includes/plugin.php' );	
 		}
@@ -276,6 +281,11 @@ class Bigbluebutton {
 
 		// register widget
 		$this->loader->add_action('widgets_init', $plugin_public, 'register_widget');
+
+		// work with restrict taxonomies
+		if (is_plugin_active('restrict-categories/restrict-categories.php')) {
+			$this->loader->add_action('plugins_loaded', $plugin_public, 'call_restrict_taxonomies');
+		}
 	}
 
 	/**
