@@ -72,7 +72,7 @@ class Bigbluebutton_Public_Widget extends WP_Widget {
      */
     public function update($new_instance, $old_instance) {
         $instance = $old_instance;
-        $instance['text'] = isset($new_instance['text']) ? wp_strip_all_tags( $new_instance['text'] ) : '';
+        $instance['text'] = isset($new_instance['text']) ? wp_strip_all_tags($new_instance['text']) : '';
         $instance['author'] = isset($old_instance['author']) ? $old_instance['author'] : get_current_user_id();
         return $instance;
     }

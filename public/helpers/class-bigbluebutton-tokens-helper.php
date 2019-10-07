@@ -22,7 +22,7 @@ class BigbluebuttonTokensHelper {
         $access_as_viewer = current_user_can('join_as_viewer_bbb_room');
         $rooms = array();
 
-        foreach($tokens_arr as $raw_token) {
+        foreach ($tokens_arr as $raw_token) {
             if (sanitize_text_field($raw_token) == "") {
                 continue;
             }
@@ -32,7 +32,7 @@ class BigbluebuttonTokensHelper {
                 $content = "<p>The token: " . $token . " is not associated with a room.</p>";
                 return $content;
             }
-            $rooms[] = (object) array (
+            $rooms[] = (object) array(
                 'room_id' => $room_id,
                 'room_name' => get_the_title($room_id)
             );
@@ -71,7 +71,7 @@ class BigbluebuttonTokensHelper {
         $room_ids = array();
         $content = "";
 
-        foreach($tokens_arr as $raw_token) {
+        foreach ($tokens_arr as $raw_token) {
             if (sanitize_text_field($raw_token) == "") {
                 continue;
             }

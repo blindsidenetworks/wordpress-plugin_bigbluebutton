@@ -23,9 +23,8 @@ class Bigbluebutton_Public_Shortcode {
      * @return  String  $content    Content of the shortcode with rooms and recordings.
      */
     public function display_bigbluebutton_shortcode($atts = [], $content = null) {
-		$rooms = array();
 		$type = 'room';
-		$author = get_the_author_meta('ID');
+		$author = (int) get_the_author_meta('ID');
 		$display_helper = new BigbluebuttonDisplayHelper(plugin_dir_path(__FILE__));
 		$tokens_string = "";
 

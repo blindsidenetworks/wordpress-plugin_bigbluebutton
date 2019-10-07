@@ -163,7 +163,7 @@ class Bigbluebutton {
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/helpers/class-bigbluebutton-tokens-helper.php';
 		
-		if( ! function_exists('is_plugin_active') ) {
+		if( ! function_exists('is_plugin_active')) {
 			include_once( ABSPATH . 'wp-admin/includes/plugin.php' );	
 		}
 
