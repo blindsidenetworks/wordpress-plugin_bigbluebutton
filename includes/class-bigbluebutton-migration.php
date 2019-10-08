@@ -70,6 +70,7 @@ class BigbluebuttonMigration {
 
         // delete old log table
         $wpdb->query("DROP TABLE IF EXISTS " . $old_room_logs_table);
+        return true;
     }
 
     private function import_permissions() {
