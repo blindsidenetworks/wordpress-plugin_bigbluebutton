@@ -82,6 +82,9 @@ class BigbluebuttonMigration {
         if ($old_permissions !== false) {
             foreach($old_permissions as $old_role_name => $old_role) {
                 $role = get_role($old_role_name);
+                if ($role === NULL) {
+                    continue;
+                }
                 if (isset($old_role['participate']) && $old_role['participate']) {
                     switch($old_role['defaultRole']) {
                         case 'moderator':
