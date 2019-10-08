@@ -37,6 +37,7 @@ class BigbluebuttonMigration {
                 $new_room_args = array(
                     'post_title' => $old_room->meetingName,
                     'post_type' => 'bbb-room',
+                    'post_name' => wp_unique_post_slug($old_room->meetingName)
                 );
 
                 $new_room_id = wp_insert_post($new_room_args);
