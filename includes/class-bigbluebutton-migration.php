@@ -37,7 +37,6 @@ class BigbluebuttonMigration {
                 $new_room_args = array(
                     'post_title' => $old_room->meetingName,
                     'post_type' => 'bbb-room',
-                    'post_name' => wp_unique_post_slug($old_room->meetingName)
                 );
 
                 $new_room_id = wp_insert_post($new_room_args);
@@ -47,6 +46,10 @@ class BigbluebuttonMigration {
                     return false;
                 } else {
                     wp_publish_post($new_room_id);
+                    wp_update_post(array(
+                        'ID' => $new_room_id,
+                        'post_name' => wp_unique_post_slug($old_room->meetingName, $new_room_id, 'publish', 'bbb-room', 0)
+                    ));
                     // add room codes to postmeta data
                     update_post_meta($new_room_id, 'bbb-room-moderator-code', $old_room->moderatorPW);
                     update_post_meta($new_room_id, 'bbb-room-viewer-code', $old_room->attendeePW);
