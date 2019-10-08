@@ -72,7 +72,7 @@ register_activation_hook(__FILE__, 'activate_bigbluebutton');
 register_deactivation_hook(__FILE__, 'deactivate_bigbluebutton');
 
 register_activation_hook(__FILE__, 'install_bigbluebutton');
-register_uninstall_hook(__FILE__, 'bigbluebutton_uninstall');
+register_uninstall_hook(__FILE__, 'uninstall_bigbluebutton');
 
 /**
  * The core plugin class that is used to define internationalization,

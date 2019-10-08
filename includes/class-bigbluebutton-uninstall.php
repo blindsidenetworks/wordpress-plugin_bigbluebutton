@@ -13,7 +13,7 @@ class Bigbluebutton_Uninstall {
         if ( ! defined('WP_UNINSTALL_PLUGIN')) {
             exit;
         }
-        
+
         self::trash_rooms_and_categories();
         self::delete_capabilities();
         self::remove_options();
