@@ -107,7 +107,7 @@ class BigbluebuttonTokensHelper {
         if (substr($token, 0, 8) == 'meeting') {
             $room_id = substr($token, 8);
             $room = get_post($room_id);
-            if ($room !== false && $room->post_type == 'bbb-room') {
+            if ($room !== false && $room->post_type == 'bbb-room' && $room->post_status == 'publish') {
                 return $room->ID;
             } else {
                 return 0;
@@ -116,6 +116,7 @@ class BigbluebuttonTokensHelper {
             // look for the meeting ID in the post meta of the room
             $args = array(
                 'post_type' => 'bbb-room',
+                'post_status' => 'publish',
                 'fields' => 'ids',
                 'no_found_rows' => true,
                 'posts_per_page' => -1,

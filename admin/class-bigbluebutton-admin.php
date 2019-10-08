@@ -383,7 +383,7 @@ class Bigbluebutton_Admin {
 	 */
 	public function fetch_room_server_settings() {
 		$settings = array(
-			'bbb_url' => get_option('bigbluebutton_endpoint_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/'),
+			'bbb_url' => get_option('bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/'),
 			'bbb_salt' => get_option('bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6'),
 			'bbb_default_url' => 'http://test-install.blindsidenetworks.com/bigbluebutton/',
 			'bbb_default_salt' => '8cd8ef52e8e101574e400365b55e11a6'
@@ -415,7 +415,7 @@ class Bigbluebutton_Admin {
 					return 2;
 				}
 
-				update_option('bigbluebutton_endpoint_url', $bbb_url);
+				update_option('bigbluebutton_url', $bbb_url);
 				update_option('bigbluebutton_salt', $bbb_salt);
 
 				return 1;

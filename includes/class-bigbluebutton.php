@@ -81,6 +81,22 @@ class Bigbluebutton {
 
 	}
 
+	public function check_migration() {
+		$previous_version = get_option('bigbluebutton_plugin_version');
+		$new_version = $this->get_version();
+		$migrator = new BigbluebuttonMigration($previous_version, $new_version);
+
+		if ($previous_version === false) {
+			update_option('bigbluebutton_plugin_version', $new_version);
+		} else if (version_compare($previous_version, $new_version, '<')) {
+			// TODO: warn user to back up database first
+			// $success = $migrator->migrate();
+			// if ($success) {
+			// 	update_option('bigbluebutton_plugin_version', $new_version);
+			// }
+		} 
+	}
+
 	/**
 	 * Load the required dependencies for this plugin.
 	 *
@@ -128,6 +144,11 @@ class Bigbluebutton {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-bigbluebutton-public.php';
 
 		/**
+		 * The class responsible for migrations from previous versions of the plugin to new ones.
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-migration.php';
+
+		/**
 		 * Public facing plugin API
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-bigbluebutton-public-room-api.php';
@@ -168,7 +189,7 @@ class Bigbluebutton {
 		}
 
 		$this->loader = new Bigbluebutton_Loader();
-
+		$this->loader->add_action('plugins_loaded', $this, 'check_migration');
 	}
 
 	/**

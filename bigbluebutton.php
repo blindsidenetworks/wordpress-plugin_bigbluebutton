@@ -55,8 +55,24 @@ function deactivate_bigbluebutton() {
 	Bigbluebutton_Deactivator::deactivate();
 }
 
+/**
+ * The code that runs during installing the plugin.
+ */
+function install_bigbluebutton() {
+	require_once plugin_dir_path(__FILE__) . 'includes/class-bigbluebutton-install.php';
+	Bigbluebutton_Install::install();
+}
+
+function uninstall_bigbluebutton() {
+	require_once plugin_dir_path(__FILE__) . 'includes/class-bigbluebutton-uninstall.php';
+	Bigbluebutton_Uninstall::uninstall();
+}
+
 register_activation_hook(__FILE__, 'activate_bigbluebutton');
 register_deactivation_hook(__FILE__, 'deactivate_bigbluebutton');
+
+register_activation_hook(__FILE__, 'install_bigbluebutton');
+register_uninstall_hook(__FILE__, 'bigbluebutton_uninstall');
 
 /**
  * The core plugin class that is used to define internationalization,

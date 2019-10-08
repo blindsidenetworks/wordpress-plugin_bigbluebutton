@@ -14,7 +14,7 @@ class Bigbluebutton_Public_Widget extends WP_Widget {
      */
     public function __construct() {
         parent::__construct(
-            'Bigbluebutton',
+            'bigbluebuttonwidget',
             __('Rooms', 'bigbluebutton'),
             array(
                 'customize_selective_refresh' => true,
