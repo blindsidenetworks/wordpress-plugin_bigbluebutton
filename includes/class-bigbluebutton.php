@@ -90,10 +90,10 @@ class Bigbluebutton {
 			update_option('bigbluebutton_plugin_version', $new_version);
 		} else if (version_compare($previous_version, $new_version, '<')) {
 			// TODO: warn user to back up database first
-			// $success = $migrator->migrate();
-			// if ($success) {
-			// 	update_option('bigbluebutton_plugin_version', $new_version);
-			// }
+			$success = $migrator->migrate();
+			if ($success) {
+				update_option('bigbluebutton_plugin_version', $new_version);
+			}
 		} 
 	}
 

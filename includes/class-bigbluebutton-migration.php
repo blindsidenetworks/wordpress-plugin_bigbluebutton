@@ -34,16 +34,18 @@ class BigbluebuttonMigration {
             $old_rooms = $wpdb->get_results("SELECT * FROM " . $old_rooms_table . ";");
             // import old rooms to new rooms
             foreach($old_rooms as $old_room) {
-                $new_room_id = $new_room_args = array(
+                $new_room_args = array(
                     'post_title' => $old_room->meetingName,
                     'post_type' => 'bbb-room',
-                    'post_status' => 'publish'
                 );
+
+                $new_room_id = wp_insert_post($new_room_args);
 
                 if ($new_room_id == 0) {
                     $this->error_message = "Failed to import the room, " . $old_room->meetingName . ".";
                     return false;
                 } else {
+                    wp_publish_post($new_room_id);
                     // add room codes to postmeta data
                     update_post_meta($new_room_id, 'bbb-room-moderator-code', $old_room->moderatorPW);
                     update_post_meta($new_room_id, 'bbb-room-viewer-code', $old_room->attendeePW);
@@ -54,7 +56,7 @@ class BigbluebuttonMigration {
                     update_post_meta($new_room_id, 'bbb-room-wait-for-moderator', ($old_room->waitForModerator ? 'true' : 'false'));
                     
                     // delete room from old table
-                    $wpdb->delete($table, array('id', $old_room->id));
+                    $wpdb->delete($old_rooms_table, array('id' => $old_room->id));
                 }
             }
             $check_old_rooms = $wpdb->get_results("SELECT * FROM " . $old_rooms_table . ";");
