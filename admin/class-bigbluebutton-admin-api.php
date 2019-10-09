@@ -40,7 +40,8 @@ class Bigbluebutton_Admin_Api {
 			$viewer_code = sanitize_text_field($_POST['bbb-viewer-code']);
 			$recordable = (array_key_exists('bbb-room-recordable', $_POST) && 
 				sanitize_text_field($_POST['bbb-room-recordable']) == 'checked');
-			$wait_for_mod = (sanitize_text_field($_POST['bbb-room-wait-for-moderator']) == 'checked');
+				
+			$wait_for_mod = (isset($_POST['bbb-room-wait-for-moderator']) && sanitize_text_field($_POST['bbb-room-wait-for-moderator']) == 'checked');
 
 			// add room codes to postmeta data
 			update_post_meta($post_id, 'bbb-room-moderator-code', $moderator_code);
