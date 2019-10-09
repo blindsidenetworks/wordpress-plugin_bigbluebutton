@@ -158,12 +158,6 @@ class Bigbluebutton_Public {
 		}
 
 		$room_id = get_the_ID();
-		// $meta_nonce = wp_create_nonce('bbb_join_room_meta_nonce');
-
-		// only access the meeting using a code if there is no other way
-		// $access_using_code = current_user_can('join_with_access_code_bbb_room');
-		// $access_as_moderator = (current_user_can('join_as_moderator_bbb_room') || get_current_user_id() == get_post($room_id)->post_author);
-		// $access_as_viewer = current_user_can('join_as_viewer_bbb_room');
 
 		if ($room_id === null || $room_id === false || ! isset(get_post($room_id)->post_type) || 
 			get_post($room_id)->post_type != 'bbb-room') {
@@ -171,22 +165,13 @@ class Bigbluebutton_Public {
 		}
 
 		$token = get_post_meta($room_id, 'bbb-room-token', true);
-		// add join form to post content
 		$content .= '[bigbluebutton token="' . $token . '"]';
-		// $display_helper = new BigbluebuttonDisplayHelper(plugin_dir_path(__FILE__));
-		// $html_form = $display_helper->get_join_form_as_string($room_id, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code, true);
-		// $content .= $html_form;
 
 		// add recordings list to post content if the room is recordable
 		$room_can_record = get_post_meta($room_id, 'bbb-room-recordable', true);
-		// $manage_recordings = current_user_can('manage_bbb_room_recordings');
-		// $view_extended_recording_formats = current_user_can('view_extended_bbb_room_recording_formats');
 
 		if ($room_can_record == 'true') {
 			$content .= '[bigbluebutton type="recording" token="' . $token . '"]';
-			// $recordings = $this->get_recordings(array($room_id));
-			// $html_recordings = $display_helper->get_collapsable_recordings_view_as_string($room_id, $recordings, $manage_recordings, $view_extended_recording_formats);
-			// $content .= $html_recordings;
 		}
 		
 		return $content;
