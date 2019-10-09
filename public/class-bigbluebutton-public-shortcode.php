@@ -56,9 +56,9 @@ class Bigbluebutton_Public_Shortcode {
 		}
 
 		if ($type == 'room') {
-			echo BigbluebuttonTokensHelper::join_form_from_tokens_string($display_helper, $tokens_string, $author);
+			$content .= BigbluebuttonTokensHelper::join_form_from_tokens_string($display_helper, $tokens_string, $author);
 		} else if ($type == 'recording') {
-			echo BigbluebuttonTokensHelper::recordings_table_from_tokens_string($display_helper, $tokens_string, $author);
+			$content .= BigbluebuttonTokensHelper::recordings_table_from_tokens_string($display_helper, $tokens_string, $author);
 		}
 		return $content;
 	}
