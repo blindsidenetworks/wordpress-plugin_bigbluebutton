@@ -186,6 +186,9 @@ msgstr ""
 msgid "Bigbluebutton depends on the heartbeat API. Please enable it."
 msgstr ""
 
+msgid "The token: %s is not associated with a published room."
+msgstr ""
+
 # Public strings
 msgid "Access Code"
 msgstr ""

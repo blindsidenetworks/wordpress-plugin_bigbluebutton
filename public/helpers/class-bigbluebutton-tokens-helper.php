@@ -48,7 +48,9 @@ class BigbluebuttonTokensHelper {
             $token = preg_replace("/[^a-zA-Z0-9]+/", "", $raw_token);
             $room_id = self::find_room_id_by_token($token, $author);
             if ($room_id == 0) {
-                $content = "<p>The token: " . $token . " is not associated with a published room.</p>";
+                $content = "<p>";
+                $content .= sprintf(wp_kses(__('The token: %s is not associated with a published room.', 'bigbluebutton'), array()), $token);
+                $content .= "</p>";
                 return $content;
             }
             $rooms[] = (object) array(
@@ -97,7 +99,8 @@ class BigbluebuttonTokensHelper {
             $token = preg_replace("/[^a-zA-Z0-9]+/", "", $raw_token);
             $room_id = self::find_room_id_by_token($token, $author);
             if ($room_id == 0) {
-                $content = "<p>The token: " . $token . " is not associated with a published room.</p>";
+                $content = "<p>" . sprintf(wp_kses(__('The token: %s is not associated with a published room.', 'bigbluebutton'), array()), $token);
+                $content .= "</p>";
                 return $content;
             }
             $room_ids[] = $room_id;
