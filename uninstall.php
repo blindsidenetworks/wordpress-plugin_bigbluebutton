@@ -29,3 +29,8 @@
 if ( ! defined('WP_UNINSTALL_PLUGIN')) {
 	exit;
 }
+
+if ( ! class_exists('Bigbluebutton_Uninstall')) {
+	require_once plugin_dir_path(__FILE__) . 'includes/class-bigbluebutton-uninstall.php';
+}
+Bigbluebutton_Uninstall::uninstall();
