@@ -1,5 +1,24 @@
 <?php
 
+/**
+ * The shortcode for the plugin.
+ *
+ * @link       https://blindsidenetworks.com
+ * @since      3.0.0
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public
+ */
+
+/**
+ * The shortcode for the plugin.
+ *
+ * Registers the shortcode and handles displaying the shortcode.
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public
+ * @author     Blindside Networks <contact@blindsidenetworks.com>
+ */
 class Bigbluebutton_Public_Shortcode {
 
     /**

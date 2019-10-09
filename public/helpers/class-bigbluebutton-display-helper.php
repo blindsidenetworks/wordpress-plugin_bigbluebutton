@@ -1,5 +1,24 @@
 <?php
 
+/**
+ * The display helper to get partials as strings.
+ *
+ * @link       https://blindsidenetworks.com
+ * @since      3.0.0
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public/helpers
+ */
+
+/**
+ * The display helper to get partials as strings.
+ *
+ * Gets views stored in strings for the plugin.
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public/helpers
+ * @author     Blindside Networks <contact@blindsidenetworks.com>
+ */
 class BigbluebuttonDisplayHelper {
 
     private $file;

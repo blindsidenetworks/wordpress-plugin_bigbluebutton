@@ -2,8 +2,22 @@
 
 /**
  * Handle the majority of Bigbluebutton API calls to admin.
- * 
- * @since	3.0.0
+ *
+ * @link       https://blindsidenetworks.com
+ * @since      3.0.0
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/admin
+ */
+
+/**
+ * Handle the majority of Bigbluebutton API calls to admin.
+ *
+ * Handles saving rooms as custom post type, with custom fields.
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/admin
+ * @author     Blindside Networks <contact@blindsidenetworks.com>
  */
 class Bigbluebutton_Admin_Api {
     

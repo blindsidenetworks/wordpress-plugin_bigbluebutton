@@ -1,20 +1,48 @@
 <?php
 
+/**
+ * Fired during plugin migration
+ *
+ * @link       https://blindsidenetworks.com
+ * @since      3.0.0
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/includes
+ */
+
+/**
+ * Fired during plugin migration.
+ *
+ * This class defines all code necessary to run to upgrade the plugin from an older version to the newest version.
+ *
+ * @since      3.0.0
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/includes
+ * @author     Blindside Networks <contact@blindsidenetworks.com>
+ */
 class BigbluebuttonMigration {
 
     private $old_version;
     private $new_version;
     private $error_message = "";
 
+    /**
+     * Constructor for the migration class.
+     * 
+     * @since   3.0.0
+     */
     public function __construct($old_version, $new_version) {
         $this->old_version = $old_version;
         $this->new_version = $new_version;
     }
 
+    /**
+     * Migrate from the old version to the new version.
+     * 
+     * @since   3.0.0
+     */
     public function migrate() {
-        error_log("run migration script");
-        $success = true;
-        
+        $success = true;        
         $success = $this->import_rooms();
         if (!$success) {
             return $success;
@@ -23,6 +51,11 @@ class BigbluebuttonMigration {
         return $success;
     }
 
+    /**
+     * Import rooms from the old table to the new tables.
+     * 
+     * @since   3.0.0
+     */
     private function import_rooms() {
         global $wpdb;
         $old_rooms_table = 'wp_bigbluebutton';
@@ -77,6 +110,11 @@ class BigbluebuttonMigration {
         return true;
     }
 
+    /**
+     * Import old capabilities associated with roles to the new way of handling them.
+     * 
+     * @since   3.0.0
+     */
     private function import_permissions() {
         $old_permissions = get_option('bigbluebutton_permissions');
         if ($old_permissions !== false) {
@@ -115,6 +153,16 @@ class BigbluebuttonMigration {
                             }
                             break;
                     }
+                } else if (isset($old_role['participate']) && !$old_role['participate']) {
+                    if ($role->has_cap('join_as_moderator_bbb_room')) {
+                        $role->remove_cap('join_as_moderator_bbb_room');
+                    }
+                    if ($role->has_cap('join_as_viewer_bbb_room')) {
+                        $role->remove_cap('join_as_viewer_bbb_room');
+                    }
+                    if ($role->has_cap('join_with_access_code_bbb_room')) {
+                        $role->remove_cap('join_with_access_code_bbb_room');
+                    }
                 }
                 if (isset($old_role['manageRecordings']) && $old_role['manageRecordings']) {
                     $role->add_cap('manage_bbb_room_recordings');
@@ -125,6 +173,9 @@ class BigbluebuttonMigration {
         delete_option('bigbluebutton_permissions');
     }
 
+    /**
+     * Get the error message if migration script is not successful.
+     */
     public function get_error() {
         return $this->error_message;
     }

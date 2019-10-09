@@ -212,7 +212,7 @@ Try chnaging the Permalinks structure through the Dashboard from Settings > Perm
 == Upgrade Notice ==
 
 = 3.0.0
-This plugin has been enterely rewriten. And although there has been some efforts on making it backward compatible, data and settings migrations is required.
+This plugin has been enterely rewriten. And although there has been some efforts on making it backward compatible, data and settings migrations is required. Please backup your database beforehand.
 
 = 1.3.4 =
 This version fixes some presentation issues. Style and javascript functions can added using classes and ids included on html elements.

@@ -1,5 +1,24 @@
 <?php
 
+/**
+ * The public-facing recordings API of the plugin.
+ *
+ * @link       https://blindsidenetworks.com
+ * @since      3.0.0
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public
+ */
+
+/**
+ * The public-facing recordings API of the plugin.
+ *
+ * Answers the API calls made from public facing pages about recordings.
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public
+ * @author     Blindside Networks <contact@blindsidenetworks.com>
+ */
 class Bigbluebutton_Public_Recording_Api {
 
     /**

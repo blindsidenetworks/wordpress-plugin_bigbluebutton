@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The public-facing functionality of the plugin.
+ * The public-facing room API of the plugin.
  *
  * @link       https://blindsidenetworks.com
  * @since      3.0.0
@@ -11,9 +11,9 @@
  */
 
 /**
- * The public-facing functionality of the plugin.
+ * The public-facing room API of the plugin.
  *
- * Answers the API calls made from public facing pages.
+ * Answers the API calls made from public facing pages about rooms.
  *
  * @package    Bigbluebutton
  * @subpackage Bigbluebutton/public

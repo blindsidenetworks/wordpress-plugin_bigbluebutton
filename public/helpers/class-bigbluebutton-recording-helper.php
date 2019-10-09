@@ -1,8 +1,23 @@
 <?php 
+
 /**
- * Helper for bigbigbluebutton recordings.
- * 
- * @since   3.0.0
+ * The recordings helper to fetch recordings.
+ *
+ * @link       https://blindsidenetworks.com
+ * @since      3.0.0
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public/helpers
+ */
+
+/**
+ * The recordings helper to fetch recordings.
+ *
+ * Gets recordings based on rooms, capability, and order.
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public/helpers
+ * @author     Blindside Networks <contact@blindsidenetworks.com>
  */
 class BigbluebuttonRecordingHelper {
 

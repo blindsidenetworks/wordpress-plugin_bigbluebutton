@@ -128,9 +128,14 @@ class Bigbluebutton {
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-bigbluebutton-i18n.php';
 
 		/**
-		 * The class responsible for defining all actions that occur in the admin area.
+		 * The class responsible for defining actions specific to the admin area.
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-bigbluebutton-admin.php';
+
+		/**
+		 * Registration of necessary components for the plugin.
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-bigbluebutton-register-custom-types.php';
 
 		/**
 		 * Admin area API
@@ -220,6 +225,7 @@ class Bigbluebutton {
 
 		$plugin_admin = new Bigbluebutton_Admin($this->get_plugin_name(), $this->get_version());
 		$plugin_admin_api = new Bigbluebutton_Admin_Api();
+		$plugin_admin_register_custom_types = new Bigbluebutton_Register_Custom_types();
 
 		// suggest installing font awesome plugin
 		if ( ! is_plugin_active('font-awesome/font-awesome.php')) {
@@ -228,10 +234,13 @@ class Bigbluebutton {
 
 		// suggest not disabling heartbeat
 		$this->loader->add_action('admin_notices', $plugin_admin, 'check_for_heartbeat_script');
+
+		// update notice
+		$this->loader->add_action('in_plugin_update_message-bigbluebutton/bigbluebutton-plugin.php', $plugin_admin, 'bigbluebutton_show_upgrade_notification');
 	
 		// register bbb-rooms and custom fields
-		$this->loader->add_action('init', $plugin_admin, 'bbb_room_as_post_type');
-		$this->loader->add_action('init', $plugin_admin, 'bbb_room_category_as_taxonomy_type');
+		$this->loader->add_action('init', $plugin_admin_register_custom_types, 'bbb_room_as_post_type');
+		$this->loader->add_action('init', $plugin_admin_register_custom_types, 'bbb_room_category_as_taxonomy_type');
 
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
@@ -241,9 +250,9 @@ class Bigbluebutton {
 		$this->loader->add_filter('parent_file', $plugin_admin, 'bbb_set_current_menu');
 
 		// add room metadata hooks
-		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'register_room_code_metaboxes');
-		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'register_record_room_metabox');
-		$this->loader->add_action('add_meta_boxes', $plugin_admin, 'register_wait_for_moderator_metabox');
+		$this->loader->add_action('add_meta_boxes', $plugin_admin_register_custom_types, 'register_room_code_metaboxes');
+		$this->loader->add_action('add_meta_boxes', $plugin_admin_register_custom_types, 'register_record_room_metabox');
+		$this->loader->add_action('add_meta_boxes', $plugin_admin_register_custom_types, 'register_wait_for_moderator_metabox');
 		$this->loader->add_action('save_post', $plugin_admin_api, 'save_room');
 
 		// show custom fields in rooms table

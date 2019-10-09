@@ -1,9 +1,23 @@
 <?php
 
 /**
- * Create instance of bigbluebutton widget.
- * 
- * @since   3.0.0
+ * The widget for the plugin.
+ *
+ * @link       https://blindsidenetworks.com
+ * @since      3.0.0
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public
+ */
+
+/**
+ * The widget for the plugin.
+ *
+ * Extends the core widget class for the plugin's custom widget.
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public
+ * @author     Blindside Networks <contact@blindsidenetworks.com>
  */
 class Bigbluebutton_Public_Widget extends WP_Widget {
     

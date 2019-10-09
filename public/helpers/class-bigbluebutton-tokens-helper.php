@@ -1,5 +1,24 @@
 <?php 
 
+/**
+ * The tokens helper to handle creating public facing views.
+ *
+ * @link       https://blindsidenetworks.com
+ * @since      3.0.0
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public/helpers
+ */
+
+/**
+ * The tokens helper to handle creating public facing views.
+ *
+ * Generates rooms for viewing from tokens.
+ *
+ * @package    Bigbluebutton
+ * @subpackage Bigbluebutton/public/helpers
+ * @author     Blindside Networks <contact@blindsidenetworks.com>
+ */
 class BigbluebuttonTokensHelper {
 
     /**
