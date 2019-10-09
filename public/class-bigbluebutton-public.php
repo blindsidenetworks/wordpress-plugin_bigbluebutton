@@ -153,7 +153,7 @@ class Bigbluebutton_Public {
 	public function bbb_room_content($content) {
 		global $pagenow;
 
-		if ($pagenow == 'edit.php' || $pagenow == 'post.php') {
+		if ($pagenow == 'edit.php' || $pagenow == 'post.php' || $pagenow == 'post-new.php') {
 			return $content;
 		}
 

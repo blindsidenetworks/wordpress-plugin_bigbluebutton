@@ -326,8 +326,8 @@ class BigbluebuttonApi {
 	private static function build_url($request_type, $args) {
 		$type = sanitize_text_field($request_type);
 
-		$url_val = strval(get_option('bigbluebutton_url'));
-		$salt_val = strval(get_option('bigbluebutton_salt'));
+		$url_val = strval(get_option('bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/'));
+		$salt_val = strval(get_option('bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6'));
 
 		$url = $url_val . 'api/' . $type . '?';
 
