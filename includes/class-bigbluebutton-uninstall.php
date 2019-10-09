@@ -24,7 +24,7 @@ class Bigbluebutton_Uninstall {
         $wpdb->query('DELETE FROM wp_postmeta WHERE post_id in (SELECT id from wp_posts where post_type="bbb-room");');
         $wpdb->query('DELETE FROM wp_term_relationships WHERE term_taxonomy_id in (SELECT term_taxonomy_id from wp_term_taxonomy WHERE taxonomy="bbb-room-category");');
         $wpdb->query('DELETE FROM wp_posts WHERE post_type="bbb-room";');
-        $wpdb->query('DELETE FROM wp_term_relationships WHERE taxonomy="bbb-room-category";');
+        $wpdb->query('DELETE FROM wp_term_taxonomy WHERE taxonomy="bbb-room-category";');
     }
 
     private static function delete_capabilities() {
