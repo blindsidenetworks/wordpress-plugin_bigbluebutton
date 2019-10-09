@@ -174,7 +174,7 @@ class Bigbluebutton_Admin {
 				}
 				break;
 			case 'permalink' :
-				echo '<a>' . (get_permalink($post_id) ? get_permalink($post_id) : '') . '</a>';
+				echo '<a href="' . (get_permalink($post_id) ? get_permalink($post_id) : '') . '">' . (get_permalink($post_id) ? get_permalink($post_id) : '') . '</a>';
 				break;
 			case 'token':
 				echo (string) get_post_meta($post_id, 'bbb-room-token', true);

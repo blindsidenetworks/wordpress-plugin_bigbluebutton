@@ -2,8 +2,8 @@
 Contributors: blindsidenetworks, jfederico
 Donate link: https://blindsidenetworks.com
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
-Requires at least: 3.0.1
-Tested up to: 5.2
+Requires at least: 5.1
+Tested up to: 5.2.3
 Stable tag: 3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -48,7 +48,7 @@ For setting the joining form up as a page/post, add the shortcode [bigbluebutton
 
 Since version 1.4.2 it is possible to add parameters for the shortcode which are: type, title, token and join.
 
-Type(default rooms): "rooms" or "recordings", this will show the shortcode chossen to be displayed
+Type(default rooms): "rooms" or "recordings", this will show the shortcode chosen to be displayed
 Title(default Rooms): Any title as per administrators setup.
 Token: add the meeting rooms token that you want to see in the joining form, but if left empty, all the meetings that were created will show up
 Join(default true): if true, the useres can directly join the meeting session, if false, the users View a webpage where there is an potion to join the meeting.

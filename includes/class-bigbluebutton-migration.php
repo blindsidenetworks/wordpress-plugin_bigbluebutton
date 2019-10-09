@@ -63,6 +63,8 @@ class BigbluebuttonMigration {
 
         // import old rooms to new rooms
         $old_rooms_query = $wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($old_rooms_table));
+        $old_room_logs_query = $wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($old_room_logs_table));
+        $old_room_logs_table_exists = ($wpdb->get_var($old_room_logs_query) === $old_room_logs_table);
         if ($wpdb->get_var($old_rooms_query) === $old_rooms_table) {
             $old_rooms = $wpdb->get_results("SELECT * FROM " . $old_rooms_table . ";");
             // import old rooms to new rooms
@@ -83,10 +85,15 @@ class BigbluebuttonMigration {
                         'ID' => $new_room_id,
                         'post_name' => wp_unique_post_slug($old_room->meetingName, $new_room_id, 'publish', 'bbb-room', 0)
                     ));
+
                     // add room codes to postmeta data
+                    $meeting_id = (strlen($old_room->meetingID) == 12)? sha1(home_url().$old_room->meetingID): $old_room->meetingID;
                     update_post_meta($new_room_id, 'bbb-room-moderator-code', $old_room->moderatorPW);
                     update_post_meta($new_room_id, 'bbb-room-viewer-code', $old_room->attendeePW);
-                    update_post_meta($new_room_id, 'bbb-room-token', $old_room->meetingID);
+                    update_post_meta($new_room_id, 'bbb-room-token', $meeting_id);
+                    if ($old_room_logs_table_exists) {
+                        $wpdb->delete($old_room_logs_table, array('meetingID' => $meeting_id));
+                    }
 
                     // update room recordable value
                     update_post_meta($new_room_id, 'bbb-room-recordable', ($old_room->recorded ? 'true' : 'false'));
@@ -103,10 +110,16 @@ class BigbluebuttonMigration {
             } else {
                 $wpdb->query("DROP TABLE IF EXISTS " . $old_rooms_table);
             }
+            $check_room_logs = $wpdb->get_results("SELECT * FROM " . $old_room_logs_table . ";");
+            if (count($check_room_logs)) {
+                $this->error_message = "Not all room logs were able to be imported to the new version.";
+                return false;
+            } else {
+                // delete old log table
+                $wpdb->query("DROP TABLE IF EXISTS " . $old_room_logs_table);
+            }
         }
-
-        // delete old log table
-        $wpdb->query("DROP TABLE IF EXISTS " . $old_room_logs_table);
+        
         return true;
     }
 

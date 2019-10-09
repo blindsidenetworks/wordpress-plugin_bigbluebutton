@@ -139,7 +139,8 @@
 
 .bbb-recording-link > a:hover,
 .bbb-recording-link > a:focus,
-.bbb-recording-link > a:active {
+.bbb-recording-link > a:active,
+.bbb-recording-link > a:visited {
     color: white;
 }
 
