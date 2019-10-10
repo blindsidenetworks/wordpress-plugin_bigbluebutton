@@ -3,6 +3,12 @@
     <input id="bbb_join_room_id" type="hidden" name="room_id" value="<?php echo $room_id; ?>">
     <input type="hidden" id="bbb_join_room_meta_nonce" name="bbb_join_room_meta_nonce" value="<?php echo $meta_nonce; ?>">
     <input type="hidden" name="REQUEST_URI" value="<?php echo $current_url; ?>">
+    <?php if ( ! is_user_logged_in()) { ?>
+        <div id="bbb_join_with_username">
+            <label id="bbb_meeting_name_label"><?php esc_html_e('Name', 'bigbluebutton'); ?>: </label>
+            <input type="text" name="bbb_meeting_username" size=20 aria-labelledby="bbb_meeting_name_label">
+        </div>
+    <?php } ?>
     <?php if ( ! $access_as_moderator && ! $access_as_viewer && $access_using_code) { ?>
         <div id="bbb_join_with_password">
     <?php } else { ?>

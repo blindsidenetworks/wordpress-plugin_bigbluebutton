@@ -42,10 +42,6 @@ class Bigbluebutton_Activator {
 	 * @since	3.0.0
 	 */
     public static function set_default_roles() {
-		// default role capabilities have already been set
-		if (get_role('administrator') !== NULL && get_role('administrator')->has_cap('edit_bbb_rooms')) {
-			return;
-		}
 		$roles = get_editable_roles();
 		$role_names = array_keys($roles);
 

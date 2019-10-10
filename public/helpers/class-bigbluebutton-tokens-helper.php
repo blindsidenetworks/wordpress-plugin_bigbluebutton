@@ -39,6 +39,12 @@ class BigbluebuttonTokensHelper {
         $access_using_code = current_user_can('join_with_access_code_bbb_room');
 		$access_as_moderator = current_user_can('join_as_moderator_bbb_room');
         $access_as_viewer = current_user_can('join_as_viewer_bbb_room');
+        if ( ! is_user_logged_in() && get_role('anonymous')) {
+            $current_role = get_role('anonymous');
+            $access_using_code = $current_role->has_cap('join_with_access_code_bbb_room');
+            $access_as_moderator = $current_role->has_cap('join_as_moderator_bbb_room');
+            $access_as_viewer = $current_role->has_cap('join_as_viewer_bbb_room');
+        }
         $rooms = array();
 
         foreach ($tokens_arr as $raw_token) {

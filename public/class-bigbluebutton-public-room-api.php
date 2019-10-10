@@ -67,13 +67,22 @@ class Bigbluebutton_Public_Room_Api {
 				$moderator_code = strval(get_post_meta($room_id, 'bbb-room-moderator-code', true));
 				$viewer_code = strval(get_post_meta($room_id, 'bbb-room-viewer-code', true));
 				$wait_for_mod = get_post_meta($room_id, 'bbb-room-wait-for-moderator', true);
+				$access_using_code = current_user_can('join_with_access_code_bbb_room');
+				$access_as_moderator = current_user_can('join_as_moderator_bbb_room');
+				$access_as_viewer = current_user_can('join_as_viewer_bbb_room');
+				if ( ! is_user_logged_in() && get_role('anonymous')) {
+					$current_role = get_role('anonymous');
+					$access_using_code = $current_role->has_cap('join_with_access_code_bbb_room');
+					$access_as_moderator = $current_role->has_cap('join_as_moderator_bbb_room');
+					$access_as_viewer = $current_role->has_cap('join_as_viewer_bbb_room');
+				}
 				$return_url = esc_url($_POST['REQUEST_URI']);
 
-				if (current_user_can('join_as_moderator_bbb_room') || $user->ID == get_post($room_id)->post_author) {
+				if ($access_as_moderator || $user->ID == get_post($room_id)->post_author) {
 					$entry_code = $moderator_code;
-				} else if (current_user_can('join_as_viewer_bbb_room')) {
+				} else if ($access_as_viewer) {
 					$entry_code = $viewer_code;
-				} else if (current_user_can('join_with_access_code_bbb_room') && isset($_POST['bbb_meeting_access_code'])) {
+				} else if ($access_using_code && isset($_POST['bbb_meeting_access_code'])) {
 					$entry_code = sanitize_text_field($_POST['bbb_meeting_access_code']);
 					if ($entry_code != $moderator_code && $entry_code != $viewer_code) {
 						$query = array(
@@ -197,7 +206,12 @@ class Bigbluebutton_Public_Room_Api {
 	 * @return	String	$username	Display of the user for joining the meeting.
 	 */
 	private function get_meeting_username($user) {
-		$username = ($user && $user->display_name) ? $user->display_name : '';
+		$username = '';
+		if ($user && $user->display_name) {
+			$username = $user->display_name;
+		} else if (isset($_POST['bbb_meeting_username'])) {
+			$username = sanitize_text_field($_POST['bbb_meeting_username']);
+		}
 		return $username;
 	}
 }
