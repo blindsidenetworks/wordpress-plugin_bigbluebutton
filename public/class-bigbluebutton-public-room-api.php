@@ -53,7 +53,7 @@ class Bigbluebutton_Public_Room_Api {
     }
     
     /**
-	 * Handle authenticated user joining room.
+	 * Handle user joining room.
 	 * 
 	 * @since 	3.0.0
 	 */
@@ -87,7 +87,8 @@ class Bigbluebutton_Public_Room_Api {
 					if ($entry_code != $moderator_code && $entry_code != $viewer_code) {
 						$query = array(
 							'password_error' => true,
-							'room_id' => $room_id
+							'room_id' => $room_id,
+							'username' => $username
 						);
 						wp_redirect(add_query_arg($query, $return_url));
 						return;
@@ -141,7 +142,7 @@ class Bigbluebutton_Public_Room_Api {
 			return $response;
 		}
 
-		$username = $this->get_meeting_username(wp_get_current_user());
+		$username = sanitize_text_field($data['bigbluebutton_room_username']);
 		$room_id = (int) $data['bigbluebutton_room_id'];
 		$entry_code = "";
 		$response["bigbluebutton_admin_has_entered"] = false;
@@ -185,8 +186,13 @@ class Bigbluebutton_Public_Room_Api {
 					'wait_for_mod' => true,
 					'room_id' => $room_id
 				);
+
+				$access_as_viewer = current_user_can('join_as_viewer_bbb_room');
+				if ( ! is_user_logged_in() && get_role('anonymous')) {
+					$access_as_viewer = get_role('anonymous')->has_cap('join_as_viewer_bbb_room');
+				}
 				// make user wait for moderator to join room
-				if ( ! current_user_can('join_as_viewer_bbb_room')) {
+				if ( ! $access_as_viewer) {
 					$send_entry_code = $viewer_code;
 					$query['entry_code'] = $entry_code;
 				}

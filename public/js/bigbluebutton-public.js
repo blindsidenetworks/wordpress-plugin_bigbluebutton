@@ -61,6 +61,9 @@
 				if ($("#bbb-wait-for-mod-msg").data("room-code")) {
 					data.bigbluebutton_room_code = $("#bbb-wait-for-mod-msg").data("room-code");
 				}
+				if ($("#bbb-wait-for-mod-msg").data("room-username")) {
+					data.bigbluebutton_username = $("#bbb-wait-for-mod-msg").data("room-username");
+				}
 			}
 		});
 

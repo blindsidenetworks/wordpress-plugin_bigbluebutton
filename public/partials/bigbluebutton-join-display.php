@@ -29,6 +29,9 @@
                 data-room-id="<?php echo $room_id; ?>"
                 <?php if (isset($_REQUEST['entry_code'])) { ?>
                     data-room-code="<?php echo $_REQUEST['entry_code']; ?>"
+                <?php } ?>
+                <?php if (isset($_REQUEST['username'])) { ?>
+                    data-room-username="<?php echo $_REQUEST['username']; ?>"
                 <?php } ?>>
                 <?php if ($heartbeat_available) { ?>
                     <?php esc_html_e('The meeting has not started yet. You will be automatically redirected to the meeting when it starts.', 'bigbluebutton'); ?>
