@@ -42,7 +42,8 @@ class BigbluebuttonMigration {
      * @since   3.0.0
      */
     public function migrate() {
-        $success = true;        
+        $success = true;
+        $this->import_from_older_versions();        
         $success = $this->import_rooms();
         if (!$success) {
             return $success;
@@ -188,8 +189,143 @@ class BigbluebuttonMigration {
 
     /**
      * Get the error message if migration script is not successful.
+     * 
+     * @since   3.0.0
      */
     public function get_error() {
         return $this->error_message;
+    }
+
+    /**
+     * Import from older versions to 1.4.6 before updating to 3.0.0
+     * 
+     * @since   1.4.6
+     */
+    public function import_from_older_versions() {
+        global $wpdb, $wp_roles;
+        // Load roles if not set
+        if ( ! isset( $wp_roles ) )
+            $wp_roles = new WP_Roles();
+    
+        //Sets the name of the table
+        $table_name = $wpdb->prefix . "bigbluebutton";
+        $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+    
+        ////////////////// Updates for version 1.3.1 and earlier //////////////////
+        $bigbluebutton_plugin_version_installed = get_option('bigbluebutton_plugin_version');
+        if( !$bigbluebutton_plugin_version_installed                                                                 //It's 1.0.2 or earlier
+                || (strcmp("1.3.1", $bigbluebutton_plugin_version_installed) <= 0 && get_option("bbb_db_version")) ) {  //It's 1.3.1 not updated
+            ////////////////// Update Database //////////////////
+            /// Initialize database will create the tables added for the new version
+            $this->bigbluebutton_init_old_database();
+            /// Transfer the data from old table to the new one
+            $table_name_old = $wpdb->prefix . "bbb_meetingRooms";
+            $list_of_meetings = $wpdb->get_results("SELECT * FROM ".$table_name_old." ORDER BY id");
+            foreach ($list_of_meetings as $meeting) {
+                $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW) VALUES ( %s, %s, %s, %s, %s);";
+                $wpdb->query(
+                        $wpdb->prepare($sql, bigbluebutton_generateToken(), $meeting->meetingID, $meeting->meetingVersion, $meeting->attendeePW, $meeting->moderatorPW)
+                );
+            }
+            /// Remove the old table
+            $wpdb->query("DROP TABLE IF EXISTS $table_name_old");
+    
+            ////////////////// Update Settings //////////////////
+            if( !get_option('mt_bbb_url') ) {
+                update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
+            } else {
+                update_option( 'bigbluebutton_url', get_option('mt_bbb_url') );
+                delete_option('mt_bbb_url');
+            }
+    
+            if( !get_option('mt_salt') ) {
+                update_option( 'bigbluebutton_salt', '8cd8ef52e8e101574e400365b55e11a6' );
+            } else {
+                update_option( 'bigbluebutton_salt', get_option('mt_salt') );
+                delete_option('mt_salt');
+            }
+    
+            delete_option('mt_waitForModerator'); //deletes this option because it is no longer needed, it has been incorportated into the table.
+            delete_option('bbb_db_version'); //deletes this option because it is no longer needed, the versioning pattern has changed.
+        }
+    
+        //Set the new permission schema
+        if( $bigbluebutton_plugin_version_installed && strcmp($bigbluebutton_plugin_version_installed, "1.3.3") < 0 ) {
+            $roles = $wp_roles->role_names;
+            $roles['anonymous'] = 'Anonymous';
+    
+            if( get_option('bigbluebutton_permissions') ) {
+                $old_permissions = get_option('bigbluebutton_permissions');
+                foreach($roles as $key => $value) {
+                    if( !isset($old_permissions[$key]['participate']) ) {
+                        $permissions[$key]['participate'] = true;
+                        if($value == "Administrator") {
+                            $permissions[$key]['manageRecordings'] = true;
+                            $permissions[$key]['defaultRole'] = "moderator";
+                        } else if($value == "Anonymous") {
+                            $permissions[$key]['manageRecordings'] = false;
+                            $permissions[$key]['defaultRole'] = "none";
+                        } else {
+                            $permissions[$key]['manageRecordings'] = false;
+                            $permissions[$key]['defaultRole'] = "attendee";
+                        }
+                    } else {
+                        $permissions[$key] = $old_permissions[$key];
+                    }
+                }
+                update_option( 'bigbluebutton_permissions', $permissions );
+            }
+        }
+    
+        ////////////////// Set new bigbluebutton_plugin_version value //////////////////
+        update_option( "bigbluebutton_plugin_version", "1.4.6" );
+    
+    }
+
+    /**
+     * Initialize 1.4.6 database before moving to new version
+     * 
+     * @since   1.4.6
+     */
+    public function bigbluebutton_init_old_database() {
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    
+        global $wpdb;
+    
+        //Sets the name of the table
+        $table_name = $wpdb->prefix . "bigbluebutton";
+        $table_logs_name = $wpdb->prefix . "bigbluebutton_logs";
+    
+        //Execute sql
+        $sql = "CREATE TABLE " . $table_name . " (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        meetingID text NOT NULL,
+        meetingName text NOT NULL,
+        meetingVersion int NOT NULL,
+        attendeePW text NOT NULL,
+        moderatorPW text NOT NULL,
+        waitForModerator BOOLEAN NOT NULL DEFAULT FALSE,
+        recorded BOOLEAN NOT NULL DEFAULT FALSE,
+        UNIQUE KEY id (id)
+        );";
+        dbDelta($sql);
+    
+        $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW)
+        VALUES ('".bigbluebutton_generateToken()."','Demo meeting', '".time()."', 'ap', 'mp');";
+        dbDelta($sql);
+    
+        $sql = "INSERT INTO " . $table_name . " (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW, recorded)
+        VALUES ('".bigbluebutton_generateToken()."','Demo meeting (recorded)', '".time()."', 'ap', 'mp', TRUE);";
+        dbDelta($sql);
+    
+        $sql = "CREATE TABLE " . $table_logs_name . " (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        meetingID text NOT NULL,
+        recorded BOOLEAN NOT NULL DEFAULT FALSE,
+        timestamp int NOT NULL,
+        event text NOT NULL,
+        UNIQUE KEY id (id)
+        );";
+        dbDelta($sql);
     }
 }

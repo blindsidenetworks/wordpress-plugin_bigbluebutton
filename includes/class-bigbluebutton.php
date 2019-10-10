@@ -83,13 +83,13 @@ class Bigbluebutton {
 
 	public function check_migration() {
 		$previous_version = get_option('bigbluebutton_plugin_version');
+		$oldest_version = get_option('bbb_db_version');
 		$new_version = $this->get_version();
 		$migrator = new BigbluebuttonMigration($previous_version, $new_version);
 
-		if ($previous_version === false) {
+		if ($previous_version === false && $oldest_version === false) {
 			update_option('bigbluebutton_plugin_version', $new_version);
 		} else if (version_compare($previous_version, $new_version, '<')) {
-			// TODO: warn user to back up database first
 			$success = $migrator->migrate();
 			if ($success) {
 				update_option('bigbluebutton_plugin_version', $new_version);
