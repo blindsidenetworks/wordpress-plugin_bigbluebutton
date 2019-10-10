@@ -184,7 +184,8 @@ class Bigbluebutton_Public_Room_Api {
 			} else {
 				$query = array(
 					'wait_for_mod' => true,
-					'room_id' => $room_id
+					'room_id' => $room_id,
+					'username' => $username
 				);
 
 				$access_as_viewer = current_user_can('join_as_viewer_bbb_room');

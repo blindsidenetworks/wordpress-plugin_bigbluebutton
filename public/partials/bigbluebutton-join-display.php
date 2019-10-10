@@ -4,18 +4,18 @@
     <input type="hidden" id="bbb_join_room_meta_nonce" name="bbb_join_room_meta_nonce" value="<?php echo $meta_nonce; ?>">
     <input type="hidden" name="REQUEST_URI" value="<?php echo $current_url; ?>">
     <?php if ( ! is_user_logged_in()) { ?>
-        <div id="bbb_join_with_username">
-            <label id="bbb_meeting_name_label"><?php esc_html_e('Name', 'bigbluebutton'); ?>: </label>
-            <input type="text" name="bbb_meeting_username" size=20 aria-labelledby="bbb_meeting_name_label">
+        <div id="bbb_join_with_username" class="bbb-join-form-block">
+            <label id="bbb_meeting_name_label" class="bbb-join-room-label"><?php esc_html_e('Name', 'bigbluebutton'); ?>: </label>
+            <input type="text" name="bbb_meeting_username" class="bbb-join-room-input" aria-labelledby="bbb_meeting_name_label">
         </div>
     <?php } ?>
     <?php if ( ! $access_as_moderator && ! $access_as_viewer && $access_using_code) { ?>
-        <div id="bbb_join_with_password">
+        <div id="bbb_join_with_password" class="bbb-join-form-block">
     <?php } else { ?>
         <div id="bbb_join_with_password" style="display:none;">
     <?php } ?>
-            <label id="bbb_meeting_access_code_label"><?php esc_html_e('Access Code', 'bigbluebutton'); ?>: </label>
-            <input type="text" name="bbb_meeting_access_code" size=20 aria-labelledby="bbb_meeting_access_code_label">
+            <label id="bbb_meeting_access_code_label" class="bbb-join-room-label"><?php esc_html_e('Access Code', 'bigbluebutton'); ?>: </label>
+            <input type="text" name="bbb_meeting_access_code" class="bbb-join-room-input" aria-labelledby="bbb_meeting_access_code_label">
         </div>
         <?php if (isset($_REQUEST['password_error']) && $_REQUEST['room_id'] == $room_id) { ?>
             <div class="bbb-error">
@@ -24,7 +24,7 @@
         <?php } ?>
     <br>
     <?php if (isset($_REQUEST['wait_for_mod']) && $_REQUEST['room_id'] == $room_id) { ?>
-        <div>
+        <div class="bbb-join-form-block">
             <label id="bbb-wait-for-mod-msg"
                 data-room-id="<?php echo $room_id; ?>"
                 <?php if (isset($_REQUEST['entry_code'])) { ?>
