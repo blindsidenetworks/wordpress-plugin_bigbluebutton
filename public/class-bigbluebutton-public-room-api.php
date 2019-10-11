@@ -20,7 +20,7 @@
  * @author     Blindside Networks <contact@blindsidenetworks.com>
  */
 class Bigbluebutton_Public_Room_Api {
-    /**
+	/**
 	 * The ID of this plugin.
 	 *
 	 * @since    3.0.0
@@ -42,122 +42,128 @@ class Bigbluebutton_Public_Room_Api {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    3.0.0
-	 * @param      string    $plugin_name       The name of the plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @param    string    $plugin_name       The name of the plugin.
+	 * @param    string    $version    The version of this plugin.
 	 */
-	public function __construct($plugin_name, $version) {
+	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
-		$this->version = $version;
+		$this->version     = $version;
 
-    }
-    
-    /**
+	}
+
+	/**
 	 * Handle user joining room.
-	 * 
-	 * @since 	3.0.0
+	 *
+	 * @since   3.0.0
 	 */
 	public function bbb_user_join_room() {
-		if ( ! empty($_POST['action']) && $_POST['action'] == 'join_room') {
-			if (wp_verify_nonce($_POST['bbb_join_room_meta_nonce'], 'bbb_join_room_meta_nonce')) {
-				$room_id = $_POST['room_id'];
-				$user = wp_get_current_user();
-				$entry_code = '';
-				$username = $this->get_meeting_username($user);
-				$moderator_code = strval(get_post_meta($room_id, 'bbb-room-moderator-code', true));
-				$viewer_code = strval(get_post_meta($room_id, 'bbb-room-viewer-code', true));
-				$wait_for_mod = get_post_meta($room_id, 'bbb-room-wait-for-moderator', true);
-				$access_using_code = current_user_can('join_with_access_code_bbb_room');
-				$access_as_moderator = current_user_can('join_as_moderator_bbb_room');
-				$access_as_viewer = current_user_can('join_as_viewer_bbb_room');
-				if ( ! is_user_logged_in() && get_role('anonymous')) {
-					$current_role = get_role('anonymous');
-					$access_using_code = $current_role->has_cap('join_with_access_code_bbb_room');
-					$access_as_moderator = $current_role->has_cap('join_as_moderator_bbb_room');
-					$access_as_viewer = $current_role->has_cap('join_as_viewer_bbb_room');
+		if ( ! empty( $_POST['action'] ) && 'join_room' == $_POST['action'] ) {
+			if ( wp_verify_nonce( $_POST['bbb_join_room_meta_nonce'], 'bbb_join_room_meta_nonce' ) ) {
+				$room_id             = $_POST['room_id'];
+				$user                = wp_get_current_user();
+				$entry_code          = '';
+				$username            = $this->get_meeting_username( $user );
+				$moderator_code      = strval( get_post_meta( $room_id, 'bbb-room-moderator-code', true ) );
+				$viewer_code         = strval( get_post_meta( $room_id, 'bbb-room-viewer-code', true ) );
+				$wait_for_mod        = get_post_meta( $room_id, 'bbb-room-wait-for-moderator', true );
+				$access_using_code   = current_user_can( 'join_with_access_code_bbb_room' );
+				$access_as_moderator = current_user_can( 'join_as_moderator_bbb_room' );
+				$access_as_viewer    = current_user_can( 'join_as_viewer_bbb_room' );
+				if ( ! is_user_logged_in() && get_role( 'anonymous' ) ) {
+					$current_role        = get_role( 'anonymous' );
+					$access_using_code   = $current_role->has_cap( 'join_with_access_code_bbb_room' );
+					$access_as_moderator = $current_role->has_cap( 'join_as_moderator_bbb_room' );
+					$access_as_viewer    = $current_role->has_cap( 'join_as_viewer_bbb_room' );
 				}
-				$return_url = esc_url($_POST['REQUEST_URI']);
+				$return_url = esc_url( $_POST['REQUEST_URI'] );
 
-				if ($access_as_moderator || $user->ID == get_post($room_id)->post_author) {
+				if ( $access_as_moderator || $user->ID == get_post( $room_id )->post_author ) {
 					$entry_code = $moderator_code;
-				} else if ($access_as_viewer) {
+				} elseif ( $access_as_viewer ) {
 					$entry_code = $viewer_code;
-				} else if ($access_using_code && isset($_POST['bbb_meeting_access_code'])) {
-					$entry_code = sanitize_text_field($_POST['bbb_meeting_access_code']);
-					if ($entry_code != $moderator_code && $entry_code != $viewer_code) {
+				} elseif ( $access_using_code && isset( $_POST['bbb_meeting_access_code'] ) ) {
+					$entry_code = sanitize_text_field( $_POST['bbb_meeting_access_code'] );
+					if ( $entry_code != $moderator_code && $entry_code != $viewer_code ) {
 						$query = array(
 							'password_error' => true,
-							'room_id' => $room_id,
-							'username' => $username
+							'room_id'        => $room_id,
+							'username'       => $username,
 						);
-						wp_redirect(add_query_arg($query, $return_url));
+						wp_redirect( add_query_arg( $query, $return_url ) );
 						return;
 					}
 				} else {
-					wp_die(_('You do not have permission to enter the room. Please request permission.', 'bigbluebutton'));
+					wp_die( _( 'You do not have permission to enter the room. Please request permission.', 'bigbluebutton' ) );
 				}
 
-				$this->join_meeting($return_url, $room_id, $username, $entry_code, $viewer_code, $wait_for_mod);
+				$this->join_meeting( $return_url, $room_id, $username, $entry_code, $viewer_code, $wait_for_mod );
 			} else {
-				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
+				wp_die( esc_html( _( 'The form has expired or is invalid. Please try again.', 'bigbluebutton' ) ) );
 			}
 		}
-    }
-	
+	}
+
 	/**
 	 * Update the join room form on the front end with the room ID and whether the access code input should be shown or not.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @return	String	$response	JSON response to changing room for the join form.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @return  String  $response   JSON response to changing room for the join form.
 	 */
 	public function get_join_form() {
-		$response = array();
+		$response            = array();
 		$response['success'] = false;
-		
-		if (array_key_exists('room_id', $_POST)) {
-			$access_using_code = current_user_can('join_with_access_code_bbb_room');
-			$access_as_moderator = (current_user_can('join_as_moderator_bbb_room') || (get_current_user_id() == get_post($_POST['room_id'])->post_author));
-			$access_as_viewer = current_user_can('join_as_viewer_bbb_room');
 
-			$response["success"] = true;
-			$response["hide_access_code_input"] = $access_as_moderator || $access_as_viewer || ! $access_using_code;
+		if ( array_key_exists( 'room_id', $_POST ) ) {
+			$access_using_code   = current_user_can( 'join_with_access_code_bbb_room' );
+			$access_as_moderator = ( current_user_can( 'join_as_moderator_bbb_room' ) || ( get_current_user_id() == get_post( $_POST['room_id'] )->post_author ) );
+			$access_as_viewer    = current_user_can( 'join_as_viewer_bbb_room' );
+			if ( ! is_user_logged_in() && get_role( 'anonymous' ) ) {
+				$current_role        = get_role( 'anonymous' );
+				$access_using_code   = $current_role->has_cap( 'join_with_access_code_bbb_room' );
+				$access_as_moderator = $current_role->has_cap( 'join_as_moderator_bbb_room' );
+				$access_as_viewer    = $current_role->has_cap( 'join_as_viewer_bbb_room' );
+			}
+
+			$response['success']                = true;
+			$response['hide_access_code_input'] = $access_as_moderator || $access_as_viewer || ! $access_using_code;
 		}
 
-		wp_send_json($response);
+		wp_send_json( $response );
 	}
 
 	/**
 	 * Check if the moderator has entered the room yet.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @param	Array	$response	Empty response without meaningful data.
-	 * @param	Array	$data		Request data for checking if the moderator has entered the meeting yet.
-	 * 
-	 * @return	Array	$response 	Response that says if the admin has entered the meeting or not.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   Array   $response   Empty response without meaningful data.
+	 * @param   Array   $data       Request data for checking if the moderator has entered the meeting yet.
+	 *
+	 * @return  Array   $response   Response that says if the admin has entered the meeting or not.
 	 */
-	public function bbb_check_meeting_state($response, $data = []) {
-		if (empty($data['check_bigbluebutton_meeting_state']) || empty($data['bigbluebutton_room_id'])) {
+	public function bbb_check_meeting_state( $response, $data = [] ) {
+		if ( empty( $data['check_bigbluebutton_meeting_state'] ) || empty( $data['bigbluebutton_room_id'] ) ) {
 			return $response;
 		}
 
-		$username = sanitize_text_field($data['bigbluebutton_room_username']);
-		$room_id = (int) $data['bigbluebutton_room_id'];
-		$entry_code = "";
-		$response["bigbluebutton_admin_has_entered"] = false;
+		$username                                    = sanitize_text_field( $data['bigbluebutton_room_username'] );
+		$room_id                                     = (int) $data['bigbluebutton_room_id'];
+		$entry_code                                  = '';
+		$response['bigbluebutton_admin_has_entered'] = false;
 
-		if (current_user_can('join_as_viewer_bbb_room')) {
-			$entry_code = strval(get_post_meta($room_id, 'bbb-room-viewer-code', true));
+		if ( current_user_can( 'join_as_viewer_bbb_room' ) ) {
+			$entry_code = strval( get_post_meta( $room_id, 'bbb-room-viewer-code', true ) );
 		} else {
-			$entry_code = sanitize_text_field($data['bigbluebutton_room_code']);
+			$entry_code = sanitize_text_field( $data['bigbluebutton_room_code'] );
 		}
 
-		$join_url = BigbluebuttonApi::get_join_meeting_url($room_id, $username, $entry_code);
+		$join_url = Bigbluebutton_Api::get_join_meeting_url( $room_id, $username, $entry_code );
 
-		if (BigbluebuttonApi::is_meeting_running($room_id)) {
-			$response["bigbluebutton_admin_has_entered"] = true;
-			$response["bigbluebutton_join_url"] = $join_url;
+		if ( Bigbluebutton_Api::is_meeting_running( $room_id ) ) {
+			$response['bigbluebutton_admin_has_entered'] = true;
+			$response['bigbluebutton_join_url']          = $join_url;
 		}
 
 		return $response;
@@ -165,58 +171,58 @@ class Bigbluebutton_Public_Room_Api {
 
 	/**
 	 * Join meeting if possible.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @param	String		$return_url		URL of the page the request was made from.
-	 * @param	Integer		$room_id		ID of the room to join.
-	 * @param	String		$username		The name of the user who wants to enter the meeting.
-	 * @param	String		$entry_code		The entry code the user is attempting to join with.
-	 * @param	String		$viewer_code	The entry code for viewers.
-	 * @param	Boolean		$wait_for_mod	Boolean value for if the room requires a moderator to join before any viewers.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   String      $return_url     URL of the page the request was made from.
+	 * @param   Integer     $room_id        ID of the room to join.
+	 * @param   String      $username       The name of the user who wants to enter the meeting.
+	 * @param   String      $entry_code     The entry code the user is attempting to join with.
+	 * @param   String      $viewer_code    The entry code for viewers.
+	 * @param   Boolean     $wait_for_mod   Boolean value for if the room requires a moderator to join before any viewers.
 	 */
-	private function join_meeting($return_url, $room_id, $username, $entry_code, $viewer_code, $wait_for_mod) {
-		$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, $username, $entry_code);
+	private function join_meeting( $return_url, $room_id, $username, $entry_code, $viewer_code, $wait_for_mod ) {
+		$join_url = Bigbluebutton_Api::get_join_meeting_url( $room_id, $username, $entry_code );
 
-		if ($entry_code == $viewer_code && $wait_for_mod == "true") {
-			if (BigbluebuttonApi::is_meeting_running($room_id)) {
-				wp_redirect($join_url);
+		if ( $entry_code == $viewer_code && 'true' == $wait_for_mod ) {
+			if ( Bigbluebutton_Api::is_meeting_running( $room_id ) ) {
+				wp_redirect( $join_url );
 			} else {
 				$query = array(
 					'wait_for_mod' => true,
-					'room_id' => $room_id
+					'room_id'      => $room_id,
 				);
 
-				$access_as_viewer = current_user_can('join_as_viewer_bbb_room');
-				if ( ! is_user_logged_in() && get_role('anonymous')) {
-					$access_as_viewer = get_role('anonymous')->has_cap('join_as_viewer_bbb_room');
+				$access_as_viewer = current_user_can( 'join_as_viewer_bbb_room' );
+				if ( ! is_user_logged_in() && get_role( 'anonymous' ) ) {
+					$access_as_viewer = get_role( 'anonymous' )->has_cap( 'join_as_viewer_bbb_room' );
 				}
 				// make user wait for moderator to join room
-				if ( ! $access_as_viewer) {
-					$send_entry_code = $viewer_code;
+				if ( ! $access_as_viewer ) {
+					$send_entry_code     = $viewer_code;
 					$query['entry_code'] = $entry_code;
 				}
-				wp_redirect(add_query_arg($query, $return_url));
+				wp_redirect( add_query_arg( $query, $return_url ) );
 			}
 		} else {
-			wp_redirect($join_url);
+			wp_redirect( $join_url );
 		}
 	}
 
-    /**
+	/**
 	 * Get user's name for the meeting.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @param	Object	$user		User object.
-	 * @return	String	$username	Display of the user for joining the meeting.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   Object  $user       User object.
+	 * @return  String  $username   Display of the user for joining the meeting.
 	 */
-	private function get_meeting_username($user) {
+	private function get_meeting_username( $user ) {
 		$username = '';
-		if ($user && $user->display_name) {
+		if ( $user && $user->display_name ) {
 			$username = $user->display_name;
-		} else if (isset($_POST['bbb_meeting_username'])) {
-			$username = sanitize_text_field($_POST['bbb_meeting_username']);
+		} elseif ( isset( $_POST['bbb_meeting_username'] ) ) {
+			$username = sanitize_text_field( $_POST['bbb_meeting_username'] );
 		}
 		return $username;
 	}

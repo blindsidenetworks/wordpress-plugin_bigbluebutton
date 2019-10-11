@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Define the internationalization functionality
  *
@@ -24,8 +23,7 @@
  * @subpackage Bigbluebutton/includes
  * @author     Blindside Networks <contact@blindsidenetworks.com>
  */
-class Bigbluebutton_i18n {
-
+class Bigbluebutton_I18n {
 
 	/**
 	 * Load the plugin text domain for translation.
@@ -37,11 +35,8 @@ class Bigbluebutton_i18n {
 		load_plugin_textdomain(
 			'bigbluebutton',
 			false,
-			dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
+			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
 		);
 
 	}
-
-
-
 }

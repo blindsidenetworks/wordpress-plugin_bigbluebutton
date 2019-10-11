@@ -1,3 +1,3 @@
 <div class="error">
-    <p><?php echo $bbb_admin_error_message; ?></p>
+	<p><?php esc_html_e( $bbb_admin_error_message ); ?></p>
 </div>

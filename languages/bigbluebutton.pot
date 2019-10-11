@@ -167,6 +167,16 @@ msgstr ""
 msgid "Unprotected"
 msgstr ""
 
+# Migration Error Messages
+msgid "Failed to import the room, %s."
+msgstr ""
+
+msgid "Not all rooms were able to be imported to the new version."
+msgstr ""
+
+msgid "Not all room logs were able to be imported to the new version."
+msgstr ""
+
 # Error messages
 msgid "The form has expired or is invalid. Please try again."
 msgstr ""

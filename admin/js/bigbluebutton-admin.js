@@ -1,4 +1,4 @@
-(function( $ ) {
+( function( $ ) {
 	'use strict';
 
 	/**
@@ -29,11 +29,13 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
-	 $( window ).load(function() {
+	$( window ).load( function() {
+
 		// make update success message in save server settings disppear after 2 seconds
-		if ($(".updated").length) {
-			$(".updated").delay(2000).fadeOut();
+		if ( $( '.updated' ).length ) {
+			$( '.updated' )
+				.delay( 2000 )
+				.fadeOut();
 		}
-		
-	 });
-})( jQuery );
+	});
+}(jQuery));

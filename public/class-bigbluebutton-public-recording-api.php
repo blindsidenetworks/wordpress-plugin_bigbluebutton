@@ -21,117 +21,117 @@
  */
 class Bigbluebutton_Public_Recording_Api {
 
-    /**
+	/**
 	 * Handle publishing/unpublishing a recording
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @return	String	$response	JSON response to changing a recording's publication status.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @return  String  $response   JSON response to changing a recording's publication status.
 	 */
 	public function set_bbb_recording_publish_state() {
-		$response = array();
+		$response            = array();
 		$response['success'] = false;
-		if (current_user_can('manage_bbb_room_recordings')) {
-			if (array_key_exists('meta_nonce', $_POST) && array_key_exists('record_id', $_POST) && 
-				array_key_exists('value', $_POST) && 
-				(sanitize_text_field($_POST['value']) == 'true' || sanitize_text_field($_POST['value']) == 'false') &&
-				wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')) {
+		if ( current_user_can( 'manage_bbb_room_recordings' ) ) {
+			if ( array_key_exists( 'meta_nonce', $_POST ) && array_key_exists( 'record_id', $_POST ) &&
+				array_key_exists( 'value', $_POST ) &&
+				( sanitize_text_field( $_POST['value'] ) == 'true' || sanitize_text_field( $_POST['value'] ) == 'false' ) &&
+				wp_verify_nonce( $_POST['meta_nonce'], 'bbb_manage_recordings_nonce' ) ) {
 
-				$record_id = sanitize_text_field($_POST['record_id']);
-				$value = sanitize_text_field($_POST['value']);
-				$return_code = BigbluebuttonApi::set_recording_publish_state($record_id, $value);
+				$record_id   = sanitize_text_field( $_POST['record_id'] );
+				$value       = sanitize_text_field( $_POST['value'] );
+				$return_code = Bigbluebutton_Api::set_recording_publish_state( $record_id, $value );
 
-				if ($return_code == 200) {
+				if ( $return_code == 200 ) {
 					$response['success'] = true;
-				}	
+				}
 			}
 		}
-		wp_send_json($response);
+		wp_send_json( $response );
 	}
-    
-    /**
+
+	/**
 	 * Handle protect/unprotect a recording
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @return	String	$response	JSON response to changing a recording's protection status.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @return  String  $response   JSON response to changing a recording's protection status.
 	 */
 	public function set_bbb_recording_protect_state() {
-		$response = array();
+		$response            = array();
 		$response['success'] = false;
-		if (current_user_can('manage_bbb_room_recordings')) {
-			if (array_key_exists('meta_nonce', $_POST) && array_key_exists('record_id', $_POST) && 
-				array_key_exists('value', $_POST) && 
-				(sanitize_text_field($_POST['value']) == 'true' || sanitize_text_field($_POST['value']) == 'false') &&
-				wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')) {
+		if ( current_user_can( 'manage_bbb_room_recordings' ) ) {
+			if ( array_key_exists( 'meta_nonce', $_POST ) && array_key_exists( 'record_id', $_POST ) &&
+				array_key_exists( 'value', $_POST ) &&
+				( sanitize_text_field( $_POST['value'] ) == 'true' || sanitize_text_field( $_POST['value'] ) == 'false' ) &&
+				wp_verify_nonce( $_POST['meta_nonce'], 'bbb_manage_recordings_nonce' ) ) {
 
-				$record_id = sanitize_text_field($_POST['record_id']);
-				$value = sanitize_text_field($_POST['value']);
-				$return_code = BigbluebuttonApi::set_recording_protect_state($record_id, $value);
+				$record_id   = sanitize_text_field( $_POST['record_id'] );
+				$value       = sanitize_text_field( $_POST['value'] );
+				$return_code = Bigbluebutton_Api::set_recording_protect_state( $record_id, $value );
 
-				if ($return_code == 200) {
+				if ( $return_code == 200 ) {
 					$response['success'] = true;
-				}	
+				}
 			}
 		}
-		wp_send_json($response);
-    }
+		wp_send_json( $response );
+	}
 
-    /**
+	/**
 	 * Handle deleting a recording.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @return	String	$response 	JSON response to deleting a recording.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @return  String  $response   JSON response to deleting a recording.
 	 */
 	public function trash_bbb_recording() {
-		$response = array();
+		$response            = array();
 		$response['success'] = false;
-		if (current_user_can('manage_bbb_room_recordings')) {
-			if (array_key_exists('meta_nonce', $_POST) && array_key_exists('record_id', $_POST) && 
-				wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')) {
+		if ( current_user_can( 'manage_bbb_room_recordings' ) ) {
+			if ( array_key_exists( 'meta_nonce', $_POST ) && array_key_exists( 'record_id', $_POST ) &&
+				wp_verify_nonce( $_POST['meta_nonce'], 'bbb_manage_recordings_nonce' ) ) {
 
-				$record_id = sanitize_text_field($_POST['record_id']);
-				$return_code = BigbluebuttonApi::delete_recording($record_id);
+				$record_id   = sanitize_text_field( $_POST['record_id'] );
+				$return_code = Bigbluebutton_Api::delete_recording( $record_id );
 
-				if ($return_code == 200) {
+				if ( $return_code == 200 ) {
 					$response['success'] = true;
-				}	
+				}
 			}
 		}
-		wp_send_json($response);
-    }
-    
-    /**
-     * Send recording metadata to Bigbluebutton API.
-     * 
-     * @since   3.0.0
-     * 
-     * @return  String  $response   JSON response to editing a recording's metadata.
-     */
-    public function set_bbb_recording_edits() {
-        $response = array();
+		wp_send_json( $response );
+	}
+
+	/**
+	 * Send recording metadata to Bigbluebutton API.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @return  String  $response   JSON response to editing a recording's metadata.
+	 */
+	public function set_bbb_recording_edits() {
+		$response            = array();
 		$response['success'] = false;
 
-		if (current_user_can('manage_bbb_room_recordings')) {
-            if (array_key_exists('meta_nonce', $_POST) && 
-                array_key_exists('record_id', $_POST) && 
-                array_key_exists('type', $_POST) && 
-                array_key_exists('value', $_POST) &&
-                wp_verify_nonce($_POST['meta_nonce'], 'bbb_manage_recordings_nonce')
-                ) {
+		if ( current_user_can( 'manage_bbb_room_recordings' ) ) {
+			if ( array_key_exists( 'meta_nonce', $_POST ) &&
+				array_key_exists( 'record_id', $_POST ) &&
+				array_key_exists( 'type', $_POST ) &&
+				array_key_exists( 'value', $_POST ) &&
+				wp_verify_nonce( $_POST['meta_nonce'], 'bbb_manage_recordings_nonce' )
+				) {
 
-				$record_id = sanitize_text_field($_POST['record_id']);
-                $type = sanitize_text_field($_POST['type']);
-                $value = wp_unslash(sanitize_text_field($_POST['value']));
+				$record_id = sanitize_text_field( $_POST['record_id'] );
+				$type      = sanitize_text_field( $_POST['type'] );
+				$value     = wp_unslash( sanitize_text_field( $_POST['value'] ) );
 
-				$return_code = BigbluebuttonApi::set_recording_edits($record_id, $type, $value);
+				$return_code = Bigbluebutton_Api::set_recording_edits( $record_id, $type, $value );
 
-				if ($return_code == 200) {
+				if ( $return_code == 200 ) {
 					$response['success'] = true;
-				}	
+				}
 			}
 		}
-		wp_send_json($response);
+		wp_send_json( $response );
 	}
 }

@@ -1,14 +1,15 @@
-=== Plugin Name ===
+=== BigBlueButton ===
 Contributors: blindsidenetworks, jfederico
 Donate link: https://blindsidenetworks.com
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 5.1
 Tested up to: 5.2.3
+Requires PHP: 7.2
 Stable tag: 1.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin integrates BigBlueButton functionality into Wordpress.
+This lightweight plugin integrates BigBlueButton functionality into Wordpress.
 
 == Description ==
 
@@ -32,6 +33,12 @@ The easiest way to install is to watch this [installation video](http://www.yout
    1. You are ready to begin creating meetings, and holding conferences.
 
 == Frequently Asked Questions ==
+
+**I've migrated my rooms. Now it says they're missing when I try to access them!"**
+Please try going to settings, and save permalinks. There is no need to change your permalink structure.
+
+**I'm an admin and when I tried to enter a room, I couldn't enter as a moderator.**
+Please try deactivating the plugin, and reactivating it again.
 
 **How do I create meetings?**
 After activating the BligBlueButton plugin, click on "Rooms" when "Add New" and give the meeting a title and fill out the room details.
@@ -211,8 +218,8 @@ Try chnaging the Permalinks structure through the Dashboard from Settings > Perm
 
 == Upgrade Notice ==
 
-= 3.0.0
-This plugin has been enterely rewriten. And although there has been some efforts on making it backward compatible, data and settings migrations is required. Please backup your database beforehand.
+= 3.0.0 =
+This plugin has been entirely rewritten. Although there has been efforts to make it backward compatible, data and settings migrations is required. **Please backup your database beforehand.**
 
 = 1.3.4 =
 This version fixes some presentation issues. Style and javascript functions can added using classes and ids included on html elements.
