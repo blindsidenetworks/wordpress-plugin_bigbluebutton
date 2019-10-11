@@ -174,3 +174,17 @@
 	border-top: groove;
 	border-bottom: groove;
 }
+
+.bbb-join-room-label {
+	display: inline-block;
+	min-width: 20%;
+}
+
+.bbb-join-room-input {
+	display: inline-block;
+	min-width: 70%;
+}
+
+.bbb-join-form-block {
+	margin-bottom: 0.2em;
+}
