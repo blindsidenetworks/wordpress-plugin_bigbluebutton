@@ -78,14 +78,11 @@
 				data.bigbluebutton_room_id = $( '#bbb-wait-for-mod-msg' ).data(
 					'room-id'
 				);
-				console.log( $( '#bbb-wait-for-mod-msg' ).data( 'temp-room-pass' ) );
 				if ( $( '#bbb-wait-for-mod-msg' ).data( 'temp-room-pass' ) ) {
 					data.bigbluebutton_temp_room_pass = $(
 						'#bbb-wait-for-mod-msg'
 					).data( 'temp-room-pass' );
-					console.log( 'submitted temp pass' );
 				}
-				console.log( $( '#bbb-wait-for-mod-msg' ).data( 'room-username' ) );
 				if ( $( '#bbb-wait-for-mod-msg' ).data( 'room-username' ) ) {
 					data.bigbluebutton_room_username = $(
 						'#bbb-wait-for-mod-msg'
@@ -120,6 +117,10 @@
 							.siblings( '#joinroom' )
 							.children( '#bbb_join_room_id' )
 							.val( room_id );
+						$( self )
+							.siblings( '#joinroom' )
+							.children( '.bbb-error' )
+							.hide();
 
 						if ( response['hide_access_code_input']) {
 							$( self )
