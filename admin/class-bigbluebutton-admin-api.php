@@ -40,7 +40,6 @@ class Bigbluebutton_Admin_Api {
 			$recordable     = ( array_key_exists( 'bbb-room-recordable', $_POST ) && sanitize_text_field( $_POST['bbb-room-recordable'] ) == 'checked' );
 
 			$wait_for_mod = ( isset( $_POST['bbb-room-wait-for-moderator'] ) && sanitize_text_field( $_POST['bbb-room-wait-for-moderator'] ) == 'checked' );
-			$token        = 'meeting' . $post_id;
 
 			// Ensure the moderator code is not the same as the viewer code.
 			if ( $moderator_code === $viewer_code ) {

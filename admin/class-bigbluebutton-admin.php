@@ -191,7 +191,7 @@ class Bigbluebutton_Admin {
 				echo esc_attr( get_post_meta( $post_id, 'bbb-room-moderator-code', true ) );
 				break;
 			case 'viewer-code':
-				echo esc_attr( $post_id, 'bbb-room-viewer-code', true );
+				echo esc_attr( get_post_meta( $post_id, 'bbb-room-viewer-code', true ) );
 				break;
 		}
 	}

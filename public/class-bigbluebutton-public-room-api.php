@@ -41,8 +41,8 @@ class Bigbluebutton_Public_Room_Api {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    3.0.0
-	 * @param    string    $plugin_name       The name of the plugin.
-	 * @param    string    $version    The version of this plugin.
+	 * @param    string $plugin_name       The name of the plugin.
+	 * @param    string $version    The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
@@ -96,8 +96,6 @@ class Bigbluebutton_Public_Room_Api {
 	 * Update the join room form on the front end with the room ID and whether the access code input should be shown or not.
 	 *
 	 * @since   3.0.0
-	 *
-	 * @return  String  $response   JSON response to changing room for the join form.
 	 */
 	public function get_join_form() {
 		$response            = array();
@@ -120,10 +118,10 @@ class Bigbluebutton_Public_Room_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Array   $response   Empty response without meaningful data.
-	 * @param   Array   $data       Request data for checking if the moderator has entered the meeting yet.
+	 * @param   Array $response   Empty response without meaningful data.
+	 * @param   Array $data       Request data for checking if the moderator has entered the meeting yet.
 	 *
-	 * @return  Array   $response   Response that says if the admin has entered the meeting or not.
+	 * @return  Array $response   Response that says if the admin has entered the meeting or not.
 	 */
 	public function bbb_check_meeting_state( $response, $data = [] ) {
 		if ( empty( $data['check_bigbluebutton_meeting_state'] ) || empty( $data['bigbluebutton_room_id'] ) ) {
@@ -163,12 +161,12 @@ class Bigbluebutton_Public_Room_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   String      $return_url     URL of the page the request was made from.
-	 * @param   Integer     $room_id        ID of the room to join.
-	 * @param   String      $username       The name of the user who wants to enter the meeting.
-	 * @param   String      $entry_code     The entry code the user is attempting to join with.
-	 * @param   String      $viewer_code    The entry code for viewers.
-	 * @param   Boolean     $wait_for_mod   Boolean value for if the room requires a moderator to join before any viewers.
+	 * @param   String  $return_url     URL of the page the request was made from.
+	 * @param   Integer $room_id        ID of the room to join.
+	 * @param   String  $username       The name of the user who wants to enter the meeting.
+	 * @param   String  $entry_code     The entry code the user is attempting to join with.
+	 * @param   String  $viewer_code    The entry code for viewers.
+	 * @param   Boolean $wait_for_mod   Boolean value for if the room requires a moderator to join before any viewers.
 	 */
 	private function join_meeting( $return_url, $room_id, $username, $entry_code, $viewer_code, $wait_for_mod ) {
 		$join_url = Bigbluebutton_Api::get_join_meeting_url( $room_id, $username, $entry_code );
@@ -202,8 +200,8 @@ class Bigbluebutton_Public_Room_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Object  $user       User object.
-	 * @return  String  $username   Display of the user for joining the meeting.
+	 * @param   Object $user       User object.
+	 * @return  String $username   Display of the user for joining the meeting.
 	 */
 	private function get_meeting_username( $user ) {
 		$username = '';

@@ -151,7 +151,7 @@ class Bigbluebutton_Tokens_Helper {
 
 		// New way of creating meeting ID.
 		if ( 'meeting' == substr( $token, 0, 7 ) ) {
-			$room_id = substr( $token, 7 );
+			$room_id = (int) substr( $token, 7 );
 			$room    = get_post( $room_id );
 			if ( false !== $room && null !== $room && 'bbb-room' == $room->post_type && 'publish' == $room->post_status ) {
 				return $room->ID;

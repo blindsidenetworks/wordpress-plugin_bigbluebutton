@@ -55,7 +55,7 @@ class Bigbluebutton_Activator {
 		$roles      = get_editable_roles();
 		$role_names = array_keys( $roles );
 
-		self::set_default_capabilities_for_each_role( $roles, $role_names );
+		self::set_default_capabilities_for_each_role( $role_names );
 		update_option( 'bigbluebutton_default_roles_set', true );
 	}
 
@@ -110,7 +110,7 @@ class Bigbluebutton_Activator {
 	 *
 	 * @since  3.0.0
 	 *
-	 * @param  Role $role The role object to set capabilties for.
+	 * @param  Object $role The role object to set capabilties for.
 	 */
 	private static function set_admin_capability( $role ) {
 		$role->add_cap( 'edit_bbb_rooms' );
