@@ -208,7 +208,6 @@ class Bigbluebutton_Public_Room_Api {
 				}
 				// Make user wait for moderator to join room.
 				if ( ! $access_as_viewer ) {
-					$send_entry_code          = $viewer_code;
 					$query['temp_entry_pass'] = wp_create_nonce( 'bigbluebutton_entry_code_' . $entry_code );
 				}
 				wp_redirect( add_query_arg( $query, $return_url ) );
