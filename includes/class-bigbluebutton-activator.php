@@ -78,32 +78,20 @@ class Bigbluebutton_Activator {
 						$role->add_cap( 'join_as_moderator_bbb_room' );
 					}
 					break;
-				case 'editor':
-					if ( ! self::join_permissions_set( $role ) ) {
-						$role->add_cap( 'join_as_viewer_bbb_room' );
-					}
-					break;
 				case 'author':
 					self::set_edit_room_capability( $role );
 					if ( ! self::join_permissions_set( $role ) ) {
 						$role->add_cap( 'join_as_viewer_bbb_room' );
 					}
 					break;
+				case 'editor':
 				case 'contributor':
-					if ( ! self::join_permissions_set( $role ) ) {
-						$role->add_cap( 'join_as_viewer_bbb_room' );
-					}
-					break;
 				case 'subscriber':
 					if ( ! self::join_permissions_set( $role ) ) {
 						$role->add_cap( 'join_as_viewer_bbb_room' );
 					}
 					break;
 				case 'anonymous':
-					if ( ! self::join_permissions_set( $role ) ) {
-						$role->add_cap( 'join_with_access_code_bbb_room' );
-					}
-					break;
 				default:
 					if ( ! self::join_permissions_set( $role ) ) {
 						$role->add_cap( 'join_with_access_code_bbb_room' );
