@@ -35,7 +35,7 @@ class Bigbluebutton_Api {
 			return 404;
 		}
 
-		$name           = get_the_title( $rid );
+		$name           = html_entity_decode( get_the_title( $rid ) );
 		$moderator_code = get_post_meta( $rid, 'bbb-room-moderator-code', true );
 		$viewer_code    = get_post_meta( $rid, 'bbb-room-viewer-code', true );
 		$recordable     = get_post_meta( $rid, 'bbb-room-recordable', true );
@@ -98,7 +98,7 @@ class Bigbluebutton_Api {
 		}
 
 		$meeting_id = get_post_meta( $rid, 'bbb-room-meeting-id', true );
-		$arr_params  = array(
+		$arr_params = array(
 			'meetingID' => rawurlencode( $meeting_id ),
 			'fullName'  => rawurlencode( $uname ),
 			'password'  => rawurlencode( $pword ),
@@ -126,7 +126,7 @@ class Bigbluebutton_Api {
 		}
 
 		$meeting_id = get_post_meta( $rid, 'bbb-room-meeting-id', true );
-		$arr_params  = array(
+		$arr_params = array(
 			'meetingID' => rawurlencode( $meeting_id ),
 		);
 
