@@ -312,4 +312,25 @@ class Bigbluebutton_Admin {
 			require_once 'partials/bigbluebutton-error-admin-notice-display.php';
 		}
 	}
+
+	/**
+	 * Hide others rooms if user does not have permission to edit them.
+	 *
+	 * @since  3.0.0
+	 *
+	 * @param  Object $query   Query so far.
+	 * @return Object $query   Query for rooms.
+	 */
+	public function filter_rooms_list( $query ) {
+		global $pagenow;
+
+		if ( 'edit.php' != $pagenow || ! $query->is_admin || 'bbb-room' != $query->query_vars['post_type'] ) {
+			return $query;
+		}
+
+		if ( ! current_user_can( 'edit_others_bbb_rooms' )) {
+			$query->set( 'author', get_current_user_id() );
+		}
+		return $query;
+	}
 }

@@ -254,6 +254,9 @@ class Bigbluebutton {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
+		// Hide viewing other's rooms in rooms list.
+		$this->loader->add_filter( 'pre_get_posts', $plugin_admin, 'filter_rooms_list' );
+
 		// Create admin menu.
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'create_admin_menu' );
 		$this->loader->add_filter( 'parent_file', $plugin_admin, 'bbb_set_current_menu' );
