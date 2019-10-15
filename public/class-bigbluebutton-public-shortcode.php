@@ -49,13 +49,11 @@ class Bigbluebutton_Public_Shortcode {
 		if ( 'edit.php' == $pagenow || 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
 			return $content;
 		}
-
-		foreach ( $atts as $key => $param ) {
-			if ( 'type' == $key && 'recording' == $param ) {
-				$type = 'recording';
-			} elseif ( 'token' == $key ) {
-				$tokens_string = $param;
-			}
+		if ( array_key_exists( 'type', $atts ) && 'recording' == $atts['type'] ) {
+			$type = 'recording';
+		}
+		if ( array_key_exists( 'token', $atts ) ) {
+			$tokens_string = $atts['token'];
 		}
 
 		if ( 'room' == $type ) {

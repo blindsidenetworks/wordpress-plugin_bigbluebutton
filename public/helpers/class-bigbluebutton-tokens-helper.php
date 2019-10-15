@@ -35,9 +35,9 @@ class Bigbluebutton_Tokens_Helper {
 		$content             = '';
 		$tokens_arr          = preg_split( '/\,/', $token_string );
 		$meta_nonce          = wp_create_nonce( 'bbb_join_room_meta_nonce' );
-		$access_using_code   = self::can_user_access_room_with( 'join_with_access_code_bbb_room' );
-		$access_as_moderator = self::can_user_access_room_with( 'join_as_moderator_bbb_room' );
-		$access_as_viewer    = self::can_user_access_room_with( 'join_as_viewer_bbb_room' );
+		$access_using_code   = self::user_has_bbb_cap( 'join_with_access_code_bbb_room' );
+		$access_as_moderator = self::user_has_bbb_cap( 'join_as_moderator_bbb_room' );
+		$access_as_viewer    = self::user_has_bbb_cap( 'join_as_viewer_bbb_room' );
 		$rooms               = array();
 
 		foreach ( $tokens_arr as $raw_token ) {
@@ -84,7 +84,7 @@ class Bigbluebutton_Tokens_Helper {
 	 *
 	 * @return Boolean $user_can    Whether the user can access room using that type.
 	 */
-	public static function can_user_access_room_with( $type ) {
+	public static function user_has_bbb_cap( $type ) {
 		$user_can = false;
 		if ( is_user_logged_in() ) {
 			$user_can = current_user_can( $type );
