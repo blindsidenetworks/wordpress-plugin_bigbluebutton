@@ -43,8 +43,8 @@ class Bigbluebutton_Admin {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since   3.0.0
-	 * @param   String    $plugin_name       The name of this plugin.
-	 * @param   String    $version    The version of this plugin.
+	 * @param   String $plugin_name       The name of this plugin.
+	 * @param   String $version           The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
@@ -128,14 +128,14 @@ class Bigbluebutton_Admin {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   String  $parent_file    Current parent page that the user is on.
-	 * @return  String  $parent_file    Custom menu slug.
+	 * @param   String $parent_file    Current parent page that the user is on.
+	 * @return  String $parent_file    Custom menu slug.
 	 */
 	public function bbb_set_current_menu( $parent_file ) {
 		global $submenu_file, $current_screen, $pagenow;
 
-		# Set the submenu as active/current while anywhere in your Custom Post Type
-		if ( $current_screen->taxonomy == 'bbb-room-category' && $pagenow == 'edit-tags.php' ) {
+		// Set the submenu as active/current while anywhere in your Custom Post Type.
+		if ( 'bbb-room-category' == $current_screen->taxonomy && 'edit-tags.php' == $pagenow ) {
 			$submenu_file = 'edit-tags.php?taxonomy=bbb-room-category';
 			$parent_file  = 'bbb_room';
 		}
@@ -147,8 +147,8 @@ class Bigbluebutton_Admin {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Array   $columns    Array of existing column headers.
-	 * @return  Array   $columns    Array of existing column headers and custom column headers.
+	 * @param   Array $columns    Array of existing column headers.
+	 * @return  Array $columns    Array of existing column headers and custom column headers.
 	 */
 	public function add_custom_room_column_to_list( $columns ) {
 		$custom_columns = array(
@@ -177,20 +177,21 @@ class Bigbluebutton_Admin {
 			case 'category':
 				$categories = wp_get_object_terms( $post_id, 'bbb-room-category', array( 'fields' => 'names' ) );
 				if ( ! is_wp_error( $categories ) ) {
-					echo implode( ', ', wp_get_object_terms( $post_id, 'bbb-room-category', array( 'fields' => 'names' ) ) );
+					echo esc_attr( implode( ', ', $categories ) );
 				}
 				break;
 			case 'permalink':
-				echo '<a href="' . ( get_permalink( $post_id ) ? get_permalink( $post_id ) : '' ) . '">' . ( get_permalink( $post_id ) ? get_permalink( $post_id ) : '' ) . '</a>';
+				$permalink = ( get_permalink( $post_id ) ? get_permalink( $post_id ) : '' );
+				echo '<a href="' . esc_url( $permalink ) . '" target="_blank">' . esc_url( $permalink ) . '</a>';
 				break;
 			case 'token':
 				echo 'meeting' . esc_attr( $post_id );
 				break;
 			case 'moderator-code':
-				echo (string) get_post_meta( $post_id, 'bbb-room-moderator-code', true );
+				echo esc_attr( get_post_meta( $post_id, 'bbb-room-moderator-code', true ) );
 				break;
 			case 'viewer-code':
-				echo (string) get_post_meta( $post_id, 'bbb-room-viewer-code', true );
+				echo esc_attr( $post_id, 'bbb-room-viewer-code', true );
 				break;
 		}
 	}
@@ -230,8 +231,8 @@ class Bigbluebutton_Admin {
 	 *
 	 * @since   1.4.6
 	 *
-	 * @param   Array   $current_plugin_metadata    The plugin metadata of the current version of the plugin.
-	 * @param   Object  $new_plugin_metadata        The plugin metadata of the new version of the plugin.
+	 * @param   Array  $current_plugin_metadata    The plugin metadata of the current version of the plugin.
+	 * @param   Object $new_plugin_metadata        The plugin metadata of the new version of the plugin.
 	 */
 	public function bigbluebutton_show_upgrade_notification( $current_plugin_metadata, $new_plugin_metadata ) {
 		if ( ! $new_plugin_metadata ) {
@@ -249,8 +250,8 @@ class Bigbluebutton_Admin {
 	 *
 	 * @since   1.4.6
 	 *
-	 * @param   String      $plugin_slug            The slug of the old plugin version.
-	 * @return  Object      $new_plugin_metadata    The metadata of the new plugin version.
+	 * @param   String $plugin_slug            The slug of the old plugin version.
+	 * @return  Object $new_plugin_metadata    The metadata of the new plugin version.
 	 */
 	private function bigbluebutton_update_metadata( $plugin_slug ) {
 		$plugin_updates = get_plugin_updates();
@@ -272,23 +273,20 @@ class Bigbluebutton_Admin {
 	 *                          2 - bad url format
 	 */
 	private function room_server_settings_change() {
-		if ( ! empty( $_POST['action'] ) && $_POST['action'] == 'bbb_general_settings' ) {
-			if ( wp_verify_nonce( sanitize_text_field( $_POST['bbb_edit_server_settings_meta_nonce'] ), 'bbb_edit_server_settings_meta_nonce' ) ) {
+		if ( ! empty( $_POST['action'] ) && 'bbb_general_settings' == $_POST['action'] && wp_verify_nonce( sanitize_text_field( $_POST['bbb_edit_server_settings_meta_nonce'] ), 'bbb_edit_server_settings_meta_nonce' ) ) {
+			$bbb_url  = sanitize_text_field( $_POST['bbb_url'] );
+			$bbb_salt = sanitize_text_field( $_POST['bbb_salt'] );
 
-				$bbb_url  = sanitize_text_field( $_POST['bbb_url'] );
-				$bbb_salt = sanitize_text_field( $_POST['bbb_salt'] );
+			$bbb_url .= ( substr( $bbb_url, -1 ) == '/' ? '' : '/' );
 
-				$bbb_url .= ( substr( $bbb_url, -1 ) == '/' ? '' : '/' );
-
-				if ( substr_compare( $bbb_url, 'bigbluebutton/', strlen( $bbb_url ) - 14 ) !== 0 ) {
-					return 2;
-				}
-
-				update_option( 'bigbluebutton_url', $bbb_url );
-				update_option( 'bigbluebutton_salt', $bbb_salt );
-
-				return 1;
+			if ( substr_compare( $bbb_url, 'bigbluebutton/', strlen( $bbb_url ) - 14 ) !== 0 ) {
+				return 2;
 			}
+
+			update_option( 'bigbluebutton_url', $bbb_url );
+			update_option( 'bigbluebutton_salt', $bbb_salt );
+
+			return 1;
 		}
 		return 0;
 	}
@@ -299,7 +297,7 @@ class Bigbluebutton_Admin {
 	 * @since   3.0.0
 	 */
 	public function missing_font_awesome_admin_notice() {
-		$bbb_admin_error_message = __( ucfirst( $this->plugin_name ) . ' depends on the font awesome plugin. Please install and activate it.', 'bigbluebutton' );
+		$bbb_admin_error_message = __( 'Bigbluebutton depends on the font awesome plugin. Please install and activate it.', 'bigbluebutton' );
 		require_once 'partials/bigbluebutton-error-admin-notice-display.php';
 	}
 
@@ -310,7 +308,7 @@ class Bigbluebutton_Admin {
 	 */
 	public function check_for_heartbeat_script() {
 		if ( ! wp_script_is( 'heartbeat', 'registered' ) ) {
-			$bbb_admin_error_message = __( ucfirst( $this->plugin_name ) . ' depends on the heartbeat API. Please enable it.', 'bigbluebutton' );
+			$bbb_admin_error_message = __( 'Bigbluebutton depends on the heartbeat API. Please enable it.', 'bigbluebutton' );
 			require_once 'partials/bigbluebutton-error-admin-notice-display.php';
 		}
 	}
@@ -330,7 +328,7 @@ class Bigbluebutton_Admin {
 			return $query;
 		}
 
-		if ( ! current_user_can( 'edit_others_bbb_rooms' )) {
+		if ( ! current_user_can( 'edit_others_bbb_rooms' ) ) {
 			$query->set( 'author', get_current_user_id() );
 		}
 		return $query;
