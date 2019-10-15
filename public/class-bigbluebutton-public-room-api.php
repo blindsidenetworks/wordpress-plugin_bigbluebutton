@@ -154,7 +154,7 @@ class Bigbluebutton_Public_Room_Api {
 
 		if ( ! current_user_can( 'join_as_viewer_bbb_room' ) ) {
 			$temp_entry_pass = sanitize_text_field( $data['bigbluebutton_temp_room_pass'] );
-			if ( ! wp_verify_nonce( 'bigbluebutton_entry_code_' . $temp_entry_pass, $entry_code ) ) {
+			if ( ! wp_verify_nonce( 'bigbluebutton_entry_code_' . $entry_code, $temp_entry_pass ) ) {
 				$entry_code = '';
 			}
 		}
