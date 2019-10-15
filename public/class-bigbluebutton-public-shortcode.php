@@ -40,10 +40,15 @@ class Bigbluebutton_Public_Shortcode {
 	 * @return  String $content    Content of the shortcode with rooms and recordings.
 	 */
 	public function display_bigbluebutton_shortcode( $atts = [], $content = null ) {
+		global $pagenow;
 		$type           = 'room';
 		$author         = (int) get_the_author_meta( 'ID' );
 		$display_helper = new Bigbluebutton_Display_Helper( plugin_dir_path( __FILE__ ) );
 		$tokens_string  = '';
+
+		if ( 'edit.php' == $pagenow || 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
+			return $content;
+		}
 
 		foreach ( $atts as $key => $param ) {
 			if ( 'type' == $key && 'recording' == $param ) {

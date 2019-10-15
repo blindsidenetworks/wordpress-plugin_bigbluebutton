@@ -19,7 +19,7 @@ For more information on setting up your own BigBlueButton server or for using an
 
 == Installation ==
 
-The easiest way to install is to watch this [installation video](http://www.youtube.com/watch?v=8Tle9BEKfFo "installation video") on YouTube. Here's an overview of the installation.
+Here's an overview of the installation.
 
    1. Log in as an admin and click on the Plugins menu on the sidebar.
    1. Click Add new.

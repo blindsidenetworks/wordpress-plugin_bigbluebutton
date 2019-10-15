@@ -142,7 +142,7 @@ class Bigbluebutton_Migration {
 				$wpdb->query( 'DROP TABLE IF EXISTS ' . $old_rooms_table );
 			}
 			$check_room_logs = $wpdb->get_results( 'SELECT * FROM ' . $old_room_logs_table );
-			if ( count( $check_room_logs ) ) {
+			if ( count( $check_room_logs ) > 0 ) {
 				$this->error_message = __( 'Not all room logs were able to be imported to the new version.' );
 				return false;
 			} else {

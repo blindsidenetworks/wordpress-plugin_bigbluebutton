@@ -138,7 +138,7 @@ class Bigbluebutton_Tokens_Helper {
 		if ( 'meeting' == substr( $token, 0, 7 ) ) {
 			$room_id = substr( $token, 7 );
 			$room    = get_post( $room_id );
-			if ( false !== $room && 'bbb-room' == $room->post_type && 'publish' == $room->post_status ) {
+			if ( false !== $room && null !== $room && 'bbb-room' == $room->post_type && 'publish' == $room->post_status ) {
 				return $room->ID;
 			} else {
 				return 0;
