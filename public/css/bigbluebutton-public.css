@@ -137,7 +137,7 @@
 .bbb-recording-link > a {
 	color: #fff;
 	box-shadow: none !important;
-	text-decoration: none;
+	text-decoration: none !important;
 }
 
 .bbb-recording-link > a:hover,
