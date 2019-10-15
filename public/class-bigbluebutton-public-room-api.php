@@ -195,8 +195,8 @@ class Bigbluebutton_Public_Room_Api {
 				wp_redirect( $join_url );
 			} else {
 				$query = array(
-					'wait_for_mod' => true,
-					'room_id'      => $room_id,
+					'bigbluebutton_wait_for_mod' => true,
+					'room_id'                    => $room_id,
 				);
 
 				$access_as_viewer = current_user_can( 'join_as_viewer_bbb_room' );

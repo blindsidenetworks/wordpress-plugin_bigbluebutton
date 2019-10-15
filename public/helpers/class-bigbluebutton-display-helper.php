@@ -159,12 +159,13 @@ class Bigbluebutton_Display_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Array  $rooms      Array of rooms that were included in the shortcode.
-	 * @param   String $html_form  Form associated with dropdown.
+	 * @param   Array   $rooms           Array of rooms that were included in the shortcode.
+	 * @param   Integer $selected_room   Room ID of selected room.
+	 * @param   String  $html_form  Form associated with dropdown.
 	 *
 	 * @return  String  $dropdown   Dropdown of rooms stored in a variable.
 	 */
-	public function get_room_list_dropdown_as_string( $rooms, $html_form ) {
+	public function get_room_list_dropdown_as_string( $rooms, $selected_room, $html_form ) {
 		ob_start();
 		include $this->file . 'partials/bigbluebutton-room-dropdown-display.php';
 		$dropdown = ob_get_contents();

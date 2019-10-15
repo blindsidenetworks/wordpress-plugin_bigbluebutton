@@ -23,7 +23,7 @@
 			</div>
 		<?php } ?>
 	<br>
-	<?php if ( isset( $_REQUEST['wait_for_mod'] ) && $_REQUEST['room_id'] == $room_id ) { ?>
+	<?php if ( isset( $_REQUEST['bigbluebutton_wait_for_mod'] ) && $_REQUEST['room_id'] == $room_id ) { ?>
 		<div class="bbb-join-form-block">
 			<label id="bbb-wait-for-mod-msg"
 				data-room-id="<?php echo $room_id; ?>"
