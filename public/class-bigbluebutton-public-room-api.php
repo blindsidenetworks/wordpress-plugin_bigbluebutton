@@ -65,16 +65,10 @@ class Bigbluebutton_Public_Room_Api {
 			$moderator_code      = strval( get_post_meta( $room_id, 'bbb-room-moderator-code', true ) );
 			$viewer_code         = strval( get_post_meta( $room_id, 'bbb-room-viewer-code', true ) );
 			$wait_for_mod        = get_post_meta( $room_id, 'bbb-room-wait-for-moderator', true );
-			$access_using_code   = current_user_can( 'join_with_access_code_bbb_room' );
-			$access_as_moderator = current_user_can( 'join_as_moderator_bbb_room' );
-			$access_as_viewer    = current_user_can( 'join_as_viewer_bbb_room' );
-			if ( ! is_user_logged_in() && get_role( 'anonymous' ) ) {
-				$current_role        = get_role( 'anonymous' );
-				$access_using_code   = $current_role->has_cap( 'join_with_access_code_bbb_room' );
-				$access_as_moderator = $current_role->has_cap( 'join_as_moderator_bbb_room' );
-				$access_as_viewer    = $current_role->has_cap( 'join_as_viewer_bbb_room' );
-			}
-			$return_url = esc_url( $_POST['REQUEST_URI'] );
+			$access_using_code   = Bigbluebutton_Tokens_helper::can_user_access_room_with( 'join_with_access_code_bbb_room' );
+			$access_as_moderator = Bigbluebutton_Tokens_helper::can_user_access_room_with( 'join_as_moderator_bbb_room' );
+			$access_as_viewer    = Bigbluebutton_Tokens_helper::can_user_access_room_with( 'join_as_viewer_bbb_room' );
+			$return_url          = esc_url( $_POST['REQUEST_URI'] );
 
 			if ( $access_as_moderator || get_post( $room_id )->post_author == $user->ID ) {
 				$entry_code = $moderator_code;
@@ -110,15 +104,9 @@ class Bigbluebutton_Public_Room_Api {
 		$response['success'] = false;
 
 		if ( array_key_exists( 'room_id', $_POST ) ) {
-			$access_using_code   = current_user_can( 'join_with_access_code_bbb_room' );
-			$access_as_moderator = ( current_user_can( 'join_as_moderator_bbb_room' ) || ( get_current_user_id() == get_post( $_POST['room_id'] )->post_author ) );
-			$access_as_viewer    = current_user_can( 'join_as_viewer_bbb_room' );
-			if ( ! is_user_logged_in() && get_role( 'anonymous' ) ) {
-				$current_role        = get_role( 'anonymous' );
-				$access_using_code   = $current_role->has_cap( 'join_with_access_code_bbb_room' );
-				$access_as_moderator = $current_role->has_cap( 'join_as_moderator_bbb_room' );
-				$access_as_viewer    = $current_role->has_cap( 'join_as_viewer_bbb_room' );
-			}
+			$access_using_code   = Bigbluebutton_Tokens_helper::can_user_access_room_with( 'join_with_access_code_bbb_room' );
+			$access_as_moderator = ( Bigbluebutton_Tokens_helper::can_user_access_room_with( 'join_as_moderator_bbb_room' ) || ( get_current_user_id() == get_post( $_POST['room_id'] )->post_author ) );
+			$access_as_viewer    = Bigbluebutton_Tokens_helper::can_user_access_room_with( 'join_as_viewer_bbb_room' );
 
 			$response['success']                = true;
 			$response['hide_access_code_input'] = $access_as_moderator || $access_as_viewer || ! $access_using_code;
@@ -194,10 +182,7 @@ class Bigbluebutton_Public_Room_Api {
 					'room_id'                    => $room_id,
 				);
 
-				$access_as_viewer = current_user_can( 'join_as_viewer_bbb_room' );
-				if ( ! is_user_logged_in() && get_role( 'anonymous' ) ) {
-					$access_as_viewer = get_role( 'anonymous' )->has_cap( 'join_as_viewer_bbb_room' );
-				}
+				$access_as_viewer = Bigbluebutton_Tokens_helper::can_user_access_room_with( 'join_as_viewer_bbb_room' );
 				if ( ! is_user_logged_in() ) {
 					$query['username'] = $username;
 				}

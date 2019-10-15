@@ -231,15 +231,24 @@ class Bigbluebutton_Migration {
 	 * @since   1.4.6
 	 */
 	public function import_from_older_versions() {
-		global $wpdb, $wp_roles;
-		// Load roles if not set.
-		if ( ! isset( $wp_roles ) ) {
-			$wp_roles = new WP_Roles();
-		}
+		$this->import_from_older_versions_rooms();
+		$this->import_from_older_versions_permissions();
+
+		// Set bigbluebutton_plugin_version value.
+		update_option( 'bigbluebutton_plugin_version', '1.4.6' );
+
+	}
+
+	/**
+	 * Import rooms from older versions to 1.4.6 before updating to 3.0.0
+	 *
+	 * @since   1.4.6
+	 */
+	public function import_from_older_versions_rooms() {
+		global $wpdb;
 
 		// Sets the name of the table.
-		$table_name      = $wpdb->prefix . 'bigbluebutton';
-		$table_logs_name = $wpdb->prefix . 'bigbluebutton_logs';
+		$table_name = $wpdb->prefix . 'bigbluebutton';
 
 		// Updates for version 1.3.1 and earlier.
 		$bigbluebutton_plugin_version_installed = get_option( 'bigbluebutton_plugin_version' );
@@ -275,12 +284,26 @@ class Bigbluebutton_Migration {
 			delete_option( 'mt_waitForModerator' );
 			delete_option( 'bbb_db_version' );
 		}
+	}
 
+	/**
+	 * Import permissions from older versions to 1.4.6 before updating to 3.0.0
+	 *
+	 * @since   1.4.6
+	 */
+	public function import_from_older_versions_permissions() {
+		global $wp_roles;
+		// Load roles if not set.
+		if ( ! isset( $wp_roles ) ) {
+			$wp_roles = new WP_Roles();
+		}
+
+		$bigbluebutton_plugin_version_installed = get_option( 'bigbluebutton_plugin_version' );
 		// Set the new permission schema.
 		if ( $bigbluebutton_plugin_version_installed && strcmp( $bigbluebutton_plugin_version_installed, '1.3.3' ) < 0 ) {
 			$roles              = $wp_roles->role_names;
 			$roles['anonymous'] = 'Anonymous';
-
+			$permissions        = [];
 			if ( get_option( 'bigbluebutton_permissions' ) ) {
 				$old_permissions = get_option( 'bigbluebutton_permissions' );
 				foreach ( $roles as $key => $value ) {
@@ -303,10 +326,6 @@ class Bigbluebutton_Migration {
 				update_option( 'bigbluebutton_permissions', $permissions );
 			}
 		}
-
-		// Set bigbluebutton_plugin_version value.
-		update_option( 'bigbluebutton_plugin_version', '1.4.6' );
-
 	}
 
 	/**

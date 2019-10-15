@@ -133,16 +133,18 @@ class Bigbluebutton_Display_Helper {
 			$new_direction    = ( sanitize_text_field( $_GET['order'] ) == 'asc' ? 'desc' : 'asc' );
 			$new_sort_classes = ( 'asc' == $new_direction ? $sort_desc_classes : $sort_asc_classes ) . ' bbb-current-sort-icon';
 			$selected_field   = sanitize_text_field( $_GET['orderby'] );
-		}
 
-		foreach ( $custom_sort_fields as $field => $values ) {
-			if ( isset( $new_direction ) && isset( $new_sort_classes ) && isset( $selected_field ) && $field == $selected_field ) {
-				$custom_sort_fields[ $field ] = (object) array(
-					'url'            => '?orderby=' . $field . '&order=' . $new_direction . '&nonce=' . $sort_meta_nounce,
+			if ( array_key_exists( $selected_field, $custom_sort_fields ) ) {
+				$custom_sort_fields[ $selected_field ] = (object) array(
+					'url'            => '?orderby=' . $selected_field . '&order=' . $new_direction . '&nonce=' . $sort_meta_nounce,
 					'classes'        => $new_sort_classes,
 					'header_classes' => 'bbb-column-header-highlight',
 				);
-			} else {
+			}
+		}
+
+		foreach ( $custom_sort_fields as $field => $values ) {
+			if ( null === $custom_sort_fields[ $field ] ) {
 				$custom_sort_fields[ $field ] = (object) array(
 					'url'            => '?orderby=' . $field . '&order=asc&nonce=' . $sort_meta_nounce,
 					'classes'        => $sort_asc_classes . ' bbb-hidden',

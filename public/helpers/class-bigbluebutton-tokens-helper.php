@@ -35,16 +35,10 @@ class Bigbluebutton_Tokens_Helper {
 		$content             = '';
 		$tokens_arr          = preg_split( '/\,/', $token_string );
 		$meta_nonce          = wp_create_nonce( 'bbb_join_room_meta_nonce' );
-		$access_using_code   = current_user_can( 'join_with_access_code_bbb_room' );
-		$access_as_moderator = current_user_can( 'join_as_moderator_bbb_room' );
-		$access_as_viewer    = current_user_can( 'join_as_viewer_bbb_room' );
-		if ( ! is_user_logged_in() && get_role( 'anonymous' ) ) {
-			$current_role        = get_role( 'anonymous' );
-			$access_using_code   = $current_role->has_cap( 'join_with_access_code_bbb_room' );
-			$access_as_moderator = $current_role->has_cap( 'join_as_moderator_bbb_room' );
-			$access_as_viewer    = $current_role->has_cap( 'join_as_viewer_bbb_room' );
-		}
-		$rooms = array();
+		$access_using_code   = self::can_user_access_room_with( 'join_with_access_code_bbb_room' );
+		$access_as_moderator = self::can_user_access_room_with( 'join_as_moderator_bbb_room' );
+		$access_as_viewer    = self::can_user_access_room_with( 'join_as_viewer_bbb_room' );
+		$rooms               = array();
 
 		foreach ( $tokens_arr as $raw_token ) {
 			if ( sanitize_text_field( $raw_token ) == '' ) {
@@ -81,6 +75,23 @@ class Bigbluebutton_Tokens_Helper {
 			$content = '<p>' . esc_html__( 'There are no rooms in the selection.', 'bigbluebutton' ) . '</p>';
 		}
 		return $content;
+	}
+
+	/**
+	 * Check if user can access room using type.
+	 *
+	 * @param  String $type         Type to check if user can access room as.
+	 *
+	 * @return Boolean $user_can    Whether the user can access room using that type.
+	 */
+	public static function can_user_access_room_with( $type ) {
+		$user_can = false;
+		if ( is_user_logged_in() ) {
+			$user_can = current_user_can( $type );
+		} elseif ( get_role( 'anonymous' ) ) {
+			$user_can = get_role( 'anonymous' )->has_cap( $type );
+		}
+		return $user_can;
 	}
 
 	/**
