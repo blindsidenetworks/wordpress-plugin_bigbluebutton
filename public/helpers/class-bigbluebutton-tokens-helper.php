@@ -69,7 +69,7 @@ class Bigbluebutton_Tokens_Helper {
 				$access_as_moderator = ( get_current_user_id() == get_post( $rooms[0]->room_id )->post_author );
 			}
 			$selected_room = $rooms[0]->room_id;
-			if ( isset( $_REQUEST['bigbluebutton_wait_for_mod'] ) ) {
+			if ( isset( $_REQUEST['room_id'] ) ) {
 				$selected_room = $_REQUEST['room_id'];
 			}
 			$join_form = $display_helper->get_join_form_as_string( $selected_room, $meta_nonce, $access_as_moderator, $access_as_viewer, $access_using_code );

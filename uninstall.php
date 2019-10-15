@@ -70,7 +70,6 @@ if ( ! class_exists( 'Bigbluebutton_Uninstall' ) ) {
 		private static function delete_capabilities() {
 			$args                = get_post_type_object( 'bbb-room' );
 			$custom_capabilities = array(
-				'view_bbb_room_list',
 				'join_as_moderator_bbb_room',
 				'join_as_viewer_bbb_room',
 				'join_with_access_code_bbb_room',

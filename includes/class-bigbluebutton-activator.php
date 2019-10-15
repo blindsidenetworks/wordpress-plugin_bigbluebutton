@@ -67,7 +67,6 @@ class Bigbluebutton_Activator {
 					$role->add_cap( 'delete_others_bbb_rooms' );
 					$role->add_cap( 'delete_published_bbb_rooms' );
 					$role->add_cap( 'publish_bbb_rooms' );
-					$role->add_cap( 'view_bbb_room_list' );
 					$role->add_cap( 'create_recordable_bbb_room' );
 					$role->add_cap( 'manage_bbb_room_recordings' );
 					$role->add_cap( 'view_extended_bbb_room_recording_formats' );
@@ -87,7 +86,6 @@ class Bigbluebutton_Activator {
 					$role->add_cap( 'delete_bbb_rooms' );
 					$role->add_cap( 'delete_published_bbb_rooms' );
 					$role->add_cap( 'publish_bbb_rooms' );
-					$role->add_cap( 'view_bbb_room_list' );
 					if ( ! $role->has_cap( 'manage_categories' ) ) {
 						$role->add_cap( 'manage_categories' );
 					}

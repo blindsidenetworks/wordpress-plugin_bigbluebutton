@@ -106,17 +106,19 @@ class Bigbluebutton_Admin {
 	 */
 	public function create_admin_menu() {
 		add_menu_page(
-			__( 'Rooms', 'bigbluebutton' ), __( 'Rooms', 'bigbluebutton' ), 'view_bbb_room_list', 'bbb_room',
+			__( 'Rooms', 'bigbluebutton' ), __( 'Rooms', 'bigbluebutton' ), 'edit_plugins', 'bbb_room',
 			'', 'dashicons-video-alt2'
 		);
 
-		add_submenu_page(
-			'bbb_room', __( 'Rooms', 'bigbluebutton' ), __( 'Categories' ), 'view_bbb_room_list',
-			'edit-tags.php?taxonomy=bbb-room-category', ''
-		);
+		if ( current_user_can( 'manage_categories' ) ) {
+			add_submenu_page(
+				'bbb_room', __( 'Rooms', 'bigbluebutton' ), __( 'Categories' ), 'edit_plugins',
+				'edit-tags.php?taxonomy=bbb-room-category', ''
+			);
+		}
 
 		add_submenu_page(
-			'bbb_room', __( 'Rooms', 'bigbluebutton' ), __( 'Settings' ), 'view_bbb_room_list',
+			'bbb_room', __( 'Rooms', 'bigbluebutton' ), __( 'Settings' ), 'edit_plugins',
 			'bbb-room-server-settings', array( $this, 'display_room_server_settings' )
 		);
 	}
