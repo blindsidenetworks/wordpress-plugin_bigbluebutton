@@ -39,7 +39,7 @@ class Bigbluebutton_Admin_Api {
 			$viewer_code    = sanitize_text_field( $_POST['bbb-viewer-code'] );
 			$recordable     = ( array_key_exists( 'bbb-room-recordable', $_POST ) && sanitize_text_field( $_POST['bbb-room-recordable'] ) == 'checked' );
 
-			$wait_for_mod = ( sanitize_text_field( $_POST['bbb-room-wait-for-moderator'] ) == 'checked' );
+			$wait_for_mod = ( isset( $_POST['bbb-room-wait-for-moderator'] ) && sanitize_text_field( $_POST['bbb-room-wait-for-moderator'] ) == 'checked' );
 			$token        = 'meeting' . $post_id;
 
 			// Ensure the moderator code is not the same as the viewer code.
@@ -74,7 +74,6 @@ class Bigbluebutton_Admin_Api {
 			isset( $_POST['bbb-room-viewer-code-nonce'] ) &&
 			wp_verify_nonce( $_POST['bbb-room-viewer-code-nonce'], 'bbb-room-viewer-code-nonce' ) &&
 			isset( $_POST['bbb-room-wait-for-moderator-nonce'] ) &&
-			isset( $_POST['bbb-room-wait-for-moderator'] ) &&
 			wp_verify_nonce( $_POST['bbb-room-wait-for-moderator-nonce'], 'bbb-room-wait-for-moderator-nonce' ) &&
 			( ! current_user_can( 'create_recordable_bbb_room' ) ||
 				( isset( $_POST['bbb-room-recordable-nonce'] ) &&
