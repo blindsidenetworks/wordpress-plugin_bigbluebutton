@@ -160,62 +160,62 @@ class Bigbluebutton_Migration {
 	 */
 	private function import_permissions() {
 		$old_permissions = get_option( 'bigbluebutton_permissions' );
-		if ( false !== $old_permissions ) {
-			foreach ( $old_permissions as $old_role_name => $old_role ) {
-				$role = get_role( $old_role_name );
-				if ( null === $role ) {
-					continue;
-				}
-				if ( isset( $old_role['participate'] ) && $old_role['participate'] ) {
-					switch ( $old_role['defaultRole'] ) {
-						case 'moderator':
-							$role->add_cap( 'join_as_moderator_bbb_room' );
-							if ( $role->has_cap( 'join_as_viewer_bbb_room' ) ) {
-								$role->remove_cap( 'join_as_viewer_bbb_room' );
-							}
-							if ( $role->has_cap( 'join_with_access_code_bbb_room' ) ) {
-								$role->remove_cap( 'join_with_access_code_bbb_room' );
-							}
-							break;
-						case 'attendee':
-							$role->add_cap( 'join_as_viewer_bbb_room' );
-							if ( $role->has_cap( 'join_as_moderator_bbb_room' ) ) {
-								$role->remove_cap( 'join_as_moderator_bbb_room' );
-							}
-							if ( $role->has_cap( 'join_with_access_code_bbb_room' ) ) {
-								$role->remove_cap( 'join_with_access_code_bbb_room' );
-							}
-							break;
-						case 'none':
-							$role->add_cap( 'join_with_access_code_bbb_room' );
-							if ( $role->has_cap( 'join_as_moderator_bbb_room' ) ) {
-								$role->remove_cap( 'join_as_moderator_bbb_room' );
-							}
-							if ( $role->has_cap( 'join_as_viewer_bbb_room' ) ) {
-								$role->remove_cap( 'join_as_viewer_bbb_room' );
-							}
-							break;
-					}
-				} elseif ( isset( $old_role['participate'] ) && ! $old_role['participate'] ) {
-					if ( $role->has_cap( 'join_as_moderator_bbb_room' ) ) {
-						$role->remove_cap( 'join_as_moderator_bbb_room' );
-					}
-					if ( $role->has_cap( 'join_as_viewer_bbb_room' ) ) {
-						$role->remove_cap( 'join_as_viewer_bbb_room' );
-					}
-					if ( $role->has_cap( 'join_with_access_code_bbb_room' ) ) {
-						$role->remove_cap( 'join_with_access_code_bbb_room' );
-					}
-				}
-				if ( isset( $old_role['manageRecordings'] ) && $old_role['manageRecordings'] ) {
-					$role->add_cap( 'manage_bbb_room_recordings' );
-					$role->add_cap( 'view_extended_bbb_room_recording_formats' );
-				}
+		if ( false === $old_permissions ) {
+			delete_option( 'bigbluebutton_permissions' );
+			return;
+		}
+		foreach ( $old_permissions as $old_role_name => $old_role ) {
+			$role = get_role( $old_role_name );
+			if ( null === $role ) {
+				continue;
+			}
+			if ( isset( $old_role['manageRecordings'] ) && $old_role['manageRecordings'] ) {
+				$role->add_cap( 'manage_bbb_room_recordings' );
+				$role->add_cap( 'view_extended_bbb_room_recording_formats' );
+			}
+			if ( ! isset( $old_role['participate'] ) ) {
+				continue;
+			}
+			if ( $old_role['participate'] ) {
+				$this->set_role_participation( $role, $old_role['defaultRole'] );
+			}
+			if ( ! $old_role['participate'] ) {
+				$role->remove_cap( 'join_as_moderator_bbb_room' );
+				$role->remove_cap( 'join_as_viewer_bbb_room' );
+				$role->remove_cap( 'join_with_access_code_bbb_room' );
 			}
 		}
 		delete_option( 'bigbluebutton_permissions' );
 	}
 
+	/**
+	 * Set WordPress core role according to old role.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   Role   $role       Role object to assign join room permissions to.
+	 * @param   String $role_name  Role name for old format.
+	 * @return void
+	 */
+	private function set_role_participation( $role, $role_name ) {
+		switch ( $role_name ) {
+			case 'moderator':
+				$role->add_cap( 'join_as_moderator_bbb_room' );
+				$role->remove_cap( 'join_as_viewer_bbb_room' );
+				$role->remove_cap( 'join_with_access_code_bbb_room' );
+				break;
+			case 'attendee':
+				$role->add_cap( 'join_as_viewer_bbb_room' );
+				$role->remove_cap( 'join_as_moderator_bbb_room' );
+				$role->remove_cap( 'join_with_access_code_bbb_room' );
+				break;
+			case 'none':
+				$role->add_cap( 'join_with_access_code_bbb_room' );
+				$role->remove_cap( 'join_as_moderator_bbb_room' );
+				$role->remove_cap( 'join_as_viewer_bbb_room' );
+				break;
+		}
+	}
 	/**
 	 * Get the error message if migration script is not successful.
 	 *

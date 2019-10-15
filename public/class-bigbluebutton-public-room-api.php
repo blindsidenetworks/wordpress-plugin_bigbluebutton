@@ -57,49 +57,44 @@ class Bigbluebutton_Public_Room_Api {
 	 * @since   3.0.0
 	 */
 	public function bbb_user_join_room() {
-		if ( ! empty( $_POST['action'] ) && 'join_room' == $_POST['action'] ) {
-			if ( wp_verify_nonce( $_POST['bbb_join_room_meta_nonce'], 'bbb_join_room_meta_nonce' ) ) {
-				$room_id             = $_POST['room_id'];
-				$user                = wp_get_current_user();
-				$entry_code          = '';
-				$username            = $this->get_meeting_username( $user );
-				$moderator_code      = strval( get_post_meta( $room_id, 'bbb-room-moderator-code', true ) );
-				$viewer_code         = strval( get_post_meta( $room_id, 'bbb-room-viewer-code', true ) );
-				$wait_for_mod        = get_post_meta( $room_id, 'bbb-room-wait-for-moderator', true );
-				$access_using_code   = current_user_can( 'join_with_access_code_bbb_room' );
-				$access_as_moderator = current_user_can( 'join_as_moderator_bbb_room' );
-				$access_as_viewer    = current_user_can( 'join_as_viewer_bbb_room' );
-				if ( ! is_user_logged_in() && get_role( 'anonymous' ) ) {
-					$current_role        = get_role( 'anonymous' );
-					$access_using_code   = $current_role->has_cap( 'join_with_access_code_bbb_room' );
-					$access_as_moderator = $current_role->has_cap( 'join_as_moderator_bbb_room' );
-					$access_as_viewer    = $current_role->has_cap( 'join_as_viewer_bbb_room' );
-				}
-				$return_url = esc_url( $_POST['REQUEST_URI'] );
-
-				if ( $access_as_moderator || $user->ID == get_post( $room_id )->post_author ) {
-					$entry_code = $moderator_code;
-				} elseif ( $access_as_viewer ) {
-					$entry_code = $viewer_code;
-				} elseif ( $access_using_code && isset( $_POST['bbb_meeting_access_code'] ) ) {
-					$entry_code = sanitize_text_field( $_POST['bbb_meeting_access_code'] );
-					if ( $entry_code != $moderator_code && $entry_code != $viewer_code ) {
-						$query = array(
-							'password_error' => true,
-							'room_id'        => $room_id,
-							'username'       => $username,
-						);
-						wp_redirect( add_query_arg( $query, $return_url ) );
-						return;
-					}
-				} else {
-					wp_die( _( 'You do not have permission to enter the room. Please request permission.', 'bigbluebutton' ) );
-				}
-
-				$this->join_meeting( $return_url, $room_id, $username, $entry_code, $viewer_code, $wait_for_mod );
-			} else {
-				wp_die( esc_html( _( 'The form has expired or is invalid. Please try again.', 'bigbluebutton' ) ) );
+		if ( ! empty( $_POST['action'] ) && 'join_room' == $_POST['action'] && wp_verify_nonce( $_POST['bbb_join_room_meta_nonce'], 'bbb_join_room_meta_nonce' ) ) {
+			$room_id             = $_POST['room_id'];
+			$user                = wp_get_current_user();
+			$entry_code          = '';
+			$username            = $this->get_meeting_username( $user );
+			$moderator_code      = strval( get_post_meta( $room_id, 'bbb-room-moderator-code', true ) );
+			$viewer_code         = strval( get_post_meta( $room_id, 'bbb-room-viewer-code', true ) );
+			$wait_for_mod        = get_post_meta( $room_id, 'bbb-room-wait-for-moderator', true );
+			$access_using_code   = current_user_can( 'join_with_access_code_bbb_room' );
+			$access_as_moderator = current_user_can( 'join_as_moderator_bbb_room' );
+			$access_as_viewer    = current_user_can( 'join_as_viewer_bbb_room' );
+			if ( ! is_user_logged_in() && get_role( 'anonymous' ) ) {
+				$current_role        = get_role( 'anonymous' );
+				$access_using_code   = $current_role->has_cap( 'join_with_access_code_bbb_room' );
+				$access_as_moderator = $current_role->has_cap( 'join_as_moderator_bbb_room' );
+				$access_as_viewer    = $current_role->has_cap( 'join_as_viewer_bbb_room' );
 			}
+			$return_url = esc_url( $_POST['REQUEST_URI'] );
+
+			if ( $access_as_moderator || get_post( $room_id )->post_author == $user->ID ) {
+				$entry_code = $moderator_code;
+			} elseif ( $access_as_viewer ) {
+				$entry_code = $viewer_code;
+			} elseif ( $access_using_code && isset( $_POST['bbb_meeting_access_code'] ) ) {
+				$entry_code = sanitize_text_field( $_POST['bbb_meeting_access_code'] );
+				if ( $entry_code != $moderator_code && $entry_code != $viewer_code ) {
+					$query = array(
+						'password_error' => true,
+						'room_id'        => $room_id,
+						'username'       => $username,
+					);
+					wp_redirect( add_query_arg( $query, $return_url ) );
+					return;
+				}
+			} else {
+				wp_die( esc_html__( 'You do not have permission to enter the room. Please request permission.', 'bigbluebutton' ) );
+			}
+			$this->join_meeting( $return_url, $room_id, $username, $entry_code, $viewer_code, $wait_for_mod );
 		}
 	}
 
