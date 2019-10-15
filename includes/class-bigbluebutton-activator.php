@@ -68,36 +68,40 @@ class Bigbluebutton_Activator {
 	 */
 	private static function set_default_capabilities_for_each_role( $role_names ) {
 		foreach ( $role_names as $name ) {
-			$role = get_role( $name );
-			$role->add_cap( 'read_bbb_room' );
+			self::set_default_capability_for_one_role( $name );
+		}
+	}
 
-			switch ( $name ) {
-				case 'administrator':
-					self::set_admin_capability( $role );
-					if ( ! self::join_permissions_set( $role ) ) {
-						$role->add_cap( 'join_as_moderator_bbb_room' );
-					}
-					break;
-				case 'author':
-					self::set_edit_room_capability( $role );
-					if ( ! self::join_permissions_set( $role ) ) {
-						$role->add_cap( 'join_as_viewer_bbb_room' );
-					}
-					break;
-				case 'editor':
-				case 'contributor':
-				case 'subscriber':
-					if ( ! self::join_permissions_set( $role ) ) {
-						$role->add_cap( 'join_as_viewer_bbb_room' );
-					}
-					break;
-				case 'anonymous':
-				default:
-					if ( ! self::join_permissions_set( $role ) ) {
-						$role->add_cap( 'join_with_access_code_bbb_room' );
-					}
-					break;
+	/**
+	 * Set default capability for one role.
+	 *
+	 * @since  3.0.0
+	 *
+	 * @param  String $name    Role name to set capability for.
+	 */
+	private static function set_default_capability_for_one_role( $name ) {
+		$role         = get_role( $name );
+		$set_join_cap = self::join_permissions_set( $role );
+		$role->add_cap( 'read_bbb_room' );
+
+		if ( 'administrator' == $name ) {
+			self::set_admin_capability( $role );
+			if ( ! $set_join_cap ) {
+				$role->add_cap( 'join_as_moderator_bbb_room' );
 			}
+			return;
+		}
+		if ( 'author' == $name ) {
+			self::set_edit_room_capability( $role );
+		}
+		if ( 'author' == $name || 'editor' == $name || 'contributer' == $name || 'subscriber' == $name ) {
+			if ( ! $set_join_cap ) {
+				$role->add_cap( 'join_as_viewer_bbb_room' );
+			}
+			return;
+		}
+		if ( ! $set_join_cap ) {
+			$role->add_cap( 'join_with_access_code_bbb_room' );
 		}
 	}
 
