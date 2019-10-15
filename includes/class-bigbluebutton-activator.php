@@ -68,14 +68,18 @@ class Bigbluebutton_Activator {
 					$role->add_cap( 'delete_published_bbb_rooms' );
 					$role->add_cap( 'publish_bbb_rooms' );
 					$role->add_cap( 'view_bbb_room_list' );
-					$role->add_cap( 'join_as_moderator_bbb_room' );
 					$role->add_cap( 'create_recordable_bbb_room' );
 					$role->add_cap( 'manage_bbb_room_recordings' );
 					$role->add_cap( 'view_extended_bbb_room_recording_formats' );
+					if ( ! self::join_permissions_set( $role ) ) {
+						$role->add_cap( 'join_as_moderator_bbb_room' );
+					}
 					break;
 				case 'editor':
 					$role->add_cap( 'read_bbb_room' );
-					$role->add_cap( 'join_as_viewer_bbb_room' );
+					if ( ! self::join_permissions_set( $role ) ) {
+						$role->add_cap( 'join_as_viewer_bbb_room' );
+					}
 					break;
 				case 'author':
 					$role->add_cap( 'edit_bbb_rooms' );
@@ -84,28 +88,52 @@ class Bigbluebutton_Activator {
 					$role->add_cap( 'delete_published_bbb_rooms' );
 					$role->add_cap( 'publish_bbb_rooms' );
 					$role->add_cap( 'view_bbb_room_list' );
-					$role->add_cap( 'join_as_viewer_bbb_room' );
 					if ( ! $role->has_cap( 'manage_categories' ) ) {
 						$role->add_cap( 'manage_categories' );
+					}
+					if ( ! self::join_permissions_set( $role ) ) {
+						$role->add_cap( 'join_as_viewer_bbb_room' );
 					}
 					break;
 				case 'contributor':
 					$role->add_cap( 'read_bbb_room' );
-					$role->add_cap( 'join_as_viewer_bbb_room' );
+					if ( ! self::join_permissions_set( $role ) ) {
+						$role->add_cap( 'join_as_viewer_bbb_room' );
+					}
 					break;
 				case 'subscriber':
 					$role->add_cap( 'read_bbb_room' );
-					$role->add_cap( 'join_as_viewer_bbb_room' );
+					if ( ! self::join_permissions_set( $role ) ) {
+						$role->add_cap( 'join_as_viewer_bbb_room' );
+					}
 					break;
 				case 'anonymous':
 					$role->add_cap( 'read_bbb_room' );
-					$role->add_cap( 'join_with_access_code_bbb_room' );
+					if ( ! self::join_permissions_set( $role ) ) {
+						$role->add_cap( 'join_with_access_code_bbb_room' );
+					}
 					break;
 				default:
 					$role->add_cap( 'read_bbb_room' );
+					if ( ! self::join_permissions_set( $role ) ) {
+						$role->add_cap( 'join_with_access_code_bbb_room' );
+					}
 					break;
 			}
 		}
 		update_option( 'bigbluebutton_default_roles_set', true );
+	}
+
+	/**
+	 * Check if the role already has join room permissions set, from migration.
+	 *
+	 * @param  Object $role       The role object to check join room permissions.
+	 * @return Boolean true|false  The boolean value of whether the role already has join room permissions set.
+	 */
+	private static function join_permissions_set( $role ) {
+		if ( $role->has_cap( 'join_as_moderator_bbb_room' ) || $role->has_cap( 'join_as_viewer_bbb_room' ) || $role->has_cap( 'join_with_access_code_bbb_room' ) ) {
+			return true;
+		}
+		return false;
 	}
 }

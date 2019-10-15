@@ -78,13 +78,14 @@
 				data.bigbluebutton_room_id = $( '#bbb-wait-for-mod-msg' ).data(
 					'room-id'
 				);
-				if ( $( '#bbb-wait-for-mod-msg' ).data( 'room-code' ) ) {
-					data.bigbluebutton_room_code = $(
+				if ( $( '#bbb-wait-for-mod-msg' ).data( 'temp-room-pass' ) ) {
+					data.bigbluebutton_temp_room_pass = $(
 						'#bbb-wait-for-mod-msg'
-					).data( 'room-code' );
+					).data( 'temp-room-pass' );
 				}
+				console.log( $( '#bbb-wait-for-mod-msg' ).data( 'room-username' ) );
 				if ( $( '#bbb-wait-for-mod-msg' ).data( 'room-username' ) ) {
-					data.bigbluebutton_username = $(
+					data.bigbluebutton_room_username = $(
 						'#bbb-wait-for-mod-msg'
 					).data( 'room-username' );
 				}

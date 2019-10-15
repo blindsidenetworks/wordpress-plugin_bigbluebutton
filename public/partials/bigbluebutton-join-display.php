@@ -27,8 +27,8 @@
 		<div>
 			<label id="bbb-wait-for-mod-msg"
 				data-room-id="<?php echo $room_id; ?>"
-				<?php if ( isset( $_REQUEST['entry_code'] ) ) { ?>
-					data-room-code="<?php echo $_REQUEST['entry_code']; ?>"
+				<?php if ( isset( $_REQUEST['temp_entry_pass'] ) ) { ?>
+					data-temp-room-pass="<?php echo $_REQUEST['temp_entry_pass']; ?>"
 				<?php } ?>
 				<?php if ( isset( $_REQUEST['username'] ) ) { ?>
 					data-room-username="<?php echo $_REQUEST['username']; ?>"

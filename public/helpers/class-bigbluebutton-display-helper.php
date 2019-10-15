@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The display helper to get partials as strings.
  *
@@ -45,11 +44,11 @@ class Bigbluebutton_Display_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Integer     $room_id                Post ID of the room.
-	 * @param   String      $meta_nonce             Nonce for join meeting form.
-	 * @param   Boolean     $access_as_moderator    Check for if the current user can enter meetings as a moderator.
-	 * @param   Boolean     $access_as_viewer       Check for if the current user can enter meetings as a viewer.
-	 * @param   Boolean     $access_using_code      Check for if the current user can enter meetings using an access code.
+	 * @param   Integer $room_id                Post ID of the room.
+	 * @param   String  $meta_nonce             Nonce for join meeting form.
+	 * @param   Boolean $access_as_moderator    Check for if the current user can enter meetings as a moderator.
+	 * @param   Boolean $access_as_viewer       Check for if the current user can enter meetings as a viewer.
+	 * @param   Boolean $access_using_code      Check for if the current user can enter meetings using an access code.
 	 *
 	 * @return  String      $form                   Join meeting form stored in a variable.
 	 */
@@ -69,10 +68,10 @@ class Bigbluebutton_Display_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Integer     $room_id                            Post ID of the room.
-	 * @param   Array       $recordings                         List of recordings for the room.
-	 * @param   Boolean     $manage_bbb_recordings              User capability to manage recordings.
-	 * @param   Boolean     $view_extended_recording_formats    User capability to view extended recording formats.
+	 * @param   Integer $room_id                            Post ID of the room.
+	 * @param   Array   $recordings                         List of recordings for the room.
+	 * @param   Boolean $manage_bbb_recordings              User capability to manage recordings.
+	 * @param   Boolean $view_extended_recording_formats    User capability to view extended recording formats.
 	 *
 	 * @return  String      $optional_recordings                Recordings table stored in a variable.
 	 */
@@ -90,10 +89,10 @@ class Bigbluebutton_Display_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Integer     $room_id                            Post ID of the room.
-	 * @param   Array       $recordings                         List of recordings for the room.
-	 * @param   Boolean     $manage_bbb_recordings              User capability to manage recordings.
-	 * @param   Boolean     $view_extended_recording_formats    User capability to view extended recording formats.
+	 * @param   Integer $room_id                            Post ID of the room.
+	 * @param   Array   $recordings                         List of recordings for the room.
+	 * @param   Boolean $manage_bbb_recordings              User capability to manage recordings.
+	 * @param   Boolean $view_extended_recording_formats    User capability to view extended recording formats.
 	 *
 	 * @return  String      $html_recordings                    Recordings table stored in a variable.
 	 */
@@ -132,7 +131,7 @@ class Bigbluebutton_Display_Helper {
 
 		if ( isset( $_GET['order'] ) && isset( $_GET['orderby'] ) && isset( $_GET['nonce'] ) && wp_verify_nonce( $_GET['nonce'], 'bbb_sort_recording_columns_nonce' ) ) {
 			$new_direction    = ( sanitize_text_field( $_GET['order'] ) == 'asc' ? 'desc' : 'asc' );
-			$new_sort_classes = ( $new_direction == 'asc' ? $sort_desc_classes : $sort_asc_classes ) . ' bbb-current-sort-icon';
+			$new_sort_classes = ( 'asc' == $new_direction ? $sort_desc_classes : $sort_asc_classes ) . ' bbb-current-sort-icon';
 			$selected_field   = sanitize_text_field( $_GET['orderby'] );
 		}
 
@@ -160,11 +159,10 @@ class Bigbluebutton_Display_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Array   $rooms      Array of rooms that were included in the shortcode.
-	 * @param   String  $html_form  Form associated with dropdown.
+	 * @param   Array  $rooms      Array of rooms that were included in the shortcode.
+	 * @param   String $html_form  Form associated with dropdown.
 	 *
 	 * @return  String  $dropdown   Dropdown of rooms stored in a variable.
-	 *
 	 */
 	public function get_room_list_dropdown_as_string( $rooms, $html_form ) {
 		ob_start();

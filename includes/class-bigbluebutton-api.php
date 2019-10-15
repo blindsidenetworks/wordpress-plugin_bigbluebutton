@@ -39,11 +39,11 @@ class Bigbluebutton_Api {
 		$moderator_code = get_post_meta( $rid, 'bbb-room-moderator-code', true );
 		$viewer_code    = get_post_meta( $rid, 'bbb-room-viewer-code', true );
 		$recordable     = get_post_meta( $rid, 'bbb-room-recordable', true );
-		$entry_token    = get_post_meta( $rid, 'bbb-room-token', true );
+		$meeting_id     = get_post_meta( $rid, 'bbb-room-meeting-id', true );
 		$logout_url     = get_permalink( $rid );
 		$arr_params     = array(
-			'name'        => rawurlencode( $name ),
-			'meetingID'   => rawurlencode( $entry_token ),
+			'name'        => esc_attr( $name ),
+			'meetingID'   => rawurlencode( $meeting_id ),
 			'attendeePW'  => rawurlencode( $viewer_code ),
 			'moderatorPW' => rawurlencode( $moderator_code ),
 			'logoutURL'   => $logout_url,
@@ -52,15 +52,21 @@ class Bigbluebutton_Api {
 
 		$url = self::build_url( 'create', $arr_params );
 
-		$response = self::get_response( $url );
+		$full_response = self::get_response( $url );
 
-		if ( is_wp_error( $response ) ) {
+		if ( is_wp_error( $full_response ) ) {
 			return 404;
 		}
 
-		$return_code = $response['response']['code'];
+		$response = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
 
-		return $return_code;
+		if ( property_exists( $response, 'returncode' ) && 'SUCCESS' == $response->returncode ) {
+			return 200;
+		} elseif ( property_exists( $response, 'returncode' ) && 'FAILURE' == $response->returncode ) {
+			return 403;
+		}
+
+		return 500;
 
 	}
 
@@ -69,10 +75,10 @@ class Bigbluebutton_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Integer   $room_id    Custom post id of the room the user is trying to join.
-	 * @param   String    $username   Full name of the user trying to join the room.
-	 * @param   String    $password   Entry code of the meeting that the user is attempting to join with.
-	 * @return  String    $url|null   URL to enter the meeting.
+	 * @param   Integer $room_id    Custom post id of the room the user is trying to join.
+	 * @param   String  $username   Full name of the user trying to join the room.
+	 * @param   String  $password   Entry code of the meeting that the user is attempting to join with.
+	 * @return  String  $url|null   URL to enter the meeting.
 	 */
 	public static function get_join_meeting_url( $room_id, $username, $password ) {
 
@@ -86,14 +92,14 @@ class Bigbluebutton_Api {
 
 		if ( ! self::is_meeting_running( $rid ) ) {
 			$code = self::create_meeting( $rid );
-			if ( $code != 200 ) {
+			if ( 200 !== $code ) {
 				wp_die( esc_html__( 'It is currently not possible to create rooms on the server. Please contact support for help.', 'bigbluebutton' ) );
 			}
 		}
 
-		$entry_token = get_post_meta( $rid, 'bbb-room-token', true );
+		$meeting_id = get_post_meta( $rid, 'bbb-room-meeting-id', true );
 		$arr_params  = array(
-			'meetingID' => rawurlencode( $entry_token ),
+			'meetingID' => rawurlencode( $meeting_id ),
 			'fullName'  => rawurlencode( $uname ),
 			'password'  => rawurlencode( $pword ),
 		);
@@ -108,20 +114,20 @@ class Bigbluebutton_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Integer     $room_id            Custom post id of a room.
-	 * @return  Boolean     true|false|null     If the meeting is running or not.
+	 * @param   Integer $room_id            Custom post id of a room.
+	 * @return  Boolean true|false|null     If the meeting is running or not.
 	 */
 	public static function is_meeting_running( $room_id ) {
 
 		$rid = intval( $room_id );
 
-		if ( get_post( $rid ) === false || get_post_type( $rid ) != 'bbb-room' ) {
+		if ( get_post( $rid ) === false || 'bbb-room' != get_post_type( $rid ) ) {
 			return null;
 		}
 
-		$entry_token = get_post_meta( $rid, 'bbb-room-token', true );
+		$meeting_id = get_post_meta( $rid, 'bbb-room-meeting-id', true );
 		$arr_params  = array(
-			'meetingID' => rawurlencode( $entry_token ),
+			'meetingID' => rawurlencode( $meeting_id ),
 		);
 
 		$url           = self::build_url( 'isMeetingRunning', $arr_params );
@@ -145,23 +151,23 @@ class Bigbluebutton_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Array       $room_ids               List of custom post ids for rooms.
-	 * @param   String      $recording_state        State of recordings to get.
-	 * @return  Array       $recordings             List of recordings for this room.
+	 * @param   Array  $room_ids               List of custom post ids for rooms.
+	 * @param   String $recording_state        State of recordings to get.
+	 * @return  Array  $recordings             List of recordings for this room.
 	 */
 	public static function get_recordings( $room_ids, $recording_state = 'published' ) {
 		$state       = sanitize_text_field( $recording_state );
 		$recordings  = [];
-		$entry_token = '';
+		$meeting_ids = '';
 
 		foreach ( $room_ids as $rid ) {
-			$entry_token .= get_post_meta( sanitize_text_field( $rid ), 'bbb-room-token', true ) . ',';
+			$meeting_ids .= get_post_meta( sanitize_text_field( $rid ), 'bbb-room-meeting-id', true ) . ',';
 		}
 
-		substr_replace( $entry_token, '', -1 );
+		substr_replace( $meeting_ids, '', -1 );
 
 		$arr_params = array(
-			'meetingID' => $entry_token,
+			'meetingID' => $meeting_ids,
 			'state'     => $state,
 		);
 
@@ -185,8 +191,8 @@ class Bigbluebutton_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   String  $recording_id   The ID of the recording that will be published/unpublished.
-	 * @param   String  $state          Set publishing state of the recording.
+	 * @param   String $recording_id   The ID of the recording that will be published/unpublished.
+	 * @param   String $state          Set publishing state of the recording.
 	 * @return  Integer 200|404|500     Status of the request.
 	 */
 	public static function set_recording_publish_state( $recording_id, $state ) {
@@ -220,8 +226,8 @@ class Bigbluebutton_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   String  $recording_id   The ID of the recording that will be protected/unprotected.
-	 * @param   String  $state          Set protected state of the recording.
+	 * @param   String $recording_id   The ID of the recording that will be protected/unprotected.
+	 * @param   String $state          Set protected state of the recording.
 	 * @return  Integer 200|404|500     Status of the request.
 	 */
 	public static function set_recording_protect_state( $recording_id, $state ) {
@@ -255,8 +261,8 @@ class Bigbluebutton_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   String      $recording_id   ID of the recording that will be deleted.
-	 * @return  Integer     200|404|500     Status of the request.
+	 * @param   String $recording_id   ID of the recording that will be deleted.
+	 * @return  Integer 200|404|500     Status of the request.
 	 */
 	public static function delete_recording( $recording_id ) {
 		$record = sanitize_text_field( $recording_id );
@@ -282,11 +288,11 @@ class Bigbluebutton_Api {
 	/**
 	 * Change recording meta fields.
 	 *
-	 * @param   String      $recording_id   ID of the recording that will be edited.
-	 * @param   String      $type           Type of meta field that will be changed.
-	 * @param   String      $value          Value of the meta field.
+	 * @param   String $recording_id   ID of the recording that will be edited.
+	 * @param   String $type           Type of meta field that will be changed.
+	 * @param   String $value          Value of the meta field.
 	 *
-	 * @return  Integer     200|404|500     Status of the request.
+	 * @return  Integer 200|404|500     Status of the request.
 	 */
 	public static function set_recording_edits( $recording_id, $type, $value ) {
 		$record         = sanitize_text_field( $recording_id );
@@ -320,7 +326,7 @@ class Bigbluebutton_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   String          $url        URL to get response from.
+	 * @param   String $url        URL to get response from.
 	 * @return  Array|WP_Error  $response   Server response in array format.
 	 */
 	private static function get_response( $url ) {
@@ -333,9 +339,9 @@ class Bigbluebutton_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   String   $request_type   Type of request to the bigbluebutton server.
-	 * @param   Array    $args           Parameters of the request stored in an array format.
-	 * @return  String   $url            URL with all parameters and calculated checksum.
+	 * @param   String $request_type   Type of request to the bigbluebutton server.
+	 * @param   Array  $args           Parameters of the request stored in an array format.
+	 * @return  String $url            URL with all parameters and calculated checksum.
 	 */
 	private static function build_url( $request_type, $args ) {
 		$type = sanitize_text_field( $request_type );

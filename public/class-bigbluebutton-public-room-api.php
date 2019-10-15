@@ -147,15 +147,22 @@ class Bigbluebutton_Public_Room_Api {
 			return $response;
 		}
 
-		$username                                    = sanitize_text_field( $data['bigbluebutton_room_username'] );
+		$username                                    = '';
 		$room_id                                     = (int) $data['bigbluebutton_room_id'];
-		$entry_code                                  = '';
+		$entry_code                                  = strval( get_post_meta( $room_id, 'bbb-room-viewer-code', true ) );
 		$response['bigbluebutton_admin_has_entered'] = false;
 
-		if ( current_user_can( 'join_as_viewer_bbb_room' ) ) {
-			$entry_code = strval( get_post_meta( $room_id, 'bbb-room-viewer-code', true ) );
+		if ( ! current_user_can( 'join_as_viewer_bbb_room' ) ) {
+			$temp_entry_pass = sanitize_text_field( $data['bigbluebutton_temp_room_pass'] );
+			if ( ! wp_verify_nonce( 'bigbluebutton_entry_code_' . $temp_entry_pass, $entry_code ) ) {
+				$entry_code = '';
+			}
+		}
+
+		if ( is_user_logged_in() ) {
+			$username = wp_get_current_user()->display_name;
 		} else {
-			$entry_code = sanitize_text_field( $data['bigbluebutton_room_code'] );
+			$username = sanitize_text_field( $data['bigbluebutton_room_username'] );
 		}
 
 		$join_url = Bigbluebutton_Api::get_join_meeting_url( $room_id, $username, $entry_code );
@@ -190,17 +197,19 @@ class Bigbluebutton_Public_Room_Api {
 				$query = array(
 					'wait_for_mod' => true,
 					'room_id'      => $room_id,
-					'username'     => $username,
 				);
 
 				$access_as_viewer = current_user_can( 'join_as_viewer_bbb_room' );
 				if ( ! is_user_logged_in() && get_role( 'anonymous' ) ) {
 					$access_as_viewer = get_role( 'anonymous' )->has_cap( 'join_as_viewer_bbb_room' );
 				}
-				// make user wait for moderator to join room
+				if ( ! is_user_logged_in() ) {
+					$query['username'] = $username;
+				}
+				// Make user wait for moderator to join room.
 				if ( ! $access_as_viewer ) {
-					$send_entry_code     = $viewer_code;
-					$query['entry_code'] = $entry_code;
+					$send_entry_code          = $viewer_code;
+					$query['temp_entry_pass'] = wp_create_nonce( 'bigbluebutton_entry_code_' . $entry_code );
 				}
 				wp_redirect( add_query_arg( $query, $return_url ) );
 			}

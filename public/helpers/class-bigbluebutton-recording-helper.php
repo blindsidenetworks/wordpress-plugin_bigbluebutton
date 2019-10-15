@@ -43,10 +43,10 @@ class Bigbluebutton_Recording_Helper {
 	/**
 	 * Get filtered and ordered recordings for the room based on capability.
 	 *
-	 * @param   Array 	$room_ids       Room IDs for the list of recordings.
-	 * @param	String	$order			Direction to order in.
-	 * @param	String	$orderby		Column name to order.
-	 * @return  Array   $recordings     List of filtered and sorted recordings.
+	 * @param   Array  $room_ids       Room IDs for the list of recordings.
+	 * @param   String $order          Direction to order in.
+	 * @param   String $orderby        Column name to order.
+	 * @return  Array  $recordings     List of filtered and sorted recordings.
 	 */
 	public function get_filtered_and_ordered_recordings_based_on_capability( $room_ids, $order = '', $orderby = '' ) {
 		$this->get_recordings_based_on_capability( $room_ids );
@@ -60,8 +60,8 @@ class Bigbluebutton_Recording_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param	Array	$room_ids		List of room IDs.
-	 * @return  Array   $recordings     List of recordings.
+	 * @param   Array $room_ids    List of room IDs.
+	 * @return  Array $recordings  List of recordings.
 	 */
 	public function get_recordings_based_on_capability( $room_ids ) {
 		$manage_recordings = current_user_can( 'manage_bbb_room_recordings' );
@@ -97,7 +97,7 @@ class Bigbluebutton_Recording_Helper {
 			if ( $manage_recordings ) {
 				$recording = $this->filter_managed_recording( $recording );
 				array_push( $filtered_recordings, $recording );
-			} elseif ( $recording->published == 'true' ) {
+			} elseif ( 'true' == $recording->published ) {
 				array_push( $filtered_recordings, $recording );
 			}
 		}
@@ -109,19 +109,19 @@ class Bigbluebutton_Recording_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   SimpleXMLElement    $recording  A recording to be inspected.
-	 * @return  SimpleXMLElement    $recording  A recording that has been inspected.
+	 * @param   SimpleXMLElement $recording  A recording to be inspected.
+	 * @return  SimpleXMLElement $recording  A recording that has been inspected.
 	 */
 	private function filter_managed_recording( $recording ) {
-		if ( $recording->protected == 'true' ) {
+		if ( 'true' == $recording->protected ) {
 			$recording->protected_icon_classes = 'fa fa-lock fa-icon bbb-icon bbb_protected_recording is_protected';
 			$recording->protected_icon_title   = __( 'Protected', 'bigbluebutton' );
-		} elseif ( $recording->protected == 'false' ) {
+		} elseif ( 'false' == $recording->protected ) {
 			$recording->protected_icon_classes = 'fa fa-unlock fa-icon bbb-icon bbb_protected_recording not_protected';
 			$recording->protected_icon_title   = __( 'Unprotected', 'bigbluebutton' );
 		}
 
-		if ( $recording->published == 'true' ) {
+		if ( 'true' == $recording->published ) {
 			$recording->published_icon_classes = 'fa fa-eye fa-icon bbb-icon bbb_published_recording is_published';
 			$recording->published_icon_title   = __( 'Published' );
 		} else {
@@ -136,11 +136,11 @@ class Bigbluebutton_Recording_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param	String	$order		Direction to order in.
-	 * @param	String	$orderby	Column name to order.
+	 * @param   String $order     Direction to order in.
+	 * @param   String $order_by  Column name to order.
 	 */
 	public function order_recordings( $order = '', $order_by = '' ) {
-		if ( $order != '' && $order_by != '' ) {
+		if ( '' !== $order && '' !== $order_by ) {
 
 			$direction = sanitize_text_field( $_GET['order'] );
 			$field     = sanitize_text_field( $_GET['orderby'] );
@@ -164,10 +164,10 @@ class Bigbluebutton_Recording_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   SimpleXMLElement    $recording      A recording to get the field name from.
-	 * @param   String              $field_name     Name of the field.
+	 * @param   SimpleXMLElement $recording      A recording to get the field name from.
+	 * @param   String           $field_name     Name of the field.
 	 *
-	 * @return  String              $field_value    Value of the field.
+	 * @return  String           $field_value    Value of the field.
 	 */
 	private function get_recording_field( $recording, $field_name ) {
 		$field_value = '';

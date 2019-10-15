@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Fired when the plugin is uninstalled.
  *
@@ -50,6 +49,11 @@ if ( ! class_exists( 'Bigbluebutton_Uninstall' ) ) {
 			self::remove_options();
 		}
 
+		/**
+		 * Remove all rooms and custom types.
+		 *
+		 * @since 3.0.0
+		 */
 		private static function trash_rooms_and_categories() {
 			global $wpdb;
 			$wpdb->query( 'DELETE FROM wp_postmeta WHERE post_id in (SELECT id from wp_posts where post_type="bbb-room");' );
@@ -58,6 +62,11 @@ if ( ! class_exists( 'Bigbluebutton_Uninstall' ) ) {
 			$wpdb->query( 'DELETE FROM wp_term_taxonomy WHERE taxonomy="bbb-room-category";' );
 		}
 
+		/**
+		 * Delete all capabilitie sassociated with this plugin.
+		 *
+		 * @since 3.0.0
+		 */
 		private static function delete_capabilities() {
 			$args                = get_post_type_object( 'bbb-room' );
 			$custom_capabilities = array(
@@ -98,12 +107,13 @@ if ( ! class_exists( 'Bigbluebutton_Uninstall' ) ) {
 		/**
 		 * Remove bigbluebutton specific options.
 		 *
-		 * @since	3.0.0
+		 * @since 3.0.0
 		 */
 		private static function remove_options() {
 			delete_option( 'bigbluebutton_url' );
 			delete_option( 'bigbluebutton_salt' );
 			delete_option( 'bigbluebutton_plugin_version' );
+			delete_option( 'bigbluebutton_default_roles_set' );
 		}
 	}
 }

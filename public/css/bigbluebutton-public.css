@@ -72,6 +72,7 @@
 }
 
 @media all and (max-width: 1200px) {
+
 	.flex-row {
 		width: 100%;
 	}
@@ -96,7 +97,7 @@
 }
 
 .bbb-header-icon {
-	color: white;
+	color: #fff;
 	cursor: pointer;
 }
 

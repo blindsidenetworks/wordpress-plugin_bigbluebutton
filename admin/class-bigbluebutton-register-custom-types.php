@@ -128,10 +128,10 @@ class Bigbluebutton_Register_Custom_Types {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Object  $object     The object that has the room ID.
+	 * @param   Object $object     The object that has the room ID.
 	 */
 	public function display_moderator_code_metabox( $object ) {
-		$entry_code       = $this->generate_random_code();
+		$entry_code       = Bigbluebutton_Admin_Helper::generate_random_code();
 		$entry_code_label = __( 'Moderator Code', 'bigbluebutton' );
 		$entry_code_name  = 'bbb-moderator-code';
 		$existing_value   = get_post_meta( $object->ID, 'bbb-room-moderator-code', true );
@@ -144,10 +144,10 @@ class Bigbluebutton_Register_Custom_Types {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Object  $object     The object that has the room ID.
+	 * @param   Object $object     The object that has the room ID.
 	 */
 	public function display_viewer_code_metabox( $object ) {
-		$entry_code       = $this->generate_random_code();
+		$entry_code       = Bigbluebutton_Admin_Helper::generate_random_code();
 		$entry_code_label = __( 'Viewer Code', 'bigbluebutton' );
 		$entry_code_name  = 'bbb-viewer-code';
 		$existing_value   = get_post_meta( $object->ID, 'bbb-room-viewer-code', true );
@@ -160,7 +160,7 @@ class Bigbluebutton_Register_Custom_Types {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Object  $object     The object that has the room ID.
+	 * @param   Object $object     The object that has the room ID.
 	 */
 	public function display_wait_for_mod_metabox( $object ) {
 		$existing_value = get_post_meta( $object->ID, 'bbb-room-wait-for-moderator', true );
@@ -173,26 +173,12 @@ class Bigbluebutton_Register_Custom_Types {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Object  $object     The object that has the room ID.
+	 * @param   Object $object     The object that has the room ID.
 	 */
 	public function display_allow_record_metabox( $object ) {
 		$existing_value = get_post_meta( $object->ID, 'bbb-room-recordable', true );
 
 		wp_nonce_field( 'bbb-room-recordable-nonce', 'bbb-room-recordable-nonce' );
 		require 'partials/bigbluebutton-recordable-metabox-display.php';
-	}
-
-	/**
-	 * Generate random alphanumeric string.
-	 *
-	 * @since   3.0.0
-	 *
-	 * @param   Integer $length         Length of random string.
-	 * @return  String  $default_code   The resulting random string.
-	 */
-	public function generate_random_code( $length = 10 ) {
-		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		$default_code    = substr( str_shuffle( $permitted_chars ), 0, $length );
-		return $default_code;
 	}
 }

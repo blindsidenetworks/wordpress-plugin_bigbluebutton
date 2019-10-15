@@ -34,10 +34,10 @@ class Bigbluebutton_Public_Shortcode {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Array   $atts       Parameters in the shortcode.
-	 * @param   String  $content    Content of the shortcode.
+	 * @param   Array  $atts       Parameters in the shortcode.
+	 * @param   String $content    Content of the shortcode.
 	 *
-	 * @return  String  $content    Content of the shortcode with rooms and recordings.
+	 * @return  String $content    Content of the shortcode with rooms and recordings.
 	 */
 	public function display_bigbluebutton_shortcode( $atts = [], $content = null ) {
 		$type           = 'room';
@@ -46,7 +46,7 @@ class Bigbluebutton_Public_Shortcode {
 		$tokens_string  = '';
 
 		foreach ( $atts as $key => $param ) {
-			if ( $key == 'type' && 'recording' == $param ) {
+			if ( 'type' == $key && 'recording' == $param ) {
 				$type = 'recording';
 			} elseif ( 'token' == $key ) {
 				$tokens_string = $param;

@@ -182,7 +182,7 @@ class Bigbluebutton_Admin {
 				echo '<a href="' . ( get_permalink( $post_id ) ? get_permalink( $post_id ) : '' ) . '">' . ( get_permalink( $post_id ) ? get_permalink( $post_id ) : '' ) . '</a>';
 				break;
 			case 'token':
-				echo (string) get_post_meta( $post_id, 'bbb-room-token', true );
+				echo 'meeting' . esc_attr( $post_id );
 				break;
 			case 'moderator-code':
 				echo (string) get_post_meta( $post_id, 'bbb-room-moderator-code', true );

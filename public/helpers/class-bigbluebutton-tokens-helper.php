@@ -25,9 +25,9 @@ class Bigbluebutton_Tokens_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Bigbluebutton_Display_Helper      $display_helper     Display helper to get HTML from partials.
-	 * @param   String                          $token_string       A list of tokens as a string, separated by commas
-	 * @param   Integer                         $author             The author of the content that will display the join form.
+	 * @param   Bigbluebutton_Display_Helper $display_helper     Display helper to get HTML from partials.
+	 * @param   String                       $token_string       A list of tokens as a string, separated by commas.
+	 * @param   Integer                      $author             The author of the content that will display the join form.
 	 *
 	 * @return  String                          $content            HTML string containing join forms for the corresponding rooms.
 	 */
@@ -84,9 +84,9 @@ class Bigbluebutton_Tokens_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Bigbluebutton_Display_Helper      $display_helper     Display helper to get HTML from partials.
-	 * @param   String                          $token_string       A list of tokens as a string, separated by commas
-	 * @param   Integer                         $author             The author of the content that will display the join form.
+	 * @param   Bigbluebutton_Display_Helper $display_helper     Display helper to get HTML from partials.
+	 * @param   String                       $token_string       A list of tokens as a string, separated by commas.
+	 * @param   Integer                      $author             The author of the content that will display the join form.
 	 *
 	 * @return  String                          $content            HTML string containing recordings from the corresponding rooms.
 	 */
@@ -121,14 +121,19 @@ class Bigbluebutton_Tokens_Helper {
 	/**
 	 * Get room from token.
 	 *
-	 * @since 	3.0.0
+	 * @since   3.0.0
 	 *
-	 * @param   String      $token      Meeting ID to get associated room ID from.
-	 * @param   Integer     $author     Author writing the content using this shortcode.
+	 * @param   String  $token      Meeting ID to get associated room ID from.
+	 * @param   Integer $author     Author writing the content using this shortcode.
 	 *
 	 * @return  Integer     $room_id    ID of the room, given that the author may access it.
 	 */
 	public static function find_room_id_by_token( $token, $author ) {
+		// Only show room if author can create rooms.
+		if ( ! user_can( $author, 'edit_bbb_rooms' ) ) {
+			return 0;
+		}
+
 		// New way of creating meeting ID.
 		if ( 'meeting' == substr( $token, 0, 7 ) ) {
 			$room_id = substr( $token, 7 );
@@ -137,33 +142,6 @@ class Bigbluebutton_Tokens_Helper {
 				return $room->ID;
 			} else {
 				return 0;
-			}
-		} else {
-			// Look for the meeting ID in the post meta of the room.
-			$args = array(
-				'post_type'      => 'bbb-room',
-				'post_status'    => 'publish',
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-				'posts_per_page' => -1,
-				'meta_query'     => array(
-					array(
-						'key'   => 'bbb-room-token',
-						'value' => $token,
-					),
-				),
-			);
-
-			// Only show room if author can create rooms.
-			if ( ! user_can( $author, 'edit_bbb_rooms' ) ) {
-				return 0;
-			}
-
-			$query = new WP_Query( $args );
-			if ( ! empty( $query->posts ) ) {
-				foreach ( $query->posts as $key => $room_id ) {
-					return $room_id;
-				}
 			}
 		}
 		return 0;
@@ -174,9 +152,9 @@ class Bigbluebutton_Tokens_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Array       $room_ids           Room IDs to get recordings from.
+	 * @param   Array $room_ids           Room IDs to get recordings from.
 	 *
-	 * @return  Array       $recordings
+	 * @return  Array $recordings         List of recordings belonging to the selected rooms.
 	 */
 	private static function get_recordings( $room_ids ) {
 		$recording_helper = new Bigbluebutton_Recording_Helper();

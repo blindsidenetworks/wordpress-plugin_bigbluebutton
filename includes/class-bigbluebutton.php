@@ -93,7 +93,7 @@ class Bigbluebutton {
 
 		if ( false === $previous_version && false === $oldest_version ) {
 			update_option( 'bigbluebutton_plugin_version', $new_version );
-		} elseif ( version_compare( $previous_version, $new_version, '<' ) ) {
+		} elseif ( ( false === $previous_version && false !== $oldest_version ) || version_compare( $previous_version, $new_version, '<' ) ) {
 			$success = $migrator->migrate();
 			if ( $success ) {
 				update_option( 'bigbluebutton_plugin_version', $new_version );
@@ -145,6 +145,11 @@ class Bigbluebutton {
 		 * Admin area API
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-bigbluebutton-admin-api.php';
+
+		/**
+		 * Admin helper.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/helpers/class-bigbluebutton-admin-helper.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing

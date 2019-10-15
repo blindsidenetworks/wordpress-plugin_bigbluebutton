@@ -25,8 +25,8 @@ class Bigbluebutton_Admin_Api {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   Integer     $post_id    Post ID of the new room.
-	 * @return  Integer     $post_id    Post ID of the new room.
+	 * @param   Integer $post_id    Post ID of the new room.
+	 * @return  Integer $post_id    Post ID of the new room.
 	 */
 	public function save_room( $post_id ) {
 
@@ -39,12 +39,18 @@ class Bigbluebutton_Admin_Api {
 			$viewer_code    = sanitize_text_field( $_POST['bbb-viewer-code'] );
 			$recordable     = ( array_key_exists( 'bbb-room-recordable', $_POST ) && sanitize_text_field( $_POST['bbb-room-recordable'] ) == 'checked' );
 
-			$wait_for_mod = ( isset( $_POST['bbb-room-wait-for-moderator'] ) && sanitize_text_field( $_POST['bbb-room-wait-for-moderator'] ) == 'checked' );
+			$wait_for_mod = ( sanitize_text_field( $_POST['bbb-room-wait-for-moderator'] ) == 'checked' );
+			$token        = 'meeting' . $post_id;
+
+			// Ensure the moderator code is not the same as the viewer code.
+			if ( $moderator_code === $viewer_code ) {
+				$viewer_code = $moderator_code . '0';
+			}
 
 			// Add room codes to postmeta data.
 			update_post_meta( $post_id, 'bbb-room-moderator-code', $moderator_code );
 			update_post_meta( $post_id, 'bbb-room-viewer-code', $viewer_code );
-			update_post_meta( $post_id, 'bbb-room-token', 'meeting' . $post_id );
+			update_post_meta( $post_id, 'bbb-room-meeting-id', sha1( home_url() . Bigbluebutton_Admin_Helper::generate_random_code( 12 ) ) );
 
 			// Update room recordable value.
 			update_post_meta( $post_id, 'bbb-room-recordable', ( $recordable ? 'true' : 'false' ) );
@@ -68,6 +74,7 @@ class Bigbluebutton_Admin_Api {
 			isset( $_POST['bbb-room-viewer-code-nonce'] ) &&
 			wp_verify_nonce( $_POST['bbb-room-viewer-code-nonce'], 'bbb-room-viewer-code-nonce' ) &&
 			isset( $_POST['bbb-room-wait-for-moderator-nonce'] ) &&
+			isset( $_POST['bbb-room-wait-for-moderator'] ) &&
 			wp_verify_nonce( $_POST['bbb-room-wait-for-moderator-nonce'], 'bbb-room-wait-for-moderator-nonce' ) &&
 			( ! current_user_can( 'create_recordable_bbb_room' ) ||
 				( isset( $_POST['bbb-room-recordable-nonce'] ) &&

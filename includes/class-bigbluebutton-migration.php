@@ -54,8 +54,8 @@ class Bigbluebutton_Migration {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   String  $old_version    Old version of the plugin.
-	 * @param   String  $new_version    New version of the plugin.
+	 * @param   String $old_version    Old version of the plugin.
+	 * @param   String $new_version    New version of the plugin.
 	 */
 	public function __construct( $old_version, $new_version ) {
 		$this->old_version = $old_version;
@@ -70,7 +70,7 @@ class Bigbluebutton_Migration {
 	 * @return  Boolean     $success    Boolean value if the migration suceeded.
 	 */
 	public function migrate() {
-		$success = true;
+		$success = false;
 		$this->import_from_older_versions();
 		$success = $this->import_rooms();
 		if ( ! $success ) {
@@ -91,11 +91,11 @@ class Bigbluebutton_Migration {
 		$old_room_logs_table = 'wp_bigbluebutton_logs';
 
 		// Import old rooms to new rooms.
-		$old_rooms_query            = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $old_rooms_table ) );
-		$old_room_logs_query        = $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $old_room_logs_table ) );
+		$old_rooms_query            = $wpdb->prepare( 'SHOW TABLES LIKE %s;', $wpdb->esc_like( $old_rooms_table ) );
+		$old_room_logs_query        = $wpdb->prepare( 'SHOW TABLES LIKE %s;', $wpdb->esc_like( $old_room_logs_table ) );
 		$old_room_logs_table_exists = ( $wpdb->get_var( $old_room_logs_query ) === $old_room_logs_table );
 		if ( $wpdb->get_var( $old_rooms_query ) === $old_rooms_table ) {
-			$old_rooms = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %s;', $old_rooms_table ) );
+			$old_rooms = $wpdb->get_results( 'SELECT * FROM ' . $old_rooms_table );
 			// Import old rooms to new rooms.
 			foreach ( $old_rooms as $old_room ) {
 				$new_room_args = array(
@@ -121,7 +121,7 @@ class Bigbluebutton_Migration {
 					$meeting_id = ( 12 == strlen( $old_room->meetingID ) ) ? sha1( home_url() . $old_room->meetingID ) : $old_room->meetingID;
 					update_post_meta( $new_room_id, 'bbb-room-moderator-code', $old_room->moderatorPW );
 					update_post_meta( $new_room_id, 'bbb-room-viewer-code', $old_room->attendeePW );
-					update_post_meta( $new_room_id, 'bbb-room-token', $meeting_id );
+					update_post_meta( $new_room_id, 'bbb-room-meeting-id', $meeting_id );
 					if ( $old_room_logs_table_exists ) {
 						$wpdb->delete( $old_room_logs_table, array( 'meetingID' => $meeting_id ) );
 					}
@@ -134,20 +134,20 @@ class Bigbluebutton_Migration {
 					$wpdb->delete( $old_rooms_table, array( 'id' => $old_room->id ) );
 				}
 			}
-			$check_old_rooms = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %s;', $old_rooms_table ) );
+			$check_old_rooms = $wpdb->get_results( 'SELECT * FROM ' . $old_rooms_table );
 			if ( count( $check_old_rooms ) > 0 ) {
 				$this->error_message = __( 'Not all rooms were able to be imported to the new version.', 'bigbluebutton' );
 				return false;
 			} else {
-				$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %s;', $old_rooms_table ) );
+				$wpdb->query( 'DROP TABLE IF EXISTS ' . $old_rooms_table );
 			}
-			$check_room_logs = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %s;', $old_room_logs_table ) );
+			$check_room_logs = $wpdb->get_results( 'SELECT * FROM ' . $old_room_logs_table );
 			if ( count( $check_room_logs ) ) {
 				$this->error_message = __( 'Not all room logs were able to be imported to the new version.' );
 				return false;
 			} else {
 				// Delete old log table.
-				$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %s;', $old_room_logs_table ) );
+				$wpdb->query( 'DROP TABLE IF EXISTS ' . $old_room_logs_table );
 			}
 		}
 		return true;
@@ -252,10 +252,10 @@ class Bigbluebutton_Migration {
 			$list_of_meetings = $wpdb->get_results( 'SELECT * FROM ' . $table_name_old . ' ORDER BY id;' );
 			foreach ( $list_of_meetings as $meeting ) {
 				$sql = 'INSERT INTO ' . $table_name . ' (meetingID, meetingName, meetingVersion, attendeePW, moderatorPW) VALUES ( %s, %s, %s, %s, %s);';
-				$wpdb->query( $wpdb->prepare( $sql, bigbluebutton_generateToken(), $meeting->meetingID, $meeting->meetingVersion, $meeting->attendeePW, $meeting->moderatorPW ) );
+				$wpdb->query( $wpdb->prepare( $sql, Bigbluebutton_Admin_Helper::generate_random_code( 6 ), $meeting->meetingID, $meeting->meetingVersion, $meeting->attendeePW, $meeting->moderatorPW ) );
 			}
 			// Remove the old table.
-			$wpdb->query( "DROP TABLE IF EXISTS $table_name_old" );
+			$wpdb->query( 'DROP TABLE IF EXISTS ' . $table_name_old );
 
 			// Update settings.
 			if ( ! get_option( 'mt_bbb_url' ) ) {

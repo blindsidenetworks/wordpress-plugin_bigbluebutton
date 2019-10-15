@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The views of the plugin.
  *
@@ -44,8 +43,8 @@ class Bigbluebutton_Public {
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    3.0.0
-	 * @param      string    $plugin_name       The name of the plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @param    String $plugin_name       The name of the plugin.
+	 * @param    String $version    The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
@@ -128,7 +127,7 @@ class Bigbluebutton_Public {
 	 * @since   3.0.0
 	 */
 	public function enqueue_heartbeat() {
-		if ( get_query_var( 'wait_for_mod' ) ) {
+		if ( get_query_var( 'bigbluebutton_wait_for_mod' ) ) {
 			wp_enqueue_script( 'heartbeat' );
 		}
 	}
@@ -137,9 +136,12 @@ class Bigbluebutton_Public {
 	 * Add query vars for conditions.
 	 *
 	 * @since   3.0.0
+	 *
+	 * @param   Array $vars List of existing vars that can be queried using WordPress core functions.
+	 * @return  Array $vars List of vars that can be queried, including BigBlueButton variables.
 	 */
 	public function add_query_vars( $vars ) {
-		$vars[] = 'wait_for_mod';
+		$vars[] = 'bigbluebutton_wait_for_mod';
 		return $vars;
 	}
 
@@ -148,30 +150,30 @@ class Bigbluebutton_Public {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   String  $content    Post content as string.
-	 * @return  String  $content    Post content as string.
+	 * @param   String $content    Post content as string.
+	 * @return  String $content    Post content as string.
 	 */
 	public function bbb_room_content( $content ) {
 		global $pagenow;
 
-		if ( $pagenow == 'edit.php' || $pagenow == 'post.php' || $pagenow == 'post-new.php' ) {
+		if ( 'edit.php' == $pagenow || 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
 			return $content;
 		}
 
 		$room_id = get_the_ID();
 
-		if ( $room_id === null || $room_id === false || ! isset( get_post( $room_id )->post_type ) ||
-			get_post( $room_id )->post_type != 'bbb-room' ) {
+		if ( null === $room_id || false === $room_id || ! isset( get_post( $room_id )->post_type ) ||
+			'bbb-room' != get_post( $room_id )->post_type ) {
 			return $content;
 		}
 
-		$token    = get_post_meta( $room_id, 'bbb-room-token', true );
+		$token    = 'meeting' . $room_id;
 		$content .= '[bigbluebutton token="' . $token . '"]';
 
 		// Add recordings list to post content if the room is recordable.
 		$room_can_record = get_post_meta( $room_id, 'bbb-room-recordable', true );
 
-		if ( $room_can_record == 'true' ) {
+		if ( 'true' == $room_can_record ) {
 			$content .= '[bigbluebutton type="recording" token="' . $token . '"]';
 		}
 
@@ -185,24 +187,5 @@ class Bigbluebutton_Public {
 	 */
 	public function register_widget() {
 		register_widget( 'Bigbluebutton_Public_Widget' );
-	}
-
-	/**
-	 * Get recordings from recording helper.
-	 *
-	 * @since   3.0.0
-	 *
-	 * @param   Integer     $room_id            Room ID to get recordings of.
-	 */
-	private function get_recordings( $room_ids ) {
-		$recording_helper = new Bigbluebutton_Recording_Helper();
-
-		if ( isset( $_GET['order'] ) && isset( $_GET['orderby'] ) ) {
-			$order   = sanitize_text_field( $_GET['order'] );
-			$orderby = sanitize_text_field( $_GET['orderby'] );
-			return $recording_helper->get_filtered_and_ordered_recordings_based_on_capability( $room_ids, $order, $orderby );
-		} else {
-			return $recording_helper->get_filtered_and_ordered_recordings_based_on_capability( $room_ids );
-		}
 	}
 }
