@@ -78,10 +78,12 @@
 				data.bigbluebutton_room_id = $( '#bbb-wait-for-mod-msg' ).data(
 					'room-id'
 				);
+				console.log( $( '#bbb-wait-for-mod-msg' ).data( 'temp-room-pass' ) );
 				if ( $( '#bbb-wait-for-mod-msg' ).data( 'temp-room-pass' ) ) {
 					data.bigbluebutton_temp_room_pass = $(
 						'#bbb-wait-for-mod-msg'
 					).data( 'temp-room-pass' );
+					console.log( 'submitted temp pass' );
 				}
 				console.log( $( '#bbb-wait-for-mod-msg' ).data( 'room-username' ) );
 				if ( $( '#bbb-wait-for-mod-msg' ).data( 'room-username' ) ) {
