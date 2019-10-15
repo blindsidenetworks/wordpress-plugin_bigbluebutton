@@ -4,15 +4,15 @@
 	<input type="hidden" id="bbb_join_room_meta_nonce" name="bbb_join_room_meta_nonce" value="<?php echo $meta_nonce; ?>">
 	<input type="hidden" name="REQUEST_URI" value="<?php echo $current_url; ?>">
 	<?php if ( ! is_user_logged_in() ) { ?>
-		<div id="bbb_join_with_username">
+		<div id="bbb_join_with_username" class="bbb-join-form-block">
 			<label id="bbb_meeting_name_label" class="bbb-join-room-label"><?php esc_html_e( 'Name' ); ?>: </label>
 			<input type="text" name="bbb_meeting_username" aria-labelledby="bbb_meeting_name_label" class="bbb-join-room-input">
 		</div>
 	<?php } ?>
 	<?php if ( ! $access_as_moderator && ! $access_as_viewer && $access_using_code ) { ?>
-		<div id="bbb_join_with_password">
+		<div id="bbb_join_with_password" class="bbb-join-form-block">
 	<?php } else { ?>
-		<div id="bbb_join_with_password" style="display:none;">
+		<div id="bbb_join_with_password" class="bbb-join-form-block" style="display:none;">
 	<?php } ?>
 			<label id="bbb_meeting_access_code_label" class="bbb-join-room-label"><?php esc_html_e( 'Access Code', 'bigbluebutton' ); ?>: </label>
 			<input type="text" name="bbb_meeting_access_code" aria-labelledby="bbb_meeting_access_code_label" class="bbb-join-room-input">
@@ -24,7 +24,7 @@
 		<?php } ?>
 	<br>
 	<?php if ( isset( $_REQUEST['wait_for_mod'] ) && $_REQUEST['room_id'] == $room_id ) { ?>
-		<div>
+		<div class="bbb-join-form-block">
 			<label id="bbb-wait-for-mod-msg"
 				data-room-id="<?php echo $room_id; ?>"
 				<?php if ( isset( $_REQUEST['temp_entry_pass'] ) ) { ?>
