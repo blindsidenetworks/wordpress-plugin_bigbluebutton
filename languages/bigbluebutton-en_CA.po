@@ -2,19 +2,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2019-09-13 10:54-0400\n"
-"PO-Revision-Date: 2019-09-13 12:38-0400\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2019-10-16 10:43-0400\n"
 "Language-Team: \n"
-"Language: en_CA\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.2.4\n"
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: \n"
+"Language: en_CA\n"
 "X-Poedit-SearchPath-0: admin/partials\n"
 "X-Poedit-SearchPath-1: public/partials\n"
 
+# Admin server settings
 msgid "Rooms"
 msgstr "Rooms"
 
@@ -25,10 +26,12 @@ msgid "Server"
 msgstr "Server"
 
 msgid "The server settings explanation."
-msgstr "The settings listed below determine the BigBlueButton server that will be used for the live sessions."
+msgstr ""
+"The settings listed below determine the BigBlueButton server that will be used for the "
+"live sessions."
 
-msgid "Endpoint"
-msgstr "Endpoint"
+msgid "EndPoint"
+msgstr "EndPoint"
 
 msgid "Shared Secret"
 msgstr "Shared Secret"
@@ -38,8 +41,205 @@ msgstr "Example"
 
 msgid "Default server settings 1. Default server settings 2."
 msgstr ""
-"Note that the values included by default are using a FREE BigBlueButton server provided by Blindside Networks. "
-"They have to be replaced with the parameters obtained from a server better suited for production."
+"Note that the values included by default are using a FREE BigBlueButton server provided "
+"by Blindside Networks. They have to be replaced with the parameters obtained from a "
+"server better suited for production."
 
 msgid "Save server settings success message."
 msgstr "Success! Your room server settings have been saved."
+
+msgid "Save server settings bad url error message."
+msgstr "Error: the URL you have entered must end with '/bigbluebutton/'."
+
+# Admin Room settings
+msgid "Add New"
+msgstr "Add New"
+
+msgid "Add New Room"
+msgstr "Add New Room"
+
+msgid "Edit Room"
+msgstr "Edit Room"
+
+msgid "View Room"
+msgstr "View Room"
+
+msgid "View Rooms"
+msgstr "View Rooms"
+
+msgid "Search Rooms"
+msgstr "Search Rooms"
+
+msgid "No rooms found"
+msgstr "No rooms found"
+
+msgid "No rooms found in trash"
+msgstr "No rooms found in trash"
+
+msgid "All Rooms"
+msgstr "All Rooms"
+
+msgid "New Room"
+msgstr "New Room"
+
+msgid "Room Archives"
+msgstr "Room Archives"
+
+msgid "Insert into room"
+msgstr "Insert into room"
+
+msgid "Uploaded to this room"
+msgstr "Uploaded to this room"
+
+msgid "Filter rooms list"
+msgstr "Filter rooms list"
+
+msgid "Rooms list navigation"
+msgstr "Rooms list navigation"
+
+msgid "Rooms list"
+msgstr "Rooms list"
+
+msgid "Room published"
+msgstr "Room published"
+
+msgid "Room published privately"
+msgstr "Room published privately"
+
+msgid "Room reverted to draft"
+msgstr "Room reverted to draft"
+
+msgid "Room scheduled"
+msgstr "Room scheduled"
+
+msgid "Room updated"
+msgstr "Room updated"
+
+msgid "Moderator Code"
+msgstr "Moderator Code"
+
+msgid "Viewer Code"
+msgstr "Viewer Code"
+
+msgid "Recordable"
+msgstr "Recordable"
+
+msgid "true"
+msgstr "true"
+
+msgid "false"
+msgstr "false"
+
+# Room description
+msgid "Join"
+msgstr "Join"
+
+msgid "Wait for Moderator"
+msgstr "Wait for Moderator"
+
+# Recordings description
+msgid "Meeting"
+msgstr "Meeting"
+
+msgid "Recording"
+msgstr "Recording"
+
+msgid "Recordings"
+msgstr "Recordings"
+
+msgid "Manage"
+msgstr "Manage"
+
+msgid "Expand recordings"
+msgstr "Expand recordings"
+
+msgid "Collapse recordings"
+msgstr "Collapse recordings"
+
+msgid "Statistics"
+msgstr "Statistics"
+
+msgid "Presentation"
+msgstr "Presentation"
+
+msgid "Video"
+msgstr "Video"
+
+msgid "Protected"
+msgstr "Protected"
+
+msgid "Unprotected"
+msgstr "Unprotected"
+
+# Migration Error Messages
+msgid "Failed to import the room, %s."
+msgstr "Failed to import the room, %s."
+
+msgid "Not all rooms were able to be imported to the new version."
+msgstr "Not all rooms were able to be imported to the new version."
+
+msgid "Not all room logs were able to be imported to the new version."
+msgstr "Not all room logs were able to be imported to the new version."
+
+# Error messages
+msgid "The form has expired or is invalid. Please try again."
+msgstr "The form has expired or is invalid. Please try again."
+
+msgid "You do not have permission to enter the room. Please request permission."
+msgstr "You do not have permission to enter the room. Please request permission."
+
+msgid "The access code you have entered is incorrect. Please try again."
+msgstr "The access code you have entered is incorrect. Please try again."
+
+msgid ""
+"It is currently not possible to create rooms on the server. Please contact support for "
+"help."
+msgstr ""
+"It is currently not possible to create rooms on the server. Please contact support for "
+"help."
+
+msgid "Bigbluebutton depends on the font awesome plugin. Please install and activate it."
+msgstr "Bigbluebutton depends on the font awesome plugin. Please install and activate it."
+
+msgid "Bigbluebutton depends on the heartbeat API. Please enable it."
+msgstr "Bigbluebutton depends on the heartbeat API. Please enable it."
+
+# Public strings
+msgid "Access Code"
+msgstr "Access Code"
+
+msgid "This room does not currently have any recordings."
+msgstr "This room does not currently have any recordings."
+
+msgid ""
+"The meeting has not started yet. You will be automatically redirected to the meeting "
+"when it starts."
+msgstr ""
+"The meeting has not started yet. You will be automatically redirected to the meeting "
+"when it starts."
+
+msgid ""
+"The meeting has not started yet. Please wait for a moderator to start the meeting "
+"before joining."
+msgstr ""
+"The meeting has not started yet. Please wait for a moderator to start the meeting "
+"before joining."
+
+msgid "The token: %s is not associated with a published room."
+msgstr "The token: %s is not associated with a published room."
+
+msgid "The token: %s is not associated with an existing room."
+msgstr "The token: %s is not associated with an existing room."
+
+msgid "This user does not have permission to display any rooms in a shortcode or widget."
+msgstr "This user does not have permission to display any rooms in a shortcode or widget."
+
+# Widget strings
+msgid "Room selection"
+msgstr "Room Selection"
+
+msgid "Displays a BigBlueButton login form."
+msgstr "Displays a BigBlueButton login form."
+
+msgid "There are no rooms in the selection."
+msgstr "There are no rooms in the selection."

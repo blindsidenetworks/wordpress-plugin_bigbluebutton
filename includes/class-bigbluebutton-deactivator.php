@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Fired during plugin deactivation
  *
@@ -23,11 +22,7 @@
 class Bigbluebutton_Deactivator {
 
 	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    3.0.0
+	 * Placeholder for deactivating plugin.
 	 */
 	public static function deactivate() {
 
