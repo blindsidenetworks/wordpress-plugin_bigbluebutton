@@ -199,6 +199,12 @@ msgstr ""
 msgid "The token: %s is not associated with a published room."
 msgstr ""
 
+msgid "The token: %s is not associated with an existing room."
+msgstr ""
+
+msgid "This user does not have permission to display any rooms in a shortcode or widget."
+msgstr ""
+
 # Public strings
 msgid "Access Code"
 msgstr ""

@@ -29,8 +29,7 @@ class Bigbluebutton_Admin_Helper {
 	 * @return  String  $default_code   The resulting random string.
 	 */
 	public static function generate_random_code( $length = 10 ) {
-		$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		$default_code    = substr( str_shuffle( $permitted_chars ), 0, $length );
+		$default_code = bin2hex( random_bytes( $length / 2 ) );
 		return $default_code;
 	}
 }

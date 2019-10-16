@@ -4,6 +4,7 @@ Donate link: https://blindsidenetworks.com
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 5.1
 Tested up to: 5.2.3
+Requires PHP: 7.2
 Stable tag: 1.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -82,6 +83,8 @@ To allow another user to join as moderator, viewer, or with a code, assign them 
 
 To allow another user to manage recordings, assign them to a role which has the permissions, manage_bbb_room_recordings.
 
+To allow another user to use shortcodes or the widget, assign them to a role which has the permissions, edit_bbb_rooms.
+
 If there are no roles with the corresponding permissions, please create a custom role using the "Members" plugin and assign the permission to that role.
 
 **Is there any way users can go directly into a meeting?**
@@ -102,7 +105,7 @@ You should enable the curl extension in php.ini.
 
 Rooms may not be viewed until they are published. This is because room settings cannot be changed after publication, and we want to be certain the settings are how you like them.
 
-**I want to edit my permissions. How do I do that?**
+**I want to edit my recordings. How do I do that?**
 
 If a user has the capability to manage recordings, they will see a pencil icon next to recording name and description. Click on the icon to start editing, and press enter to submit. A user can cancel editing by pressing the ESC key.
 

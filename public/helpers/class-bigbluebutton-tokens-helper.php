@@ -21,6 +21,13 @@
 class Bigbluebutton_Tokens_Helper {
 
 	/**
+	 * The error message if a room cannot be displayed.
+	 *
+	 * @var String $error_message
+	 */
+	private static $error_message;
+
+	/**
 	 * Get join form as an HTML string.
 	 *
 	 * @since   3.0.0
@@ -48,7 +55,7 @@ class Bigbluebutton_Tokens_Helper {
 			$room_id = self::find_room_id_by_token( $token, $author );
 			if ( 0 == $room_id ) {
 				$content  = '<p>';
-				$content .= sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token );
+				$content .= self::$error_message;
 				$content .= '</p>';
 				return $content;
 			}
@@ -118,8 +125,9 @@ class Bigbluebutton_Tokens_Helper {
 			}
 			$token   = preg_replace( '/[^a-zA-Z0-9]+/', '', $raw_token );
 			$room_id = self::find_room_id_by_token( $token, $author );
-			if ( $room_id == 0 ) {
-				$content  = '<p>' . sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token );
+			if ( 0 == $room_id ) {
+				$content = '<p>';
+				$content .= self::$error_message;
 				$content .= '</p>';
 				return $content;
 			}
@@ -138,24 +146,30 @@ class Bigbluebutton_Tokens_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param   String  $token      Meeting ID to get associated room ID from.
+	 * @param   String  $token      Token to get associated room ID from.
 	 * @param   Integer $author     Author writing the content using this shortcode.
 	 *
-	 * @return  Integer     $room_id    ID of the room, given that the author may access it.
+	 * @return  Integer $room_id    ID of the room, given that the author may access it.
 	 */
 	public static function find_room_id_by_token( $token, $author ) {
 		// Only show room if author can create rooms.
 		if ( ! user_can( $author, 'edit_bbb_rooms' ) ) {
+			self::$error_message = esc_html__( 'This user does not have permission to display any rooms in a shortcode or widget.', 'bigbluebutton' );
 			return 0;
 		}
 
-		// New way of creating meeting ID.
+		// New way of creating token.
 		if ( 'meeting' == substr( $token, 0, 7 ) ) {
 			$room_id = (int) substr( $token, 7 );
 			$room    = get_post( $room_id );
-			if ( false !== $room && null !== $room && 'bbb-room' == $room->post_type && 'publish' == $room->post_status ) {
+			if ( false !== $room && null !== $room && 'bbb-room' == $room->post_type ) {
+				if ( 'publish' != $room->post_status ) {
+					self::$error_message = sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token );
+					return 0;
+				}
 				return $room->ID;
 			} else {
+				self::$error_message= sprintf( wp_kses( __( 'The token: %s is not associated with an existing room.', 'bigbluebutton' ), array() ), $token );
 				return 0;
 			}
 		}

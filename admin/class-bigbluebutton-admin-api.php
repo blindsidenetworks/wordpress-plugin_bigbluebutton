@@ -45,6 +45,13 @@ class Bigbluebutton_Admin_Api {
 			if ( $moderator_code === $viewer_code ) {
 				$viewer_code = $moderator_code . '0';
 			}
+			// Ensure neither code is empty.
+			if ( '' == $moderator_code ) {
+				$moderator_code = Bigbluebutton_Admin_Helper::generate_random_code();
+			}
+			if ( '' == $viewer_code ) {
+				$viewer_code = Bigbluebutton_Admin_Helper::generate_random_code();
+			}
 
 			// Add room codes to postmeta data.
 			update_post_meta( $post_id, 'bbb-room-moderator-code', $moderator_code );
