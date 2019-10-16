@@ -47,7 +47,7 @@ class Bigbluebutton_Public {
 	 * @param      string    $plugin_name       The name of the plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct($plugin_name, $version) {
+	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
@@ -73,7 +73,7 @@ class Bigbluebutton_Public {
 		 * class.
 		 */
 
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/bigbluebutton-public.css', array(), $this->version, 'all');
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/bigbluebutton-public.css', array(), $this->version, 'all' );
 
 	}
 
@@ -96,70 +96,8 @@ class Bigbluebutton_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/bigbluebutton-public.js', array('jquery'), $this->version, false);
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/bigbluebutton-public.js', array( 'jquery' ), $this->version, false );
 
 	}
 
-	/**
-	 * Display join room button in the bbb-room post.
-	 * 
-	 * @since	3.0.0
-	 * 
-	 * @param	String	$content	Post content as string.
-	 * @return	String	$content	Post content as string.
-	 */
-	public function bbb_room_join_form_content($content) {
-		global $pagenow;
-
-		if ($pagenow == 'edit.php' || $pagenow == 'post.php') {
-			return $content;
-		}
-
-		$room_id = get_the_ID();
-
-		if ($room_id === null || !isset(get_post($room_id)->post_type) || get_post($room_id)->post_type != 'bbb-room') {
-			return $content;
-		}
-		$meta_nonce = wp_create_nonce('bbb_join_room_meta_nonce');
-
-		include('partials/bigbluebutton-join-display.php');
-		return $content;
-	}
-	
-	/**
-	 * Handle authenticated user joining room.
-	 * 
-	 * @since 	3.0.0
-	 */
-	public function bbb_user_join_room() {
-		if ( ! empty($_POST['action']) && $_POST['action'] == 'join_room') {
-			if (wp_verify_nonce($_POST['bbb_join_room_meta_nonce'], 'bbb_join_room_meta_nonce')) {
-				$room_id = $_POST['room_id'];
-				$user = wp_get_current_user();
-				$entry_code = strval(get_post_meta($room_id, 'bbb-room-moderator-code', true));
-				$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, $user->display_name, $entry_code);
-				wp_redirect($join_url);
-			} else {
-				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
-			}
-		}
-	}
-
-	/**
-	 * Handle non-authenticated user joining room
-	 * 
-	 * @since 	3.0.0
-	 */
-	public function bbb_guest_join_room() {
-		if ( ! empty($_POST['action']) && $_POST['action'] == 'join_room') {
-			if (wp_verify_nonce($_POST['bbb_join_room_meta_nonce'], 'bbb_join_room_meta_nonce')) {
-				$room_id = $_POST['room_id'];
-				$entry_code = strval(get_post_meta($room_id, 'bbb-room-viewer-code', true));
-				$join_url = BigbluebuttonAPI::get_join_meeting_url($room_id, 'Guest', $entry_code);
-				wp_redirect($join_url);
-			} else {
-				wp_die(_('The form has expired or is invalid. Please try again.', 'bigbluebutton'));
-			}
-		}
-	}
 }
