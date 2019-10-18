@@ -167,7 +167,7 @@ class Bigbluebutton_Public {
 			return $content;
 		}
 
-		$token    = 'meeting' . $room_id;
+		$token    = 'z' . $room_id;
 		$content .= '[bigbluebutton token="' . $token . '"]';
 
 		// Add recordings list to post content if the room is recordable.
