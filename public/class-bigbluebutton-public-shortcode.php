@@ -45,9 +45,8 @@ class Bigbluebutton_Public_Shortcode {
 		$type           = 'room';
 		$author         = (int) get_the_author_meta( 'ID' );
 		$display_helper = new Bigbluebutton_Display_Helper( plugin_dir_path( __FILE__ ) );
-		$list_tokens    = false;
 
-		if ( 'edit.php' == $pagenow || 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
+		if ( ! Bigbluebutton_Tokens_Helper::can_display_room_on_page() ) {
 			return $content;
 		}
 

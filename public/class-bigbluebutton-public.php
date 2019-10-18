@@ -156,7 +156,7 @@ class Bigbluebutton_Public {
 	public function bbb_room_content( $content ) {
 		global $pagenow;
 
-		if ( 'edit.php' == $pagenow || 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
+		if ( ! Bigbluebutton_Tokens_Helper::can_display_room_on_page() ) {
 			return $content;
 		}
 

@@ -192,6 +192,21 @@ class Bigbluebutton_Tokens_Helper {
 	}
 
 	/**
+	 * Check if rooms and recordings should load on this page.
+	 *
+	 * @since  3.0.0
+	 * @return Boolean  $can_view          Boolean value of whether join room form and recordings should show on this page.
+	 */
+	public static function can_display_room_on_page() {
+		global $pagenow;
+		$can_view = true;
+		if ( 'edit.php' == $pagenow || 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
+			$can_view = false;
+		}
+		return $can_view;
+	}
+
+	/**
 	 * Get room ID using new token format.
 	 *
 	 * @since   3.0.0
