@@ -45,29 +45,18 @@ class Bigbluebutton_Public_Shortcode {
 		$type           = 'room';
 		$author         = (int) get_the_author_meta( 'ID' );
 		$display_helper = new Bigbluebutton_Display_Helper( plugin_dir_path( __FILE__ ) );
-		$tokens_string  = '';
 		$list_tokens    = false;
 
 		if ( 'edit.php' == $pagenow || 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
 			return $content;
 		}
 
-		foreach ( $atts as $key => $param ) {
-			if ( 'type' == $key && 'recording' == $param ) {
-				$type = 'recording';
-			} elseif ( 'token' == $key ) {
-				if ( 'token' == substr( $param, 0, 5 ) ) {
-					$param = substr( $param, 5 );
-				}
-				$tokens_string = $param;
-				$list_tokens = true;
-			} elseif ( $list_tokens ) {
-				if ( 'token' == substr( $param, 0, 5 ) ) {
-					$param = substr( $param, 5 );
-				}
-				$tokens_string .= ',' . $param;
-			}
+		if ( array_key_exists( 'type', $atts ) && 'recording' == $atts['type'] ) {
+			$type = 'recording';
+			unset( $atts['type'] );
 		}
+
+		$tokens_string = Bigbluebutton_Tokens_Helper::get_token_string_from_atts( $atts );
 
 		if ( 'room' == $type ) {
 			$content .= Bigbluebutton_Tokens_Helper::join_form_from_tokens_string( $display_helper, $tokens_string, $author );

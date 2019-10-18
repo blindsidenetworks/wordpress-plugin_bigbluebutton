@@ -28,6 +28,32 @@ class Bigbluebutton_Tokens_Helper {
 	private static $error_message;
 
 	/**
+	 * Get tokens string from shortcode attributes.
+	 *
+	 * @since   3.0.0
+	 * @param   Array $atts              Array of attributes submitted in the shortcode.
+	 * @return  String $tokens_string    List of tokens separated by commas.
+	 */
+	public static function get_token_string_from_atts( $atts ) {
+		$tokens_string = '';
+
+		foreach ( $atts as $key => $param ) {
+			if ( 'token' == $key ) {
+				if ( 'token' == substr( $param, 0, 5 ) ) {
+					$param = substr( $param, 5 );
+				}
+				$tokens_string .= $param;
+			} else {
+				if ( 'token' == substr( $param, 0, 5 ) ) {
+					$param = substr( $param, 5 );
+				}
+				$tokens_string .= ',' . $param;
+			}
+		}
+		return $tokens_string;
+	}
+
+	/**
 	 * Get join form as an HTML string.
 	 *
 	 * @since   3.0.0
@@ -170,7 +196,7 @@ class Bigbluebutton_Tokens_Helper {
 	 *
 	 * @since   3.0.0
 	 *
-	 * @param	String $token     String value of the token.
+	 * @param   String $token     String value of the token.
 	 * @return  Integer $room_id  Room ID associated with the token.
 	 */
 	private static function check_if_room_exists_for_new_token_format( $token ) {
@@ -210,7 +236,7 @@ class Bigbluebutton_Tokens_Helper {
 		);
 
 		$query = new WP_Query( $args );
-		if ( $query->posts ) {
+		if ( ! empty( $query->posts ) ) {
 			foreach ( $query->posts as $key => $room_id ) {
 				$room = get_post( $room_id );
 				if ( 'publish' != $room->post_status ) {
