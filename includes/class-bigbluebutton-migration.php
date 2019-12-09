@@ -121,6 +121,7 @@ class Bigbluebutton_Migration {
 					$meeting_id = ( 12 == strlen( $old_room->meetingID ) ) ? sha1( home_url() . $old_room->meetingID ) : $old_room->meetingID;
 					update_post_meta( $new_room_id, 'bbb-room-moderator-code', $old_room->moderatorPW );
 					update_post_meta( $new_room_id, 'bbb-room-viewer-code', $old_room->attendeePW );
+					update_post_meta( $new_room_id, 'bbb-room-token', $old_room->meetingID );
 					update_post_meta( $new_room_id, 'bbb-room-meeting-id', $meeting_id );
 					if ( $old_room_logs_table_exists ) {
 						$wpdb->delete( $old_room_logs_table, array( 'meetingID' => $meeting_id ) );

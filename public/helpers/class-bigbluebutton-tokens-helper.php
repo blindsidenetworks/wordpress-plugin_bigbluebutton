@@ -28,6 +28,32 @@ class Bigbluebutton_Tokens_Helper {
 	private static $error_message;
 
 	/**
+	 * Get tokens string from shortcode attributes.
+	 *
+	 * @since   3.0.0
+	 * @param   Array $atts              Array of attributes submitted in the shortcode.
+	 * @return  String $tokens_string    List of tokens separated by commas.
+	 */
+	public static function get_token_string_from_atts( $atts ) {
+		$tokens_string = '';
+
+		foreach ( $atts as $key => $param ) {
+			if ( 'token' == $key ) {
+				if ( 'token' == substr( $param, 0, 5 ) ) {
+					$param = substr( $param, 5 );
+				}
+				$tokens_string .= $param;
+			} else {
+				if ( 'token' == substr( $param, 0, 5 ) ) {
+					$param = substr( $param, 5 );
+				}
+				$tokens_string .= ',' . $param;
+			}
+		}
+		return $tokens_string;
+	}
+
+	/**
 	 * Get join form as an HTML string.
 	 *
 	 * @since   3.0.0
@@ -54,7 +80,7 @@ class Bigbluebutton_Tokens_Helper {
 			$token   = preg_replace( '/[^a-zA-Z0-9]+/', '', $raw_token );
 			$room_id = self::find_room_id_by_token( $token, $author );
 			if ( 0 == $room_id ) {
-				$content  = '<p>';
+				$content .= '<p>';
 				$content .= self::$error_message;
 				$content .= '</p>';
 				return $content;
@@ -126,7 +152,7 @@ class Bigbluebutton_Tokens_Helper {
 			$token   = preg_replace( '/[^a-zA-Z0-9]+/', '', $raw_token );
 			$room_id = self::find_room_id_by_token( $token, $author );
 			if ( 0 == $room_id ) {
-				$content = '<p>';
+				$content .= '<p>';
 				$content .= self::$error_message;
 				$content .= '</p>';
 				return $content;
@@ -158,21 +184,84 @@ class Bigbluebutton_Tokens_Helper {
 			return 0;
 		}
 
-		// New way of creating token.
-		if ( 'meeting' == substr( $token, 0, 7 ) ) {
-			$room_id = (int) substr( $token, 7 );
-			$room    = get_post( $room_id );
-			if ( false !== $room && null !== $room && 'bbb-room' == $room->post_type ) {
+		if ( 'z' == substr( $token, 0, 1 ) ) {
+			return self::check_if_room_exists_for_new_token_format( $token );
+		} else {
+			return self::check_if_room_exists_for_old_token_format( $token );
+		}
+	}
+
+	/**
+	 * Check if rooms and recordings should load on this page.
+	 *
+	 * @since  3.0.0
+	 * @return Boolean  $can_view          Boolean value of whether join room form and recordings should show on this page.
+	 */
+	public static function can_display_room_on_page() {
+		global $pagenow;
+		$can_view = true;
+		if ( 'edit.php' == $pagenow || 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
+			$can_view = false;
+		}
+		return $can_view;
+	}
+
+	/**
+	 * Get room ID using new token format.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   String $token     String value of the token.
+	 * @return  Integer $room_id  Room ID associated with the token.
+	 */
+	private static function check_if_room_exists_for_new_token_format( $token ) {
+		$room_id = (int) substr( $token, 1 );
+		$room    = get_post( $room_id );
+		if ( false !== $room && null !== $room && 'bbb-room' == $room->post_type ) {
+			if ( 'publish' != $room->post_status ) {
+				self::$error_message = sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token );
+				return 0;
+			}
+			return $room->ID;
+		} else {
+			return self::check_if_room_exists_for_old_token_format( $token );
+		}
+	}
+
+	/**
+	 * Get room ID using old token format.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   String $token     String value of the token.
+	 * @return  Integer $room_id  Room ID associated with the token.
+	 */
+	private static function check_if_room_exists_for_old_token_format( $token ) {
+		$args = array(
+			'post_type'      => 'bbb-room',
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+			'posts_per_page' => -1,
+			'meta_query'     => array(
+				array(
+					'key'   => 'bbb-room-token',
+					'value' => $token,
+				),
+			),
+		);
+
+		$query = new WP_Query( $args );
+		if ( ! empty( $query->posts ) ) {
+			foreach ( $query->posts as $key => $room_id ) {
+				$room = get_post( $room_id );
 				if ( 'publish' != $room->post_status ) {
 					self::$error_message = sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token );
 					return 0;
 				}
-				return $room->ID;
-			} else {
-				self::$error_message= sprintf( wp_kses( __( 'The token: %s is not associated with an existing room.', 'bigbluebutton' ), array() ), $token );
-				return 0;
+				return $room_id;
 			}
 		}
+		self::$error_message = sprintf( wp_kses( __( 'The token: %s is not associated with an existing room.', 'bigbluebutton' ), array() ), $token );
 		return 0;
 	}
 

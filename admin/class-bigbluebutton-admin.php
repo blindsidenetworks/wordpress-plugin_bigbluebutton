@@ -185,7 +185,12 @@ class Bigbluebutton_Admin {
 				echo '<a href="' . esc_url( $permalink ) . '" target="_blank">' . esc_url( $permalink ) . '</a>';
 				break;
 			case 'token':
-				echo 'meeting' . esc_attr( $post_id );
+				if ( metadata_exists( 'post', $post_id, 'bbb-room-token' ) ) {
+					$token = get_post_meta( $post_id, 'bbb-room-token', true );
+				} else {
+					$token = 'z' . esc_attr( $post_id );
+				}
+				echo esc_attr( $token );
 				break;
 			case 'moderator-code':
 				echo esc_attr( get_post_meta( $post_id, 'bbb-room-moderator-code', true ) );
