@@ -120,8 +120,8 @@ class Bigbluebutton_Display_Helper {
 	 * @return  Array   $custom_sort_fields     Array of sortable fields for recordings.
 	 */
 	private function set_order_by_field() {
-		$sort_asc_classes   = 'fa fa-sort-up bbb-header-icon';
-		$sort_desc_classes  = 'fa fa-sort-down bbb-header-icon';
+		$sort_asc_classes   = 'dashicons dashicons-arrow-up-alt2 bbb-header-icon';
+		$sort_desc_classes  = 'dashicons dashicons-arrow-down-alt2 bbb-header-icon';
 		$sort_meta_nounce   = wp_create_nonce( 'bbb_sort_recording_columns_nonce' );
 		$custom_sort_fields = array(
 			'name'        => null,

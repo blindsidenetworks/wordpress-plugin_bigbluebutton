@@ -190,9 +190,6 @@ msgstr ""
 msgid "It is currently not possible to create rooms on the server. Please contact support for help."
 msgstr ""
 
-msgid "BigBlueButton looks best with the Font Awesome plugin. Please install and activate it."
-msgstr ""
-
 msgid "BigBlueButton works best with the heartbeat API enabled. Please enable it."
 msgstr ""
 

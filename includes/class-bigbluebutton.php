@@ -236,11 +236,6 @@ class Bigbluebutton {
 		$plugin_admin_api                   = new Bigbluebutton_Admin_Api();
 		$plugin_admin_register_custom_types = new Bigbluebutton_Register_Custom_Types();
 
-		// Suggest installing font awesome plugin.
-		if ( ! is_plugin_active( 'font-awesome/font-awesome.php' ) ) {
-			$this->loader->add_action( 'admin_notices', $plugin_admin, 'missing_font_awesome_admin_notice' );
-		}
-
 		// Suggest not disabling heartbeat.
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'check_for_heartbeat_script' );
 
@@ -290,7 +285,6 @@ class Bigbluebutton {
 		$plugin_public_room_api      = new Bigbluebutton_Public_Room_Api( $this->get_plugin_name(), $this->get_version() );
 		$plugin_public_recording_api = new Bigbluebutton_Public_Recording_Api();
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_font_awesome_icons' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 

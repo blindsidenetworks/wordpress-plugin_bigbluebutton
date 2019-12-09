@@ -38,7 +38,7 @@
 								data-record-value="<?php echo urldecode( $recording->metadata->{'recording-name'} ); ?>"
 								data-record-type="name"
 								data-meta-nonce="<?php echo $meta_nonce; ?>"
-								class="fa fa-edit bbb-icon bbb_edit_recording_data"></i>
+								class="dashicons dashicons-edit bbb-icon bbb_edit_recording_data"></i>
 						<?php } ?>
 					</div>
 					<div id="bbb-recording-description-<?php echo $recording->recordID; ?>" class="flex-row flex-row-<?php echo $columns; ?>" role="cell">
@@ -51,7 +51,7 @@
 								data-record-value="<?php echo urldecode( $recording->metadata->{'recording-description'} ); ?>"
 								data-record-type="description"
 								data-meta-nonce="<?php echo $meta_nonce; ?>"
-								class="fa fa-edit bbb-icon bbb_edit_recording_data"></i>
+								class="dashicons dashicons-edit bbb-icon bbb_edit_recording_data"></i>
 						<?php } ?>
 					</div>
 					<div class="flex-row flex-row-<?php echo $columns; ?>" role="cell">
@@ -86,7 +86,7 @@
 							&nbsp;
 							<i data-record-id="<?php echo $recording->recordID; ?>"
 								data-meta-nonce="<?php echo $meta_nonce; ?>"
-								class="fa fa-trash bbb-icon bbb_trash_recording"
+								class="<?php echo $recording->trash_icon_classes ?>"
 								title="<?php _ex( 'Trash', 'post status' ); ?>"
 								aria-label="<?php _ex( 'Trash', 'post status' ); ?>"></i>
 						</div>

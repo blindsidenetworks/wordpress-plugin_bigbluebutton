@@ -300,30 +300,6 @@ class Bigbluebutton_Admin {
 	}
 
 	/**
-	 * Generate admin notice for missing the font awesome plugin.
-	 *
-	 * @since   3.0.0
-	 */
-	public function missing_font_awesome_admin_notice() {
-		$bbb_warning_type = 'bbb-missing-font-awesome-plugin-notice';
-		if ( ! get_option( 'dismissed-' . $bbb_warning_type, false ) ) {
-			$bbb_admin_warning_message = __( 'BigBlueButton looks best with the Font Awesome plugin. Please install and activate it.', 'bigbluebutton' );
-			$bbb_admin_notice_nonce    = wp_create_nonce( $bbb_warning_type );
-			$bbb_action_link           = wp_nonce_url(
-				add_query_arg(
-					array(
-						'tab'    => 'plugin-information',
-						'plugin' => 'font-awesome',
-					),
-					admin_url( 'plugin-install.php' )
-				),
-				'plugin-information_font-awesome'
-			);
-			require 'partials/bigbluebutton-warning-admin-notice-display.php';
-		}
-	}
-
-	/**
 	 * Generate missing heartbeat API if missing.
 	 *
 	 * @since   3.0.0
