@@ -190,10 +190,10 @@ msgstr ""
 msgid "It is currently not possible to create rooms on the server. Please contact support for help."
 msgstr ""
 
-msgid "Bigbluebutton depends on the font awesome plugin. Please install and activate it."
+msgid "BigBlueButton looks best with the Font Awesome plugin. Please install and activate it."
 msgstr ""
 
-msgid "Bigbluebutton depends on the heartbeat API. Please enable it."
+msgid "BigBlueButton works best with the heartbeat API enabled. Please enable it."
 msgstr ""
 
 msgid "The token: %s is not associated with a published room."

@@ -31,11 +31,26 @@
 
 	$( window ).load( function() {
 
-		// make update success message in save server settings disppear after 2 seconds
+		// Make update success message in save server settings disppear after 2 seconds.
 		if ( $( '.updated' ).length ) {
 			$( '.updated' )
 				.delay( 2000 )
 				.fadeOut();
 		}
+
+		// Dismiss admin notices.
+		$( '.bbb-warning-notice' ).on( 'click', function() {
+			let data = {
+				action: 'dismissed_notice_handler',
+				type: $( this ).data( 'notice' ),
+				nonce: $( this ).data( 'nonce' )
+			};
+
+			jQuery.post(
+				php_vars.ajax_url,
+				data,
+				'json'
+			);
+		});
 	});
-}(jQuery));
+}( jQuery ) );

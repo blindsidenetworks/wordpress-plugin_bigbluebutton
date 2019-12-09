@@ -244,6 +244,9 @@ class Bigbluebutton {
 		// Suggest not disabling heartbeat.
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'check_for_heartbeat_script' );
 
+		// Dismiss admin dashboard notices.
+		$this->loader->add_action( 'wp_ajax_dismissed_notice_handler', $plugin_admin_api, 'dismiss_admin_notices' );
+
 		// Show update notice.
 		$this->loader->add_action( 'in_plugin_update_message-bigbluebutton/bigbluebutton-plugin.php', $plugin_admin, 'bigbluebutton_show_upgrade_notification', 10, 2 );
 

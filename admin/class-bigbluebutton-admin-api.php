@@ -68,6 +68,20 @@ class Bigbluebutton_Admin_Api {
 	}
 
 	/**
+	 * Dismiss admin notices.
+	 *
+	 * @since 3.0.0
+	 */
+	public function dismiss_admin_notices() {
+		if ( isset( $_POST['type'] ) && 'bbb-' === substr( $_POST['type'], 0, 4 ) ) {
+			$type = sanitize_text_field( $_POST['type'] );
+			if ( wp_verify_nonce( $_POST['nonce'], $type ) ) {
+				update_option( 'dismissed-' . $type, true );
+			}
+		}
+	}
+
+	/**
 	 * Helper function to check if metadata has been submitted with correct nonces.
 	 *
 	 * @since 3.0.0

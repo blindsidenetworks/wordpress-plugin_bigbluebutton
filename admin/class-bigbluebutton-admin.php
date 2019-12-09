@@ -95,8 +95,11 @@ class Bigbluebutton_Admin {
 		 * class.
 		 */
 
+		$translations = array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+		);
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/bigbluebutton-admin.js', array( 'jquery' ), $this->version, false );
-
+		wp_localize_script( $this->plugin_name, 'php_vars', $translations );
 	}
 
 	/**
@@ -302,19 +305,35 @@ class Bigbluebutton_Admin {
 	 * @since   3.0.0
 	 */
 	public function missing_font_awesome_admin_notice() {
-		$bbb_admin_error_message = __( 'Bigbluebutton depends on the font awesome plugin. Please install and activate it.', 'bigbluebutton' );
-		require_once 'partials/bigbluebutton-error-admin-notice-display.php';
+		$bbb_warning_type = 'bbb-missing-font-awesome-plugin-notice';
+		if ( ! get_option( 'dismissed-' . $bbb_warning_type, false ) ) {
+			$bbb_admin_warning_message = __( 'BigBlueButton looks best with the Font Awesome plugin. Please install and activate it.', 'bigbluebutton' );
+			$bbb_admin_notice_nonce    = wp_create_nonce( $bbb_warning_type );
+			$bbb_action_link           = wp_nonce_url(
+				add_query_arg(
+					array(
+						'tab'    => 'plugin-information',
+						'plugin' => 'font-awesome',
+					),
+					admin_url( 'plugin-install.php' )
+				),
+				'plugin-information_font-awesome'
+			);
+			require 'partials/bigbluebutton-warning-admin-notice-display.php';
+		}
 	}
 
 	/**
-	 * Generate missing heartbeat API if missing
+	 * Generate missing heartbeat API if missing.
 	 *
 	 * @since   3.0.0
 	 */
 	public function check_for_heartbeat_script() {
-		if ( ! wp_script_is( 'heartbeat', 'registered' ) ) {
-			$bbb_admin_error_message = __( 'Bigbluebutton depends on the heartbeat API. Please enable it.', 'bigbluebutton' );
-			require_once 'partials/bigbluebutton-error-admin-notice-display.php';
+		$bbb_warning_type = 'bbb-missing-heartbeat-api-notice';
+		if ( ! wp_script_is( 'heartbeat', 'registered' ) && ! get_option( 'dismissed-' . $bbb_warning_type, false ) ) {
+			$bbb_admin_warning_message = __( 'BigBlueButton works best with the heartbeat API enabled. Please enable it.', 'bigbluebutton' );
+			$bbb_admin_notice_nonce    = wp_create_nonce( $bbb_warning_type );
+			require 'partials/bigbluebutton-warning-admin-notice-display.php';
 		}
 	}
 
