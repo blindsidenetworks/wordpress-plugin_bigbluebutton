@@ -40,8 +40,8 @@
 				$( '#bbb-recordings-list-' + room_id ).slideUp();
 				$( this )
 					.children( 'i' )
-					.removeClass( 'fa-angle-down' )
-					.addClass( 'fa-angle-right' );
+					.removeClass( 'dashicons-arrow-down-alt2' )
+					.addClass( 'dashicons-arrow-right-alt2' );
 				$( this )
 					.children( '.bbb-expandable-header' )
 					.text( php_vars.expand_recordings );
@@ -49,8 +49,8 @@
 				$( '#bbb-recordings-list-' + room_id ).slideDown();
 				$( this )
 					.children( 'i' )
-					.removeClass( 'fa-angle-right' )
-					.addClass( 'fa-angle-down' );
+					.removeClass( 'dashicons-arrow-right-alt2' )
+					.addClass( 'dashicons-arrow-down-alt2' );
 				$( this )
 					.children( '.bbb-expandable-header' )
 					.text( php_vars.collapse_recordings );
@@ -157,16 +157,16 @@
 				value = 'false';
 				curr_class = 'is_published';
 				replace_class = 'not_published';
-				curr_icon_class = 'fa-eye';
-				replace_icon_class = 'fa-eye-slash';
+				curr_icon_class = 'dashicons-visibility';
+				replace_icon_class = 'dashicons-hidden';
 				title = php_vars.unpublished;
 				$( '#bbb-recording-links-block-' + recordID ).hide();
 			} else {
 				value = 'true';
 				curr_class = 'not_published';
 				replace_class = 'is_published';
-				curr_icon_class = 'fa-eye-slash';
-				replace_icon_class = 'fa-eye';
+				curr_icon_class = 'dashicons-hidden';
+				replace_icon_class = 'dashicons-visibility';
 				title = php_vars.published;
 				$( '#bbb-recording-links-block-' + recordID ).show();
 			}
@@ -215,15 +215,15 @@
 				value = 'false';
 				curr_class = 'is_protected';
 				replace_class = 'not_protected';
-				curr_icon_class = 'fa-lock';
-				replace_icon_class = 'fa-unlock';
+				curr_icon_class = 'dashicons-lock';
+				replace_icon_class = 'dashicons-unlock';
 				title = php_vars.unprotected;
 			} else {
 				value = 'true';
 				curr_class = 'not_protected';
 				replace_class = 'is_protected';
-				curr_icon_class = 'fa-unlock';
-				replace_icon_class = 'fa-lock';
+				curr_icon_class = 'dashicons-unlock';
+				replace_icon_class = 'dashicons-lock';
 				title = php_vars.protected;
 			}
 
@@ -328,7 +328,7 @@
 								$( form ).text( new_value );
 								$( '<i>', {
 									class:
-										'fa fa-edit bbb-icon bbb_edit_recording_data',
+										'dashicons dashicons-edit bbb-icon bbb_edit_recording_data',
 									id: 'edit-recording-' + type + recordID,
 									title: php_vars.edit,
 									'data-record-id': recordID,

@@ -102,7 +102,7 @@
 	cursor: pointer;
 }
 
-.fa-disabled {
+.dashicon-disabled {
 	opacity: 0.3;
 	cursor: not-allowed;
 }

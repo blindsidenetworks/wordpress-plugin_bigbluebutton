@@ -114,20 +114,22 @@ class Bigbluebutton_Recording_Helper {
 	 */
 	private function filter_managed_recording( $recording ) {
 		if ( 'true' == $recording->protected ) {
-			$recording->protected_icon_classes = 'fa fa-lock fa-icon bbb-icon bbb_protected_recording is_protected';
+			$recording->protected_icon_classes = 'bbb-icon bbb_protected_recording is_protected dashicons dashicons-lock';
 			$recording->protected_icon_title   = __( 'Protected', 'bigbluebutton' );
 		} elseif ( 'false' == $recording->protected ) {
-			$recording->protected_icon_classes = 'fa fa-unlock fa-icon bbb-icon bbb_protected_recording not_protected';
+			$recording->protected_icon_classes = 'bbb-icon bbb_protected_recording not_protected dashicons dashicons-unlock';
 			$recording->protected_icon_title   = __( 'Unprotected', 'bigbluebutton' );
 		}
 
 		if ( 'true' == $recording->published ) {
-			$recording->published_icon_classes = 'fa fa-eye fa-icon bbb-icon bbb_published_recording is_published';
+			$recording->published_icon_classes = 'bbb-icon bbb_published_recording is_published dashicons dashicons-visibility';
 			$recording->published_icon_title   = __( 'Published' );
 		} else {
-			$recording->published_icon_classes = 'fa fa-eye-slash fa-icon bbb-icon bbb_published_recording not_published';
+			$recording->published_icon_classes = 'bbb-icon bbb_published_recording not_published dashicons dashicons-hidden';
 			$recording->published_icon_title   = __( 'Unpublished' );
 		}
+
+		$recording->trash_icon_classes = 'bbb-icon bbb_trash_recording dashicons dashicons-trash';
 		return $recording;
 	}
 
