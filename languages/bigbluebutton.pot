@@ -202,6 +202,9 @@ msgstr ""
 msgid "This user does not have permission to display any rooms in a shortcode or widget."
 msgstr ""
 
+msgid "The room linked to this resource is not configured correctly."
+msgstr ""
+
 # Public strings
 msgid "Access Code"
 msgstr ""

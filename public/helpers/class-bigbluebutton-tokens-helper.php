@@ -185,9 +185,9 @@ class Bigbluebutton_Tokens_Helper {
 		}
 
 		if ( 'z' == substr( $token, 0, 1 ) ) {
-			return self::check_if_room_exists_for_new_token_format( $token );
+			return self::check_if_room_exists_for_new_token_format( $token, $author );
 		} else {
-			return self::check_if_room_exists_for_old_token_format( $token );
+			return self::check_if_room_exists_for_old_token_format( $token, $author );
 		}
 	}
 
@@ -212,19 +212,20 @@ class Bigbluebutton_Tokens_Helper {
 	 * @since   3.0.0
 	 *
 	 * @param   String $token     String value of the token.
+	 * @param   Integer $author   Author writing the content using this shortcode.
 	 * @return  Integer $room_id  Room ID associated with the token.
 	 */
-	private static function check_if_room_exists_for_new_token_format( $token ) {
+	private static function check_if_room_exists_for_new_token_format( $token, $author ) {
 		$room_id = (int) substr( $token, 1 );
 		$room    = get_post( $room_id );
 		if ( false !== $room && null !== $room && 'bbb-room' == $room->post_type ) {
 			if ( 'publish' != $room->post_status ) {
-				self::$error_message = sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token );
+				self::set_error_message( sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token ), $author );
 				return 0;
 			}
 			return $room->ID;
 		} else {
-			return self::check_if_room_exists_for_old_token_format( $token );
+			return self::check_if_room_exists_for_old_token_format( $token, $author );
 		}
 	}
 
@@ -234,9 +235,10 @@ class Bigbluebutton_Tokens_Helper {
 	 * @since   3.0.0
 	 *
 	 * @param   String $token     String value of the token.
+	 * @param   Integer $author   Author writing the content using this shortcode.
 	 * @return  Integer $room_id  Room ID associated with the token.
 	 */
-	private static function check_if_room_exists_for_old_token_format( $token ) {
+	private static function check_if_room_exists_for_old_token_format( $token, $author ) {
 		$args = array(
 			'post_type'      => 'bbb-room',
 			'fields'         => 'ids',
@@ -255,13 +257,14 @@ class Bigbluebutton_Tokens_Helper {
 			foreach ( $query->posts as $key => $room_id ) {
 				$room = get_post( $room_id );
 				if ( 'publish' != $room->post_status ) {
-					self::$error_message = sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token );
+					self::set_error_message( sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token ), $author );
 					return 0;
 				}
 				return $room_id;
 			}
 		}
-		self::$error_message = sprintf( wp_kses( __( 'The token: %s is not associated with an existing room.', 'bigbluebutton' ), array() ), $token );
+
+		self::set_error_message( sprintf( wp_kses( __( 'The token: %s is not associated with an existing room.', 'bigbluebutton' ), array() ), $token ), $author );
 		return 0;
 	}
 
@@ -283,6 +286,22 @@ class Bigbluebutton_Tokens_Helper {
 			return $recording_helper->get_filtered_and_ordered_recordings_based_on_capability( $room_ids, $order, $orderby );
 		} else {
 			return $recording_helper->get_filtered_and_ordered_recordings_based_on_capability( $room_ids );
+		}
+	}
+
+	/**
+	 * Set error message based on if user can see the detailed error message or not.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param  String  $detailed_message                      Detailed error message that describes the issue.
+	 * @param  Integer $author                                Author writing the content using this shortcode.
+	 */
+	private static function set_error_message( $detailed_message, $author ) {
+		if ( current_user_can( 'edit_others_bbb_rooms' ) || get_current_user_id() == $author ) {
+			self::$error_message = $detailed_message;
+		} else {
+			self::$error_message = esc_html__( 'The room linked to this resource is not configured correctly.', 'bigbluebutton' );
 		}
 	}
 }
