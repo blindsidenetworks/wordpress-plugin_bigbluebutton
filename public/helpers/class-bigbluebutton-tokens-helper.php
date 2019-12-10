@@ -219,11 +219,8 @@ class Bigbluebutton_Tokens_Helper {
 		$room_id = (int) substr( $token, 1 );
 		$room    = get_post( $room_id );
 		if ( false !== $room && null !== $room && 'bbb-room' == $room->post_type ) {
-			if ( 'publish' != $room->post_status && self::can_view_detailed_error_message( $author ) ) {
-				self::$error_message = sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token );
-				return 0;
-			} elseif ( 'publish' != $room->post_status ) {
-				self::$error_message = esc_html__( 'The room linked to this resource is not configured correctly.', 'bigbluebutton' );
+			if ( 'publish' != $room->post_status ) {
+				self::set_error_message( sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token ), $author );
 				return 0;
 			}
 			return $room->ID;
@@ -259,23 +256,15 @@ class Bigbluebutton_Tokens_Helper {
 		if ( ! empty( $query->posts ) ) {
 			foreach ( $query->posts as $key => $room_id ) {
 				$room = get_post( $room_id );
-				if ( 'publish' != $room->post_status && self::can_view_detailed_error_message( $author ) ) {
-					self::$error_message = sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token );
-					return 0;
-				} elseif ( 'publish' != $room->post_status ) {
-					self::$error_message = esc_html__( 'The room linked to this resource is not configured correctly.', 'bigbluebutton' );
+				if ( 'publish' != $room->post_status ) {
+					self::set_error_message( sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token ), $author );
 					return 0;
 				}
 				return $room_id;
 			}
 		}
 
-		if ( self::can_view_detailed_error_message( $author ) ) {
-			self::$error_message = sprintf( wp_kses( __( 'The token: %s is not associated with an existing room.', 'bigbluebutton' ), array() ), $token );
-		} else {
-			self::$error_message = esc_html__( 'The room linked to this resource is not configured correctly.', 'bigbluebutton' );
-		}
-
+		self::set_error_message( sprintf( wp_kses( __( 'The token: %s is not associated with an existing room.', 'bigbluebutton' ), array() ), $token ), $author );
 		return 0;
 	}
 
@@ -301,14 +290,18 @@ class Bigbluebutton_Tokens_Helper {
 	}
 
 	/**
-	 * Check if current user can view detailed error message when a room will not display.
+	 * Set error message based on if user can see the detailed error message or not.
 	 *
 	 * @since   3.0.0
 	 *
+	 * @param  String  $detailed_message                      Detailed error message that describes the issue.
 	 * @param  Integer $author                                Author writing the content using this shortcode.
-	 * @return Boolean $can_view_detailed_error_message       If current user can view the detailed error message.
 	 */
-	private static function can_view_detailed_error_message( $author ) {
-		return current_user_can( 'edit_others_bbb_rooms' ) || get_current_user_id() == $author;
+	private static function set_error_message( $detailed_message, $author ) {
+		if ( current_user_can( 'edit_others_bbb_rooms' ) || get_current_user_id() == $author ) {
+			self::$error_message = $detailed_message;
+		} else {
+			self::$error_message = esc_html__( 'The room linked to this resource is not configured correctly.', 'bigbluebutton' );
+		}
 	}
 }
