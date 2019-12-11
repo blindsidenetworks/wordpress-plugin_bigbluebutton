@@ -1,5 +1,5 @@
 === BigBlueButton ===
-Contributors: blindsidenetworks, jfederico
+Contributors: blindsidenetworks, jfederico, yfngdu
 Donate link: https://blindsidenetworks.com
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 5.1
