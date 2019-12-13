@@ -3,7 +3,7 @@ Contributors: blindsidenetworks, jfederico, yfngdu
 Donate link: https://blindsidenetworks.com
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 5.1
-Tested up to: 5.2.3
+Tested up to: 5.2.4
 Requires PHP: 7.2
 Stable tag: 1.4.6
 License: GPLv2 or later
@@ -120,12 +120,11 @@ If a user has the capability to manage recordings, they will see a pencil icon n
 
 == Changelog ==
 
-== 3.0.0 ==
-* New version based on boilerplate.
+= 3.0.0 =
+* This version is the official release of the bigbluebutton plugin.
 
 == 2.0.0 ==
-* Added Custom Post Type and taxonomies to create and join rooms. *
-* Added custom parameters of type, title, token and join in the shortcode [bigbluebutton]. *
+* Never released.
 
 = 1.4.2 =
 * Updated. Updated tag.
@@ -214,9 +213,6 @@ If a user has the capability to manage recordings, they will see a pencil icon n
 * Uses time stamps for the meeting version, which results in better performance.
 * Includes some bug fixes.
 
-= 3.0.0 =
-* Added the initial files.
-
 == Upgrade Notice ==
 
 = 3.0.0 =
@@ -239,6 +235,3 @@ This version provides better performance, and the wait for moderator option is n
 
 = 1.0.1 =
 This version provides better performance, and includes some bug fixes.
-
-= 3.0.0 =
-This version is the official release of the bigbluebutton plugin.
