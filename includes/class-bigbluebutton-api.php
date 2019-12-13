@@ -58,7 +58,7 @@ class Bigbluebutton_Api {
 			return 404;
 		}
 
-		$response = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
+		$response = self::response_to_xml( $full_response );
 
 		if ( property_exists( $response, 'returncode' ) && 'SUCCESS' == $response->returncode ) {
 			return 200;
@@ -137,7 +137,7 @@ class Bigbluebutton_Api {
 			return null;
 		}
 
-		$response = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
+		$response = self::response_to_xml( $full_response );
 
 		if ( property_exists( $response, 'running' ) && 'true' == $response->running ) {
 			return true;
@@ -178,7 +178,7 @@ class Bigbluebutton_Api {
 			return $recordings;
 		}
 
-		$response = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
+		$response = self::response_to_xml( $full_response );
 		if ( property_exists( $response, 'recordings' ) && property_exists( $response->recordings, 'recording' ) ) {
 			$recordings = $response->recordings->recording;
 		}
@@ -213,7 +213,7 @@ class Bigbluebutton_Api {
 		if ( is_wp_error( $full_response ) ) {
 			return 404;
 		}
-		$response = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
+		$response = self::response_to_xml( $full_response );
 
 		if ( property_exists( $response, 'returncode' ) && 'SUCCESS' == $response->returncode ) {
 			return 200;
@@ -248,7 +248,7 @@ class Bigbluebutton_Api {
 		if ( is_wp_error( $full_response ) ) {
 			return 404;
 		}
-		$response = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
+		$response = self::response_to_xml( $full_response );
 
 		if ( property_exists( $response, 'returncode' ) && 'SUCCESS' == $response->returncode ) {
 			return 200;
@@ -277,7 +277,7 @@ class Bigbluebutton_Api {
 		if ( is_wp_error( $full_response ) ) {
 			return 404;
 		}
-		$response = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
+		$response = self::response_to_xml( $full_response );
 
 		if ( property_exists( $response, 'returncode' ) && 'SUCCESS' == $response->returncode ) {
 			return 200;
@@ -312,13 +312,42 @@ class Bigbluebutton_Api {
 			return 404;
 		}
 
-		$response = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
+		$response = self::response_to_xml( $full_response );
 
 		if ( property_exists( $response, 'returncode' ) && 'SUCCESS' == $response->returncode ) {
 			return 200;
 		}
 
 		return 500;
+	}
+
+	/**
+	 * Verify that the endpoint is a BigBlueButton server, the salt is correct, and the server is running.
+	 *
+	 * @since 3.0.0
+	 *
+	 * @param String $url  BigBlueButton URL endpoint to be tested.
+	 * @param String $salt BigBlueButton server salt to be tested.
+	 *
+	 * @return Boolean $valid Whether the BigBlueButton server settings are correctly configured or not.
+	 */
+	public static function test_bigbluebutton_server( $url, $salt ) {
+		$valid = false;
+
+		$test_url      = $url . 'api/?getMeetings&checksum=' . sha1( 'getMeetings' . $salt );
+		$full_response = self::get_response( $test_url );
+
+		if ( is_wp_error( $full_response ) ) {
+			return false;
+		}
+
+		$response = self::response_to_xml( $full_response );
+
+		if ( property_exists( $response, 'returncode' ) && 'SUCCESS' == $response->returncode ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -332,6 +361,23 @@ class Bigbluebutton_Api {
 	private static function get_response( $url ) {
 		$result = wp_remote_get( esc_url_raw( $url ) );
 		return $result;
+	}
+
+	/**
+	 * Convert website response to XML Object.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param  Array $full_response       Website response to convert to XML object.
+	 * @return Object $xml                 XML Object of the body.
+	 */
+	private static function response_to_xml( $full_response ) {
+		try {
+			$xml = new SimpleXMLElement( wp_remote_retrieve_body( $full_response ) );
+		} catch ( Exception $exception ) {
+			return new stdClass();
+		}
+		return $xml;
 	}
 
 	/**

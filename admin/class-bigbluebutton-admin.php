@@ -279,6 +279,7 @@ class Bigbluebutton_Admin {
 	 *                          0 - failure
 	 *                          1 - success
 	 *                          2 - bad url format
+	 *                          3 - bad bigbluebutton settings configuration
 	 */
 	private function room_server_settings_change() {
 		if ( ! empty( $_POST['action'] ) && 'bbb_general_settings' == $_POST['action'] && wp_verify_nonce( sanitize_text_field( $_POST['bbb_edit_server_settings_meta_nonce'] ), 'bbb_edit_server_settings_meta_nonce' ) ) {
@@ -286,6 +287,10 @@ class Bigbluebutton_Admin {
 			$bbb_salt = sanitize_text_field( $_POST['bbb_salt'] );
 
 			$bbb_url .= ( substr( $bbb_url, -1 ) == '/' ? '' : '/' );
+
+			if ( ! Bigbluebutton_Api::test_bigbluebutton_server( $bbb_url, $bbb_salt ) ) {
+				return 3;
+			}
 
 			if ( substr_compare( $bbb_url, 'bigbluebutton/', strlen( $bbb_url ) - 14 ) !== 0 ) {
 				return 2;

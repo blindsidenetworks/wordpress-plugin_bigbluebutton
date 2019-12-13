@@ -32,6 +32,10 @@
 			<div class="error">
 				<p><?php esc_html_e( 'Save server settings bad url error message.', 'bigbluebutton' ); ?></p>
 			</div>
+		<?php } elseif ( $change_success == 3 ) { ?>
+			<div class="error">
+				<p><?php esc_html_e( 'Save server settings bad server settings error message.', 'bigbluebutton' ); ?></p>
+			</div>
 		<?php } ?>
 		<br><br>
 		<input class="button button-primary bbb-settings-submit" type="submit" value="<?php esc_html_e( 'Save Changes' ); ?>"/>
