@@ -41,16 +41,17 @@ class Bigbluebutton_Admin_Api {
 
 			$wait_for_mod = ( isset( $_POST['bbb-room-wait-for-moderator'] ) && sanitize_text_field( $_POST['bbb-room-wait-for-moderator'] ) == 'checked' );
 
-			// Ensure the moderator code is not the same as the viewer code.
-			if ( $moderator_code === $viewer_code ) {
-				$viewer_code = $moderator_code . '0';
-			}
 			// Ensure neither code is empty.
 			if ( '' == $moderator_code ) {
 				$moderator_code = Bigbluebutton_Admin_Helper::generate_random_code();
 			}
 			if ( '' == $viewer_code ) {
 				$viewer_code = Bigbluebutton_Admin_Helper::generate_random_code();
+			}
+
+			// Ensure the moderator code is not the same as the viewer code.
+			if ( $moderator_code === $viewer_code ) {
+				$viewer_code = $moderator_code . '0';
 			}
 
 			// Add room codes to postmeta data.
