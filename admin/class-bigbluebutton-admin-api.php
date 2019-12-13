@@ -48,7 +48,6 @@ class Bigbluebutton_Admin_Api {
 			if ( '' == $viewer_code ) {
 				$viewer_code = Bigbluebutton_Admin_Helper::generate_random_code();
 			}
-
 			// Ensure the moderator code is not the same as the viewer code.
 			if ( $moderator_code === $viewer_code ) {
 				$viewer_code = $moderator_code . '0';
