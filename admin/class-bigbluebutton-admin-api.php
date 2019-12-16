@@ -51,7 +51,7 @@ class Bigbluebutton_Admin_Api {
 
 			// Ensure the moderator code is not the same as the viewer code.
 			if ( $moderator_code === $viewer_code ) {
-				$viewer_code = $moderator_code . '0';
+				$viewer_code = $moderator_code . Bigbluebutton_Admin_Helper::generate_random_code( 1 );
 			}
 
 			// Add room codes to postmeta data.
