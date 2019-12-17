@@ -31,7 +31,7 @@ class Bigbluebutton_Public_Recording_Api {
 	public function set_bbb_recording_publish_state() {
 		$response            = array();
 		$response['success'] = false;
-		if ( current_user_can( 'manage_bbb_room_recordings' ) ) {
+		if ( BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'manage_bbb_room_recordings' ) ) {
 			if ( array_key_exists( 'meta_nonce', $_POST ) && array_key_exists( 'record_id', $_POST ) &&
 				array_key_exists( 'value', $_POST ) &&
 				( sanitize_text_field( $_POST['value'] ) == 'true' || sanitize_text_field( $_POST['value'] ) == 'false' ) &&
@@ -59,7 +59,7 @@ class Bigbluebutton_Public_Recording_Api {
 	public function set_bbb_recording_protect_state() {
 		$response            = array();
 		$response['success'] = false;
-		if ( current_user_can( 'manage_bbb_room_recordings' ) ) {
+		if ( BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'manage_bbb_room_recordings' ) ) {
 			if ( array_key_exists( 'meta_nonce', $_POST ) && array_key_exists( 'record_id', $_POST ) &&
 				array_key_exists( 'value', $_POST ) &&
 				( sanitize_text_field( $_POST['value'] ) == 'true' || sanitize_text_field( $_POST['value'] ) == 'false' ) &&
@@ -87,7 +87,7 @@ class Bigbluebutton_Public_Recording_Api {
 	public function trash_bbb_recording() {
 		$response            = array();
 		$response['success'] = false;
-		if ( current_user_can( 'manage_bbb_room_recordings' ) ) {
+		if ( BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'manage_bbb_room_recordings' ) ) {
 			if ( array_key_exists( 'meta_nonce', $_POST ) && array_key_exists( 'record_id', $_POST ) &&
 				wp_verify_nonce( $_POST['meta_nonce'], 'bbb_manage_recordings_nonce' ) ) {
 
@@ -113,7 +113,7 @@ class Bigbluebutton_Public_Recording_Api {
 		$response            = array();
 		$response['success'] = false;
 
-		if ( current_user_can( 'manage_bbb_room_recordings' ) ) {
+		if ( BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'manage_bbb_room_recordings' ) ) {
 			if ( array_key_exists( 'meta_nonce', $_POST ) &&
 				array_key_exists( 'record_id', $_POST ) &&
 				array_key_exists( 'type', $_POST ) &&

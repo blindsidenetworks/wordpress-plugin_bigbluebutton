@@ -4,7 +4,7 @@
 	<?php } else { ?>
 		<p id="bbb-no-recordings-msg" style="display:none;"><?php esc_html_e( 'This room does not currently have any recordings.', 'bigbluebutton' ); ?></p>
 		<div id="bbb-recordings-table" class="bbb-table-container" role="table">
-			<div class="bbb-flex-table bbb-flex-table-<?php echo $columns; ?> header" role="rowgroup">
+			<div class="bbb-flex-table bbb-flex-table-<?php echo $columns; ?> bbb-header" role="rowgroup">
 				<div class="flex-row flex-row-<?php echo $columns; ?> first" role="columnheader"><?php esc_html_e( 'Meeting', 'bigbluebutton' ); ?></div>
 				<a href="<?php echo $sort_fields['name']->url; ?>" class="flex-row flex-row-<?php echo $columns; ?> <?php echo $sort_fields['name']->header_classes; ?>" role="columnheader">
 					<?php esc_html_e( 'Recording', 'bigbluebutton' ); ?>
@@ -26,7 +26,7 @@
 				<?php } ?>
 			</div>
 			<?php foreach ( $recordings as $recording ) { ?>
-				<div id="bbb-recording-<?php echo $recording->recordID; ?>" class="bbb-flex-table bbb-flex-table-<?php echo $columns; ?> row bbb-recording-row" role="rowgroup">
+				<div id="bbb-recording-<?php echo $recording->recordID; ?>" class="bbb-flex-table bbb-flex-table-<?php echo $columns; ?> bbb-recording-row" role="rowgroup">
 					<div class="flex-row flex-row-<?php echo $columns; ?> first" role="cell"><?php echo urldecode( $recording->name ); ?></div>
 					<div id="bbb-recording-name-<?php echo $recording->recordID; ?>" class="flex-row flex-row-<?php echo $columns; ?>" role="cell">
 						<?php echo urldecode( $recording->metadata->{'recording-name'} ); ?>

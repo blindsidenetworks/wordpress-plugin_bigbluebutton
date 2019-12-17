@@ -68,9 +68,9 @@ class Bigbluebutton_Tokens_Helper {
 		$content             = '';
 		$tokens_arr          = preg_split( '/\,/', $token_string );
 		$meta_nonce          = wp_create_nonce( 'bbb_join_room_meta_nonce' );
-		$access_using_code   = self::user_has_bbb_cap( 'join_with_access_code_bbb_room' );
-		$access_as_moderator = self::user_has_bbb_cap( 'join_as_moderator_bbb_room' );
-		$access_as_viewer    = self::user_has_bbb_cap( 'join_as_viewer_bbb_room' );
+		$access_using_code   = BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'join_with_access_code_bbb_room' );
+		$access_as_moderator = BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'join_as_moderator_bbb_room' );
+		$access_as_viewer    = BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'join_as_viewer_bbb_room' );
 		$rooms               = array();
 
 		foreach ( $tokens_arr as $raw_token ) {
@@ -111,23 +111,6 @@ class Bigbluebutton_Tokens_Helper {
 	}
 
 	/**
-	 * Check if user can access room using type.
-	 *
-	 * @param  String $type         Type to check if user can access room as.
-	 *
-	 * @return Boolean $user_can    Whether the user can access room using that type.
-	 */
-	public static function user_has_bbb_cap( $type ) {
-		$user_can = false;
-		if ( is_user_logged_in() ) {
-			$user_can = current_user_can( $type );
-		} elseif ( get_role( 'anonymous' ) ) {
-			$user_can = get_role( 'anonymous' )->has_cap( $type );
-		}
-		return $user_can;
-	}
-
-	/**
 	 * Get recordings table as an HTML string.
 	 *
 	 * @since   3.0.0
@@ -136,11 +119,11 @@ class Bigbluebutton_Tokens_Helper {
 	 * @param   String                       $token_string       A list of tokens as a string, separated by commas.
 	 * @param   Integer                      $author             The author of the content that will display the join form.
 	 *
-	 * @return  String                          $content            HTML string containing recordings from the corresponding rooms.
+	 * @return  String                       $content            HTML string containing recordings from the corresponding rooms.
 	 */
 	public static function recordings_table_from_tokens_string( $display_helper, $token_string, $author ) {
-		$manage_recordings               = current_user_can( 'manage_bbb_room_recordings' );
-		$view_extended_recording_formats = current_user_can( 'view_extended_bbb_room_recording_formats' );
+		$manage_recordings               = BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'manage_bbb_room_recordings' );
+		$view_extended_recording_formats = BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'view_extended_bbb_room_recording_formats' );
 		$tokens_arr                      = preg_split( '/\,/', $token_string );
 		$room_ids                        = array();
 		$content                         = '';

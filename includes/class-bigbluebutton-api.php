@@ -326,14 +326,12 @@ class Bigbluebutton_Api {
 	 *
 	 * @since 3.0.0
 	 *
-	 * @param String $url  BigBlueButton URL endpoint to be tested.
-	 * @param String $salt BigBlueButton server salt to be tested.
+	 * @param String $url         BigBlueButton URL endpoint to be tested.
+	 * @param String $salt        BigBlueButton server salt to be tested.
 	 *
-	 * @return Boolean $valid Whether the BigBlueButton server settings are correctly configured or not.
+	 * @return Boolean true|false Whether the BigBlueButton server settings are correctly configured or not.
 	 */
 	public static function test_bigbluebutton_server( $url, $salt ) {
-		$valid = false;
-
 		$test_url      = $url . 'api/?getMeetings&checksum=' . sha1( 'getMeetings' . $salt );
 		$full_response = self::get_response( $test_url );
 
