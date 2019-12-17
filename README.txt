@@ -103,7 +103,7 @@ You should enable the curl extension in php.ini.
 
 **I tried to preview my room, and nothing showed up!**
 
-Rooms may not be viewed until they are published. This is because room settings cannot be changed after publication, and we want to be certain the settings are how you like them.
+Rooms may not be viewed until they are published. Please try again after publication.
 
 **I want to edit my recordings. How do I do that?**
 
@@ -113,10 +113,12 @@ If a user has the capability to manage recordings, they will see a pencil icon n
 
 1. Login form for anonymous users.
 2. Login form for registered users.
-3. General settings.
-4. Create a meeting room.
-5. Recordings in a front end page.
-6. Setting up meeting room details.
+3. Server settings.
+4. Create/edit a meeting room.
+5. Recordings on a front end page.
+6. Role capabilities for creating and editing rooms.
+7. Custom capabilities, such as whether the user can enter the room as a moderator or viewer.
+8. Room categories in administrator panel.
 
 == Changelog ==
 
