@@ -57,7 +57,10 @@ class Bigbluebutton_Admin_Api {
 			// Add room codes to postmeta data.
 			update_post_meta( $post_id, 'bbb-room-moderator-code', $moderator_code );
 			update_post_meta( $post_id, 'bbb-room-viewer-code', $viewer_code );
-			update_post_meta( $post_id, 'bbb-room-meeting-id', sha1( home_url() . Bigbluebutton_Admin_Helper::generate_random_code( 12 ) ) );
+
+			if ( ! get_post_meta( $post_id, 'bbb-room-meeting-id', true ) ) {
+				update_post_meta( $post_id, 'bbb-room-meeting-id', sha1( home_url() . Bigbluebutton_Admin_Helper::generate_random_code( 12 ) ) );
+			}
 
 			// Update room recordable value.
 			update_post_meta( $post_id, 'bbb-room-recordable', ( $recordable ? 'true' : 'false' ) );
