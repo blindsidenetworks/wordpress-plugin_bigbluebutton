@@ -21,7 +21,8 @@
 
 .bbb-flex-table {
 	display: flex;
-	flex-flow: row wrap;
+	width: 100%;
+	margin: auto 0;
 	border-left: solid 1px #d9d9d9;
 	transition: 0.5s;
 }
@@ -35,11 +36,6 @@
 
 .bbb-flex-table:nth-child(even) .flex-row {
 	background: #f4f2f1;
-}
-
-.bbb-flex-table:first-of-type {
-	border-top: solid 1px #1565c0;
-	border-left: solid 1px #1565c0;
 }
 
 .bbb-flex-table:first-of-type .flex-row,
@@ -58,12 +54,6 @@
 	grid-template-columns: repeat(auto-fill, 25%);
 }
 
-.bbb-flex-table.header {
-	border-color: #1565c0;
-	color: #fff;
-	background: #1976d2;
-}
-
 .flex-row-5 {
 	width: calc(100% / 5);
 }
@@ -73,6 +63,10 @@
 }
 
 @media all and (max-width: 1200px) {
+
+	.bbb-flex-table {
+		flex-flow: row wrap;
+	}
 
 	.flex-row {
 		width: 100%;
@@ -87,9 +81,13 @@
 		border-bottom: solid 1px #d9d9d9;
 	}
 
-	.header > .flex-row {
+	.bbb-header > .flex-row {
 		border-bottom: solid 1px;
 	}
+}
+
+.bbb-recording-table-input {
+	width: 100%;
 }
 
 .bbb-icon {
@@ -122,6 +120,7 @@
 .bbb-button {
 	color: #fff !important;
 	background-color: #007acc !important;
+	padding: 0.8em 1.5em;
 }
 
 .bbb-recording-link:hover,

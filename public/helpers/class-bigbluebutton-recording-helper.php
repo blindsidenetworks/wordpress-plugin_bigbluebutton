@@ -64,7 +64,7 @@ class Bigbluebutton_Recording_Helper {
 	 * @return  Array $recordings  List of recordings.
 	 */
 	public function get_recordings_based_on_capability( $room_ids ) {
-		$manage_recordings = current_user_can( 'manage_bbb_room_recordings' );
+		$manage_recordings = BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'manage_bbb_room_recordings' );
 		if ( $manage_recordings ) {
 			$this->recordings = Bigbluebutton_Api::get_recordings( $room_ids, 'published,unpublished' );
 		} else {
@@ -83,7 +83,7 @@ class Bigbluebutton_Recording_Helper {
 	 * @since   3.0.0
 	 */
 	private function filter_recordings() {
-		$manage_recordings   = current_user_can( 'manage_bbb_room_recordings' );
+		$manage_recordings   = BigBlueButton_Permissions_Helper::user_has_bbb_cap( 'manage_bbb_room_recordings' );
 		$filtered_recordings = array();
 		foreach ( $this->recordings as $recording ) {
 			// Set recording name to be meeting name if recording name is not yet set.

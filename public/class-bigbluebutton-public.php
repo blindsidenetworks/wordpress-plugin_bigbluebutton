@@ -108,6 +108,18 @@ class Bigbluebutton_Public {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/bigbluebutton-public.js', array( 'jquery' ), $this->version, false );
 		wp_localize_script( $this->plugin_name, 'php_vars', $translations );
+
+	}
+
+	/**
+	 * Enqueues dashicon icons for use on front end.
+	 *
+	 * @since   3.0.0
+	 */
+	public function enqueue_front_end_dashicons() {
+		if ( ! wp_style_is( 'dashicons', 'enqueued' ) ) {
+			wp_enqueue_style( 'dashicons' );
+		}
 	}
 
 	/**

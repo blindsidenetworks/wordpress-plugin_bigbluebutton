@@ -202,6 +202,11 @@ class Bigbluebutton {
 			include_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
+		/**
+		 * Bigbluebutton permissions helper
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/helpers/class-bigbluebutton-permissions-helper.php';
+
 		$this->loader = new Bigbluebutton_Loader();
 		$this->loader->add_action( 'plugins_loaded', $this, 'check_migration' );
 	}
@@ -287,6 +292,9 @@ class Bigbluebutton {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+		// Enqueue dashicon icons for front end.
+		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_front_end_dashicons' );
 
 		// Display join room form.
 		$this->loader->add_filter( 'the_content', $plugin_public, 'bbb_room_content' );

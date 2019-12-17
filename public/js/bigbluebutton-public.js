@@ -301,7 +301,8 @@
 			$( '<input>', {
 				type: 'text',
 				id: 'submit-recording-' + type + '-' + recordID,
-				value: old_value
+				value: old_value,
+				class: 'bbb-recording-table-input'
 			})
 				.appendTo( form )
 				.focus();
