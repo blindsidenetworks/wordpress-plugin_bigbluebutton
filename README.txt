@@ -5,7 +5,7 @@ Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferenci
 Requires at least: 5.1
 Tested up to: 5.3.1
 Requires PHP: 7.2
-Stable tag: 3.0.0-beta.1
+Stable tag: 3.0.0-beta.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,8 +122,14 @@ If a user has the capability to manage recordings, they will see a pencil icon n
 
 == Changelog ==
 
-= 3.0.0 =
-* This version is the official release of the bigbluebutton plugin.
+
+= 3.0.0-beta.2 =
+* Hot-fix: meetingId was lost on every update of the room.
+* Bug. Fixed issue with incompatibility of css used by the recording table.
+* Improvement. Improved handling of blank entry codes.
+
+= 3.0.0-beta.1 =
+* First inception of the 3.x release.
 
 = 2.0.0 =
 * Never released.
