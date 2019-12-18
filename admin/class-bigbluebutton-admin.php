@@ -242,7 +242,7 @@ class Bigbluebutton_Admin {
 	 * @param   Array  $current_plugin_metadata    The plugin metadata of the current version of the plugin.
 	 * @param   Object $new_plugin_metadata        The plugin metadata of the new version of the plugin.
 	 */
-	public function bigbluebutton_show_upgrade_notification( $current_plugin_metadata, $new_plugin_metadata ) {
+	public function bigbluebutton_show_upgrade_notification( $current_plugin_metadata, $new_plugin_metadata = null ) {
 		if ( ! $new_plugin_metadata ) {
 			$new_plugin_metadata = $this->bigbluebutton_update_metadata( $current_plugin_metadata['slug'] );
 		}
