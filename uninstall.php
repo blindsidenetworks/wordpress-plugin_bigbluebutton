@@ -68,7 +68,7 @@ if ( ! class_exists( 'Bigbluebutton_Uninstall' ) ) {
 		 * @since 3.0.0
 		 */
 		private static function delete_capabilities() {
-			$args                = get_post_type_object( 'bbb-room' );
+			$rooms               = get_post_type_object( 'bbb-room' );
 			$custom_capabilities = array(
 				'join_as_moderator_bbb_room',
 				'join_as_viewer_bbb_room',
@@ -78,14 +78,29 @@ if ( ! class_exists( 'Bigbluebutton_Uninstall' ) ) {
 				'view_extended_bbb_room_recording_formats',
 			);
 
-			if ( property_exists( $args, 'capabilities' ) ) {
-				$arg_capabilities   = $args->capabilities;
-				$args->capabilities = array_merge( $arg_capabilities, $custom_capabilities );
+			if ( empty( $rooms ) ) {
+				$room_capabilities = array(
+					'edit_bbb_room',
+					'read_bbb_room',
+					'delete_bbb_room',
+					'edit_bbb_rooms',
+					'edit_others_bbb_rooms',
+					'publish_bbb_rooms',
+					'read_private_bbb_rooms',
+					'delete_bbb_rooms',
+					'delete_private_bbb_rooms',
+					'delete_published_bbb_rooms',
+					'delete_others_bbb_rooms',
+					'edit_private_bbb_rooms',
+					'edit_published_bbb_rooms'
+				);
+			} elseif ( property_exists( $rooms, 'cap' ) ) {
+				$room_capabilities = array_values( get_object_vars( $rooms->cap ) );
 			} else {
-				$args->capabilities = $custom_capabilities;
+				$room_capabilities = [];
 			}
 
-			$capabilities = get_object_vars( get_post_type_capabilities( $args ) );
+			$capabilities = array_merge( $room_capabilities, $custom_capabilities );
 			$roles        = get_editable_roles();
 			$role_names   = array_keys( $roles );
 
