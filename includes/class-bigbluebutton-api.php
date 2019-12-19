@@ -25,10 +25,13 @@ class Bigbluebutton_Api {
 	 * Create new meeting.
 	 *
 	 * @since   3.0.0
+	 * 
 	 * @param   Integer $room_id            Custom post id of the room the user is creating a meeting for.
+	 * @param   String  $logout_url         URL to return to after logging out.
+	 * 
 	 * @return  Integer $return_code|404    HTML response of the bigbluebutton server.
 	 */
-	public static function create_meeting( $room_id ) {
+	public static function create_meeting( $room_id, $logout_url ) {
 		$rid = intval( $room_id );
 
 		if ( get_post( $rid ) === false || 'bbb-room' != get_post_type( $rid ) ) {
@@ -40,13 +43,12 @@ class Bigbluebutton_Api {
 		$viewer_code    = get_post_meta( $rid, 'bbb-room-viewer-code', true );
 		$recordable     = get_post_meta( $rid, 'bbb-room-recordable', true );
 		$meeting_id     = get_post_meta( $rid, 'bbb-room-meeting-id', true );
-		$logout_url     = get_permalink( $rid );
 		$arr_params     = array(
 			'name'        => esc_attr( $name ),
 			'meetingID'   => rawurlencode( $meeting_id ),
 			'attendeePW'  => rawurlencode( $viewer_code ),
 			'moderatorPW' => rawurlencode( $moderator_code ),
-			'logoutURL'   => $logout_url,
+			'logoutURL'   => esc_url( $logout_url ),
 			'record'      => $recordable,
 		);
 
@@ -78,20 +80,23 @@ class Bigbluebutton_Api {
 	 * @param   Integer $room_id    Custom post id of the room the user is trying to join.
 	 * @param   String  $username   Full name of the user trying to join the room.
 	 * @param   String  $password   Entry code of the meeting that the user is attempting to join with.
+	 * @param   String  $logout_url URL to return to after logging out.
+	 * 
 	 * @return  String  $url|null   URL to enter the meeting.
 	 */
-	public static function get_join_meeting_url( $room_id, $username, $password ) {
+	public static function get_join_meeting_url( $room_id, $username, $password, $logout_url = null) {
 
 		$rid   = intval( $room_id );
 		$uname = sanitize_text_field( $username );
 		$pword = sanitize_text_field( $password );
+		$lo_url = ( $logout_url ? esc_url( $logout_url ) : get_permalink( $rid ) );
 
 		if ( get_post( $rid ) === false || 'bbb-room' != get_post_type( $rid ) ) {
 			return null;
 		}
 
 		if ( ! self::is_meeting_running( $rid ) ) {
-			$code = self::create_meeting( $rid );
+			$code = self::create_meeting( $rid, $lo_url );
 			if ( 200 !== $code ) {
 				wp_die( esc_html__( 'It is currently not possible to create rooms on the server. Please contact support for help.', 'bigbluebutton' ) );
 			}
@@ -100,7 +105,7 @@ class Bigbluebutton_Api {
 		$meeting_id = get_post_meta( $rid, 'bbb-room-meeting-id', true );
 		$arr_params = array(
 			'meetingID' => rawurlencode( $meeting_id ),
-			'fullName'  => rawurlencode( $uname ),
+			'fullName'  => $uname,
 			'password'  => rawurlencode( $pword ),
 		);
 
@@ -332,7 +337,7 @@ class Bigbluebutton_Api {
 	 * @return Boolean true|false Whether the BigBlueButton server settings are correctly configured or not.
 	 */
 	public static function test_bigbluebutton_server( $url, $salt ) {
-		$test_url      = $url . 'api/?getMeetings&checksum=' . sha1( 'getMeetings' . $salt );
+		$test_url      = $url . 'api/getMeetings?checksum=' . sha1( 'getMeetings' . $salt );
 		$full_response = self::get_response( $test_url );
 
 		if ( is_wp_error( $full_response ) ) {
