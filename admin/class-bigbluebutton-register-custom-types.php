@@ -65,7 +65,7 @@ class Bigbluebutton_Register_Custom_Types {
 				'map_meta_cap'    => true,
 				// Enables block editing in the rooms editor.
 				'show_in_rest'    => true,
-				'supports'        => array( 'title', 'editor', 'author', 'permalink' ),
+				'supports'        => array( 'title', 'editor', 'author', 'thumbnail', 'permalink' ),
 			)
 		);
 	}
