@@ -3,9 +3,9 @@ Contributors: blindsidenetworks, jfederico, yfngdu
 Donate link: https://blindsidenetworks.com
 Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferencing, webconferencing
 Requires at least: 5.1
-Tested up to: 5.3.1
+Tested up to: 5.3.2
 Requires PHP: 7.2
-Stable tag: 3.0.0-beta.2
+Stable tag: 3.0.0-beta.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -111,17 +111,20 @@ If a user has the capability to manage recordings, they will see a pencil icon n
 
 == Screenshots ==
 
-1. Login form for anonymous users.
-2. Login form for registered users.
-3. Server settings.
-4. Create/edit a meeting room.
-5. Recordings on a front end page.
-6. Role capabilities for creating and editing rooms.
-7. Custom capabilities, such as whether the user can enter the room as a moderator or viewer.
-8. Room categories in administrator panel.
+1. Rooms are a Content Type that has its own view.
+2. Rooms can be embedded into Posts, Pages and other Content Types using shortcodes.
+3. Multiple rooms can be accessed frome the same Page or Post.
+4. Server settings define where the meetings are hosted.
+5. Rooms can be managed through the Administrator Dashboard.
+6. Rooms can also be organized using Categories.
 
 == Changelog ==
 
+= 3.0.0-beta.3 =
+* Bug. Enable users who could previously edit rooms/recordings to have the same capabilities without role capability changes from an administrator.
+* Bug. Fixed issue where warning message for updating the plugin would throw an error.
+* Bug. Ensure capabilities associated with rooms are deleted when the plugin is uninstalled.
+* Improvement. Removed lint configuration files.
 
 = 3.0.0-beta.2 =
 * Hot-fix: meetingId was lost on every update of the room.
