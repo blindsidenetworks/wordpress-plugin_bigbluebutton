@@ -84,7 +84,7 @@ class Bigbluebutton_Activator {
 		$set_join_cap = self::join_permissions_set( $role );
 		$role->add_cap( 'read_bbb_room' );
 
-		if ( $role->has_cap( 'edit_plugins' ) ) {
+		if ( $role->has_cap( 'activate_plugins' ) ) {
 			self::set_admin_capability( $role );
 		}
 

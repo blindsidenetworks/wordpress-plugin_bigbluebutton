@@ -75,9 +75,9 @@ For anonymous users the Name will be always required, but again the Password req
 
 You should install and activate the "Members" plugin by Justin Tadlock and in the Dasboard under the "Users" > "Roles", update the permissions.
 
-To allow another user to create and edit rooms, assign them a role which has the permissions, edit_plugins and edit_bbb_rooms, publish_bbb_rooms, delete_bbb_rooms, delete_published_bbb_rooms, and edit_published_bbb_rooms. The permission structure is similar for posts and pages.
+To allow another user to create and edit rooms, assign them a role which has the permissions, activate_plugins and edit_bbb_rooms, publish_bbb_rooms, delete_bbb_rooms, delete_published_bbb_rooms, and edit_published_bbb_rooms. The permission structure is similar for posts and pages.
 
-To allow another user to create and edit room categories, assign them a role which has the permissions, edit_plugins and manage_categories. This does not give them permission to create rooms. They can only manage room categories.
+To allow another user to create and edit room categories, assign them a role which has the permissions, activate_plugins and manage_categories. This does not give them permission to create rooms. They can only manage room categories.
 
 To allow another user to join as moderator, viewer, or with a code, assign them to a role with one of the corresponding permissions, join_as_moderator_bbb_room, join_as_viewer_bbb_room, or join_with_password_bbb_room. By default, the owner of the room will always join their rooms as a moderator. The default does not apply to others' rooms.
 
