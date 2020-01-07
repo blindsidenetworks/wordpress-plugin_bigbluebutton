@@ -5,7 +5,7 @@ Tags: blindsidenetworks, bigbluebutton, opensource, open source, web, conferenci
 Requires at least: 5.1
 Tested up to: 5.3.2
 Requires PHP: 7.2
-Stable tag: 3.0.0-beta.3
+Stable tag: 3.0.0-beta.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -119,6 +119,11 @@ If a user has the capability to manage recordings, they will see a pencil icon n
 6. Rooms can also be organized using Categories.
 
 == Changelog ==
+
+
+= 3.0.0-beta.4 =
+* Bug. Fixed issue with plugin permission capability that prevented rooms to be accessed after upgrade.
+* Bug. Fixed issue with logoutURL not being the request location.
 
 = 3.0.0-beta.3 =
 * Bug. Enable users who could previously edit rooms/recordings to have the same capabilities without role capability changes from an administrator.
