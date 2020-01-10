@@ -85,10 +85,10 @@ class Bigbluebutton_Migration {
 	 *
 	 * @since   3.0.0
 	 */
-	private function import_rooms() {
+	public function import_rooms() {
 		global $wpdb;
-		$old_rooms_table     = 'wp_bigbluebutton';
-		$old_room_logs_table = 'wp_bigbluebutton_logs';
+		$old_rooms_table     = $wpdb->prefix . 'bigbluebutton';
+		$old_room_logs_table = $wpdb->prefix . 'bigbluebutton_logs';
 
 		// Import old rooms to new rooms.
 		$old_rooms_query            = $wpdb->prepare( 'SHOW TABLES LIKE %s;', $wpdb->esc_like( $old_rooms_table ) );
@@ -150,6 +150,14 @@ class Bigbluebutton_Migration {
 				// Delete old log table.
 				$wpdb->query( 'DROP TABLE IF EXISTS ' . $old_room_logs_table );
 			}
+		}
+
+		// Redirect to rooms page after forced migration.
+		if (isset($_POST['action']) && "bbb_force_migration" == $_POST['action']) {
+			$args = array(
+				'post_type' => 'bbb-room'
+			);
+			wp_redirect( add_query_arg( $args, admin_url( 'edit.php') ) );
 		}
 		return true;
 	}

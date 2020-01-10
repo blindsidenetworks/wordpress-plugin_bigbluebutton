@@ -55,3 +55,9 @@
 	margin-top: 2em;
 	margin-bottom: 2em;
 }
+
+.bbb-warning {
+	font-weight: 700;
+	color: red;
+	font-size: 1.2em;
+}

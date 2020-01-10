@@ -210,9 +210,10 @@ class Bigbluebutton_Admin {
 	 * @since   3.0.0
 	 */
 	public function display_room_server_settings() {
-		$change_success = $this->room_server_settings_change();
-		$bbb_settings   = $this->fetch_room_server_settings();
-		$meta_nonce     = wp_create_nonce( 'bbb_edit_server_settings_meta_nonce' );
+		$change_success  = $this->room_server_settings_change();
+		$bbb_settings    = $this->fetch_room_server_settings();
+		$meta_nonce      = wp_create_nonce( 'bbb_edit_server_settings_meta_nonce' );
+		$old_rooms_exist = $this->check_old_room_tables(); 
 		require_once 'partials/bigbluebutton-settings-display.php';
 	}
 
@@ -251,6 +252,18 @@ class Bigbluebutton_Admin {
 			echo '<div style="background-color: #d54e21; padding: 10px; color: #f9f9f9; margin-top: 10px"><strong>Important Upgrade Notice:</strong> ';
 			echo esc_html( strip_tags( $new_plugin_metadata->upgrade_notice ) ), '</div>';
 		}
+	}
+
+	/**
+	 * Check if old rooms table exists.
+	 * 
+	 * @since 3.0.0
+	 */
+	private function check_old_room_tables() {
+		global $wpdb;
+		$old_rooms_table = $wpdb->prefix . 'bigbluebutton';
+		$old_rooms_query = $wpdb->prepare( 'SHOW TABLES LIKE %s;', $wpdb->esc_like( $old_rooms_table ) );
+		return $wpdb->get_var( $old_rooms_query ) === $old_rooms_table;
 	}
 
 	/**
