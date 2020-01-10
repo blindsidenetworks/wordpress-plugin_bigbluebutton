@@ -236,10 +236,10 @@ class Bigbluebutton {
 	 * @access   private
 	 */
 	private function define_admin_hooks() {
-
 		$plugin_admin                       = new Bigbluebutton_Admin( $this->get_plugin_name(), $this->get_version() );
 		$plugin_admin_api                   = new Bigbluebutton_Admin_Api();
 		$plugin_admin_register_custom_types = new Bigbluebutton_Register_Custom_Types();
+		$migrator                           = new Bigbluebutton_Migration( "1.4.6", $this->get_version() );
 
 		// Suggest not disabling heartbeat.
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'check_for_heartbeat_script' );
@@ -273,6 +273,9 @@ class Bigbluebutton {
 		// Show custom fields in rooms table.
 		$this->loader->add_action( 'manage_posts_custom_column', $plugin_admin, 'bbb_room_custom_columns', 10, 2 );
 		$this->loader->add_filter( 'manage_bbb-room_posts_columns', $plugin_admin, 'add_custom_room_column_to_list' );
+
+		// Force old rooms migration.
+		$this->loader->add_action( 'admin_post_bbb_force_migration', $migrator, 'import_rooms' );
 
 	}
 

@@ -50,6 +50,12 @@ msgstr ""
 msgid "Save server settings bad server settings error message."
 msgstr ""
 
+msgid "Force Migration"
+msgstr ""
+
+msgid "Please backup your database before migrating old rooms."
+msgstr ""
+
 # Admin Room settings
 msgid "Add New"
 msgstr ""

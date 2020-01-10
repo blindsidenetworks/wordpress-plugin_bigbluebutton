@@ -1,4 +1,11 @@
 <div class="bbb-settings-card">
+	<?php if ( $old_rooms_exist && current_user_can( 'administrator' ) ) { ?>
+		<form id="bbb-force-migration-form" method="POST" action="<?php echo admin_url( 'admin-post.php' ); ?>">
+			<input type="hidden" name="action" value="bbb_force_migration">
+			<p class="bbb-warning"><?php esc_html_e( 'Please backup your database before migrating old rooms.', 'bigbluebutton' ); ?></p>
+			<input class="button button-primary" type="submit" value="<?php esc_html_e( 'Force Migration', 'bigbluebutton' ); ?>"/>
+		</form>
+	<?php } ?>
 	<h1><?php esc_html_e( 'Room Settings', 'bigbluebutton' ); ?></h1>
 	<h2><?php esc_html_e( 'Server', 'bigbluebutton' ); ?></h2>
 	<p><?php esc_html_e( 'The server settings explanation.', 'bigbluebutton' ); ?></p>
