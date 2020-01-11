@@ -183,7 +183,7 @@ class Bigbluebutton_Tokens_Helper {
 	public static function can_display_room_on_page() {
 		global $pagenow;
 		$can_view = true;
-		if ( 'edit.php' == $pagenow || 'post.php' == $pagenow || 'post-new.php' == $pagenow ) {
+		if ( 'edit.php' == $pagenow || 'post.php' == $pagenow || 'post-new.php' == $pagenow || post_password_required() ) {
 			$can_view = false;
 		}
 		return $can_view;
@@ -202,11 +202,12 @@ class Bigbluebutton_Tokens_Helper {
 		$room_id = (int) substr( $token, 1 );
 		$room    = get_post( $room_id );
 		if ( false !== $room && null !== $room && 'bbb-room' == $room->post_type ) {
-			if ( 'publish' != $room->post_status ) {
+			if ( 'publish' == $room->post_status || 'private' == $room->post_status ) {
+				return $room->ID;
+			} else {
 				self::set_error_message( sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token ), $author );
 				return 0;
 			}
-			return $room->ID;
 		} else {
 			return self::check_if_room_exists_for_old_token_format( $token, $author );
 		}
@@ -239,7 +240,9 @@ class Bigbluebutton_Tokens_Helper {
 		if ( ! empty( $query->posts ) ) {
 			foreach ( $query->posts as $key => $room_id ) {
 				$room = get_post( $room_id );
-				if ( 'publish' != $room->post_status ) {
+				if ( 'publish' == $room->post_status || 'private' == $room->post_status ) {
+					return $room->ID;
+				} else {
 					self::set_error_message( sprintf( wp_kses( __( 'The token: %s is not associated with a published room.', 'bigbluebutton' ), array() ), $token ), $author );
 					return 0;
 				}
