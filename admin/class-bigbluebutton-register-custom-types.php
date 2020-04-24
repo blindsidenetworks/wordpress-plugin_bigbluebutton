@@ -158,7 +158,7 @@ class Bigbluebutton_Register_Custom_Types {
     public function display_maxParticipants_metabox( $object ) {
         $default_max_participants 	  = "-1";
         $entry_max_participants_label = __( 'Max Participants', 'bigbluebutton' );
-        $defaultMsg 	 			  = "-1 = unlimited";
+        $defaultMsg 	 			  = __( 'Max Participants Msg', 'bigbluebutton' );
         $entry_max_participants_name  = 'bbb-maxParticipants';
         $existing_value   		      = get_post_meta( $object->ID, 'bbb-room-maxParticipants', true );
         wp_nonce_field( 'bbb-room-maxParticipants-nonce', 'bbb-room-maxParticipants-nonce' );
