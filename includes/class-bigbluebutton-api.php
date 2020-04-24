@@ -43,6 +43,7 @@ class Bigbluebutton_Api {
 		$viewer_code    = get_post_meta( $rid, 'bbb-room-viewer-code', true );
 		$recordable     = get_post_meta( $rid, 'bbb-room-recordable', true );
 		$meeting_id     = get_post_meta( $rid, 'bbb-room-meeting-id', true );
+		$maxParticipants= get_post_meta( $rid, 'bbb-room-maxParticipants', true );
 		$arr_params     = array(
 			'name'        => esc_attr( $name ),
 			'meetingID'   => rawurlencode( $meeting_id ),
@@ -51,6 +52,9 @@ class Bigbluebutton_Api {
 			'logoutURL'   => esc_url( $logout_url ),
 			'record'      => $recordable,
 		);
+		if($maxParticipants && $maxParticipants > 0){
+            $arr_params['maxParticipants'] = $maxParticipants;
+        }
 
 		$url = self::build_url( 'create', $arr_params );
 

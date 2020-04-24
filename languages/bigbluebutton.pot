@@ -120,6 +120,12 @@ msgstr ""
 msgid "Viewer Code"
 msgstr ""
 
+msgid "Max Participants"
+msgstr ""
+
+msgid "Max Participants Msg"
+msgstr ""
+
 msgid "Recordable"
 msgstr ""
 

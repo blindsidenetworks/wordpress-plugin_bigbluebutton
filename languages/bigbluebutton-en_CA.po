@@ -126,6 +126,12 @@ msgstr "Moderator Code"
 msgid "Viewer Code"
 msgstr "Viewer Code"
 
+msgid "Max Participants"
+msgstr "Max Participants"
+
+msgid "Max Participants Msg"
+msgstr "-1 = unlimited"
+
 msgid "Recordable"
 msgstr "Recordable"
 

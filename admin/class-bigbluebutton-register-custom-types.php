@@ -104,6 +104,15 @@ class Bigbluebutton_Register_Custom_Types {
 	}
 
 	/**
+     * Create Max Participants metaboxes on room creation and edit.
+     *
+     * @since   3.0.0
+     */
+    public function register_room_maxParticipants_metaboxes() {
+        add_meta_box( 'bbb-maxParticipants', __( 'Max Participants', 'bigbluebutton' ), array( $this, 'display_maxParticipants_metabox' ), 'bbb-room' );
+    }
+
+	/**
 	 * Show recordable option in room creation to users who have the corresponding capability.
 	 *
 	 * @since   3.0.0
@@ -138,6 +147,23 @@ class Bigbluebutton_Register_Custom_Types {
 		wp_nonce_field( 'bbb-room-moderator-code-nonce', 'bbb-room-moderator-code-nonce' );
 		require 'partials/bigbluebutton-room-code-metabox-display.php';
 	}
+
+	/**
+     * Display Max Participants metabox.
+     *
+     * @since   3.0.0
+     *
+     * @param   Object $object     The object that has the room ID.
+     */
+    public function display_maxParticipants_metabox( $object ) {
+        $default_max_participants 	  = "-1";
+        $entry_max_participants_label = __( 'Max Participants', 'bigbluebutton' );
+        $defaultMsg 	 			  = "-1 = unlimited";
+        $entry_max_participants_name  = 'bbb-maxParticipants';
+        $existing_value   		      = get_post_meta( $object->ID, 'bbb-room-maxParticipants', true );
+        wp_nonce_field( 'bbb-room-maxParticipants-nonce', 'bbb-room-maxParticipants-nonce' );
+        require 'partials/bigbluebutton-max-participants-metabox-display.php';
+    }
 
 	/**
 	 * Display viewer code metabox.
