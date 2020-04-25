@@ -133,6 +133,15 @@ class Bigbluebutton_Register_Custom_Types {
 	}
 
 	/**
+	 * Show Pre-upload presentation metabox.
+	 *
+	 * @since   3.0.0
+	 */
+	public function register_pre_upload_presentation_metabox() {
+		add_meta_box( 'bbb-room-pre-upload-presentation', __( 'Pre-upload presentation', 'bigbluebutton' ), array( $this, 'display_pre_upload_presentation' ), 'bbb-room' );
+	}
+
+	/**
 	 * Display moderator code metabox.
 	 *
 	 * @since   3.0.0
@@ -206,5 +215,21 @@ class Bigbluebutton_Register_Custom_Types {
 
 		wp_nonce_field( 'bbb-room-recordable-nonce', 'bbb-room-recordable-nonce' );
 		require 'partials/bigbluebutton-recordable-metabox-display.php';
+	}
+
+	/**
+	 * Display Pre-upload presentation metabox.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   Object $object     The object that has the room ID.
+	 */
+	public function display_pre_upload_presentation($object){
+		$entry_pre_upload_presentation_label  = __( 'Presentation Link', 'bigbluebutton' );
+		$defaultMsg 	 			          = __( 'Presentation Link Msg ', 'bigbluebutton' );
+		$entry_pre_upload_presentation_name   = 'bbb-pre-upload-presentation';
+		$existing_value   		              = get_post_meta( $object->ID, 'bbb-room-pre-upload-presentation', true );
+		wp_nonce_field( 'bbb-room-pre-upload-presentation-nonce', 'bbb-room-pre-upload-presentation-nonce' );
+		require 'partials/bigbluebutton-pre-upload-presentation-metabox-display.php';
 	}
 }

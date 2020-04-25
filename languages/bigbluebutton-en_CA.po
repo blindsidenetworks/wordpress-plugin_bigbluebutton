@@ -132,6 +132,15 @@ msgstr "Max Participants"
 msgid "Max Participants Msg"
 msgstr "-1 = unlimited"
 
+msgid "Pre-upload presentation"
+msgstr "Pre-upload presentation"
+
+msgid "Presentation Link"
+msgstr "Presentation Link"
+
+msgid "Presentation Link Msg"
+msgstr "example: https://mysite.com/presentation.pdf"
+
 msgid "Recordable"
 msgstr "Recordable"
 

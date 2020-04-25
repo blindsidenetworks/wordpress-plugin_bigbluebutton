@@ -269,6 +269,7 @@ class Bigbluebutton {
 		$this->loader->add_action( 'add_meta_boxes', $plugin_admin_register_custom_types, 'register_record_room_metabox' );
 		$this->loader->add_action( 'add_meta_boxes', $plugin_admin_register_custom_types, 'register_room_maxParticipants_metaboxes' );
 		$this->loader->add_action( 'add_meta_boxes', $plugin_admin_register_custom_types, 'register_wait_for_moderator_metabox' );
+		$this->loader->add_action( 'add_meta_boxes', $plugin_admin_register_custom_types, 'register_pre_upload_presentation_metabox' );
 		$this->loader->add_action( 'save_post', $plugin_admin_api, 'save_room' );
 
 		// Show custom fields in rooms table.

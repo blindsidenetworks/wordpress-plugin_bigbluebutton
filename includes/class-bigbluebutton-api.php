@@ -44,6 +44,7 @@ class Bigbluebutton_Api {
 		$recordable     = get_post_meta( $rid, 'bbb-room-recordable', true );
 		$meeting_id     = get_post_meta( $rid, 'bbb-room-meeting-id', true );
 		$maxParticipants= get_post_meta( $rid, 'bbb-room-maxParticipants', true );
+		$preUplaodPresentation = get_post_meta( $rid, 'bbb-room-pre-upload-presentation', true );
 		$arr_params     = array(
 			'name'        => esc_attr( $name ),
 			'meetingID'   => rawurlencode( $meeting_id ),
@@ -57,8 +58,11 @@ class Bigbluebutton_Api {
         }
 
 		$url = self::build_url( 'create', $arr_params );
-
-		$full_response = self::get_response( $url );
+		if($preUplaodPresentation !== ""){
+			$full_response = self::get_response( $url, "post", $preUplaodPresentation);
+		}else{
+			$full_response = self::get_response( $url );
+		}
 
 		if ( is_wp_error( $full_response ) ) {
 			return 404;
@@ -365,10 +369,44 @@ class Bigbluebutton_Api {
 	 * @param   String $url        URL to get response from.
 	 * @return  Array|WP_Error  $response   Server response in array format.
 	 */
-	private static function get_response( $url ) {
-		$result = wp_remote_get( esc_url_raw( $url ) );
+	private static function get_response( $url, $method = "get", $preUploadFileLink = null ) {
+		if($method  == "post"){
+			if($preUploadFileLink !== null){
+				$payload = self::getPresentationsAsXML($preUploadFileLink);
+				$headers = array(
+					'Content-type' => 'application/xml',
+					'Content-length' => mb_strlen($payload)
+				);
+				$result = wp_remote_post($url, array(
+						'method' => 'POST',
+						'headers' => $headers,
+						'body' => $payload
+				));
+			}
+		}else{
+			$result = wp_remote_get( esc_url_raw( $url ) );
+		}
 		return $result;
 	}
+
+	/**
+	 * format pre upload file.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   String $url        URL
+	 * @return  String xml  xml format.
+	 */
+	private function getPresentationsAsXML($url){
+		$xml    = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><modules/>');
+		$module = $xml->addChild('module');
+		$module->addAttribute('name', 'presentation');
+		$presentation = $module->addChild('document');
+		$presentation->addAttribute('url', $url);
+		return $xml->asXML();
+	}
+
+
 
 	/**
 	 * Convert website response to XML Object.

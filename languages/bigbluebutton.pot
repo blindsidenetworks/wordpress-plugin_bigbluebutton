@@ -126,6 +126,15 @@ msgstr ""
 msgid "Max Participants Msg"
 msgstr ""
 
+msgid "Pre-upload presentation"
+msgstr ""
+
+msgid "Presentation Link"
+msgstr ""
+
+msgid "Presentation Link Msg"
+msgstr ""
+
 msgid "Recordable"
 msgstr ""
 

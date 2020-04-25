@@ -67,6 +67,10 @@ class Bigbluebutton_Admin_Api {
 			update_post_meta( $post_id, 'bbb-room-recordable', ( $recordable ? 'true' : 'false' ) );
 			update_post_meta( $post_id, 'bbb-room-wait-for-moderator', ( $wait_for_mod ? 'true' : 'false' ) );
 
+			if($_POST['bbb-pre-upload-presentation'] !== ""){
+				update_post_meta( $post_id, 'bbb-room-pre-upload-presentation', $_POST['bbb-pre-upload-presentation'] );
+			}
+
 		} else {
 			return $post_id;
 		}
