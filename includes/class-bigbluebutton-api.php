@@ -180,8 +180,8 @@ class Bigbluebutton_Api {
 		substr_replace( $meeting_ids, '', -1 );
 
 		$arr_params = array(
-			'meetingID' => $meeting_ids,
-			'state'     => $state,
+			'meetingID' => rtrim($meeting_ids, ","),
+			'state'     => rtrim($state, ","),
 		);
 
 		$url           = self::build_url( 'getRecordings', $arr_params );
