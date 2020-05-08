@@ -45,6 +45,8 @@ class Bigbluebutton_Api {
 		$meeting_id     = get_post_meta( $rid, 'bbb-room-meeting-id', true );
 		$maxParticipants= get_post_meta( $rid, 'bbb-room-maxParticipants', true );
 		$preUplaodPresentation = get_post_meta( $rid, 'bbb-room-pre-upload-presentation', true );
+		$duration= get_post_meta( $rid, 'bbb-room-duration', true );
+		$guestPolicy= get_post_meta( $rid, 'bbb-room-guestPolicy', true );
 		$arr_params     = array(
 			'name'        => esc_attr( $name ),
 			'meetingID'   => rawurlencode( $meeting_id ),
@@ -56,6 +58,12 @@ class Bigbluebutton_Api {
 		if($maxParticipants && $maxParticipants > 0){
             $arr_params['maxParticipants'] = $maxParticipants;
         }
+		if($duration > 0){
+			$arr_params['duration'] = $duration;
+		}
+		if($guestPolicy){
+			$arr_params['guestPolicy'] = $guestPolicy;
+		}
 
 		$url = self::build_url( 'create', $arr_params );
 		if($preUplaodPresentation !== ""){
@@ -181,7 +189,7 @@ class Bigbluebutton_Api {
 
 		$arr_params = array(
 			'meetingID' => rtrim($meeting_ids, ","),
-			'state'     => rtrim($state, ","),
+			'state'     => rtrim($state, ",")
 		);
 
 		$url           = self::build_url( 'getRecordings', $arr_params );

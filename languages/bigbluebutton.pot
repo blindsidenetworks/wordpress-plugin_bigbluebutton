@@ -135,6 +135,18 @@ msgstr ""
 msgid "Presentation Link Msg"
 msgstr ""
 
+msgid "Extra Options"
+msgstr ""
+
+msgid "Duration"
+msgstr ""
+
+msgid "Duration Msg"
+msgstr ""
+
+msgid "Guest Policy"
+msgstr ""
+
 msgid "Recordable"
 msgstr ""
 

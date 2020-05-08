@@ -142,6 +142,15 @@ class Bigbluebutton_Register_Custom_Types {
 	}
 
 	/**
+	 * Show Pre-upload presentation metabox.
+	 *
+	 * @since   3.0.0
+	 */
+	public function register_extra_options_metabox() {
+		add_meta_box( 'bbb-room-extra-options', __( 'Extra Options', 'bigbluebutton' ), array( $this, 'display_extra_options' ), 'bbb-room' );
+	}
+
+	/**
 	 * Display moderator code metabox.
 	 *
 	 * @since   3.0.0
@@ -231,5 +240,33 @@ class Bigbluebutton_Register_Custom_Types {
 		$existing_value   		              = get_post_meta( $object->ID, 'bbb-room-pre-upload-presentation', true );
 		wp_nonce_field( 'bbb-room-pre-upload-presentation-nonce', 'bbb-room-pre-upload-presentation-nonce' );
 		require 'partials/bigbluebutton-pre-upload-presentation-metabox-display.php';
+	}
+
+	public function display_extra_options($object){
+		$duration_label = __( 'Duration', 'bigbluebutton' );
+		$duration_value = get_post_meta( $object->ID, 'bbb-room-duration', true );
+
+		$guestPolicy_label = __( 'Guest Policy', 'bigbluebutton');
+		$guestPolicy_value = get_post_meta( $object->ID, 'bbb-room-guestPolicy', true );
+		$guestPolicy_select = $this->formatGuestPolicy($guestPolicy_value);
+
+		wp_nonce_field( 'bbb-room-extra-options-nonce', 'bbb-room-extra-options-nonce' );
+		require 'partials/bigbluebutton-extra-options-metabox-display.php';
+	}
+
+	private function formatGuestPolicy($value = "ALWAYS_ACCEPT"){
+		$policies = array("ALWAYS_ACCEPT", "ASK_MODERATOR", "ALWAYS_DENY");
+
+		$html = '<select name="bbb-room-guestPolicy">';
+		foreach ($policies as $key => $policy){
+			$selected = "";
+			if($policy == $value){
+				$selected = "selected";
+			}
+			$html .= "<option {$selected} value='{$policy}'>{$policy}</option>";
+		}
+		$html .= "</select>";
+
+		return $html;
 	}
 }

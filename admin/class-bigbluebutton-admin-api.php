@@ -70,6 +70,8 @@ class Bigbluebutton_Admin_Api {
 			if($_POST['bbb-pre-upload-presentation'] !== ""){
 				update_post_meta( $post_id, 'bbb-room-pre-upload-presentation', $_POST['bbb-pre-upload-presentation'] );
 			}
+			update_post_meta( $post_id, 'bbb-room-duration', $_POST['bbb-room-duration'] );
+			update_post_meta( $post_id, 'bbb-room-guestPolicy', $_POST['bbb-room-guestPolicy'] );
 
 		} else {
 			return $post_id;
