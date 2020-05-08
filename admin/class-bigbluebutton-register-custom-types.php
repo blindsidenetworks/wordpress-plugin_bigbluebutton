@@ -142,7 +142,7 @@ class Bigbluebutton_Register_Custom_Types {
 	}
 
 	/**
-	 * Show Pre-upload presentation metabox.
+	 * Show Extra Options metabox.
 	 *
 	 * @since   3.0.0
 	 */
@@ -242,6 +242,13 @@ class Bigbluebutton_Register_Custom_Types {
 		require 'partials/bigbluebutton-pre-upload-presentation-metabox-display.php';
 	}
 
+	/**
+	 * Display Extra options metabox.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   Object $object     The object that has the room ID.
+	 */
 	public function display_extra_options($object){
 		$duration_label = __( 'Duration', 'bigbluebutton' );
 		$duration_value = get_post_meta( $object->ID, 'bbb-room-duration', true );
@@ -254,6 +261,10 @@ class Bigbluebutton_Register_Custom_Types {
 		require 'partials/bigbluebutton-extra-options-metabox-display.php';
 	}
 
+	/**
+	 * Format Guest Policy options
+	 *
+	 */
 	private function formatGuestPolicy($value = "ALWAYS_ACCEPT"){
 		$policies = array("ALWAYS_ACCEPT", "ASK_MODERATOR", "ALWAYS_DENY");
 
