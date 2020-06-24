@@ -362,7 +362,7 @@ class Bigbluebutton_Api {
 	 * @return  Array|WP_Error  $response   Server response in array format.
 	 */
 	private static function get_response( $url ) {
-		$result = wp_remote_get( esc_url_raw( $url ) );
+		$result = wp_remote_get( esc_url_raw( $url ) , array( 'timeout' => 180 ));
 		return $result;
 	}
 
