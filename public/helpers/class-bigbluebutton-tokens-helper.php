@@ -46,8 +46,8 @@ class Bigbluebutton_Tokens_Helper {
 			} else {
 				if ( 'token' == substr( $param, 0, 5 ) ) {
 					$param = substr( $param, 5 );
+					$tokens_string .= ',' . $param;
 				}
-				$tokens_string .= ',' . $param;
 			}
 		}
 		return $tokens_string;
