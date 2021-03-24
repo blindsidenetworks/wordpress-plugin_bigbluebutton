@@ -11,3 +11,4 @@ stylelint.config.js
 composer.json
 package.json
 phpcs.xml.dist
+.DS_Store

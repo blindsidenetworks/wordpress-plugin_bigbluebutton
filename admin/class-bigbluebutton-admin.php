@@ -292,10 +292,6 @@ class Bigbluebutton_Admin {
 				return 3;
 			}
 
-			if ( substr_compare( $bbb_url, 'bigbluebutton/', strlen( $bbb_url ) - 14 ) !== 0 ) {
-				return 2;
-			}
-
 			update_option( 'bigbluebutton_url', $bbb_url );
 			update_option( 'bigbluebutton_salt', $bbb_salt );
 

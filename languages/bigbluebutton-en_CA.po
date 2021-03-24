@@ -126,6 +126,33 @@ msgstr "Moderator Code"
 msgid "Viewer Code"
 msgstr "Viewer Code"
 
+msgid "Max Participants"
+msgstr "Max Participants"
+
+msgid "Max Participants Msg"
+msgstr "-1 = unlimited"
+
+msgid "Pre-upload presentation"
+msgstr "Pre-upload presentation"
+
+msgid "Presentation Link"
+msgstr "Presentation Link"
+
+msgid "Presentation Link Msg"
+msgstr "example: https://mysite.com/presentation.pdf"
+
+msgid "Extra Options"
+msgstr "Extra Options"
+
+msgid "Duration"
+msgstr "Duration"
+
+msgid "Duration Msg"
+msgstr "In minutes. 0 = unlimited"
+
+msgid "Guest Policy"
+msgstr "Guest Policy"
+
 msgid "Recordable"
 msgstr "Recordable"
 
