@@ -15,12 +15,12 @@
  * @wordpress-plugin
  * Plugin Name:       BigBlueButton
  * Plugin URI:        https://github.com/blindsidenetworks/wordpress-plugin_bigbluebutton
- * Description:       BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meetings rooms by using a Custom Post Type. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit http://bigbluebutton.org/support.
+ * Description:       BigBlueButton is an open source web conferencing system. This plugin integrates BigBlueButton into WordPress allowing bloggers to create and manage meetings rooms by using a Custom Post Type. For more information on setting up your own BigBlueButton server or for using an external hosting provider visit https://bigbluebutton.org/support.
  * Version:           3.0.0-beta.4
  * Author:            Blindside Networks
  * Author URI:        https://blindsidenetworks.com
  * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       bigbluebutton
  * Domain Path:       /languages
  */

@@ -269,7 +269,7 @@ class Bigbluebutton_Migration {
 
 			// Update settings.
 			if ( ! get_option( 'mt_bbb_url' ) ) {
-				update_option( 'bigbluebutton_url', 'http://test-install.blindsidenetworks.com/bigbluebutton/' );
+				update_option( 'bigbluebutton_url', 'https://test-install.blindsidenetworks.com/bigbluebutton/' );
 			} else {
 				update_option( 'bigbluebutton_url', get_option( 'mt_bbb_url' ) );
 				delete_option( 'mt_bbb_url' );
