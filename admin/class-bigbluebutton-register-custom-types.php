@@ -104,6 +104,15 @@ class Bigbluebutton_Register_Custom_Types {
 	}
 
 	/**
+     * Create Max Participants metaboxes on room creation and edit.
+     *
+     * @since   3.0.0
+     */
+    public function register_room_maxParticipants_metaboxes() {
+        add_meta_box( 'bbb-maxParticipants', __( 'Max Participants', 'bigbluebutton' ), array( $this, 'display_maxParticipants_metabox' ), 'bbb-room' );
+    }
+
+	/**
 	 * Show recordable option in room creation to users who have the corresponding capability.
 	 *
 	 * @since   3.0.0
@@ -124,6 +133,24 @@ class Bigbluebutton_Register_Custom_Types {
 	}
 
 	/**
+	 * Show Pre-upload presentation metabox.
+	 *
+	 * @since   3.0.0
+	 */
+	public function register_pre_upload_presentation_metabox() {
+		add_meta_box( 'bbb-room-pre-upload-presentation', __( 'Pre-upload presentation', 'bigbluebutton' ), array( $this, 'display_pre_upload_presentation' ), 'bbb-room' );
+	}
+
+	/**
+	 * Show Extra Options metabox.
+	 *
+	 * @since   3.0.0
+	 */
+	public function register_extra_options_metabox() {
+		add_meta_box( 'bbb-room-extra-options', __( 'Extra Options', 'bigbluebutton' ), array( $this, 'display_extra_options' ), 'bbb-room' );
+	}
+
+	/**
 	 * Display moderator code metabox.
 	 *
 	 * @since   3.0.0
@@ -138,6 +165,23 @@ class Bigbluebutton_Register_Custom_Types {
 		wp_nonce_field( 'bbb-room-moderator-code-nonce', 'bbb-room-moderator-code-nonce' );
 		require 'partials/bigbluebutton-room-code-metabox-display.php';
 	}
+
+	/**
+     * Display Max Participants metabox.
+     *
+     * @since   3.0.0
+     *
+     * @param   Object $object     The object that has the room ID.
+     */
+    public function display_maxParticipants_metabox( $object ) {
+        $default_max_participants 	  = "-1";
+        $entry_max_participants_label = __( 'Max Participants', 'bigbluebutton' );
+        $defaultMsg 	 			  = __( 'Max Participants Msg', 'bigbluebutton' );
+        $entry_max_participants_name  = 'bbb-maxParticipants';
+        $existing_value   		      = get_post_meta( $object->ID, 'bbb-room-maxParticipants', true );
+        wp_nonce_field( 'bbb-room-maxParticipants-nonce', 'bbb-room-maxParticipants-nonce' );
+        require 'partials/bigbluebutton-max-participants-metabox-display.php';
+    }
 
 	/**
 	 * Display viewer code metabox.
@@ -180,5 +224,60 @@ class Bigbluebutton_Register_Custom_Types {
 
 		wp_nonce_field( 'bbb-room-recordable-nonce', 'bbb-room-recordable-nonce' );
 		require 'partials/bigbluebutton-recordable-metabox-display.php';
+	}
+
+	/**
+	 * Display Pre-upload presentation metabox.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   Object $object     The object that has the room ID.
+	 */
+	public function display_pre_upload_presentation($object){
+		$entry_pre_upload_presentation_label  = __( 'Presentation Link', 'bigbluebutton' );
+		$defaultMsg 	 			          = __( 'Presentation Link Msg ', 'bigbluebutton' );
+		$entry_pre_upload_presentation_name   = 'bbb-pre-upload-presentation';
+		$existing_value   		              = get_post_meta( $object->ID, 'bbb-room-pre-upload-presentation', true );
+		wp_nonce_field( 'bbb-room-pre-upload-presentation-nonce', 'bbb-room-pre-upload-presentation-nonce' );
+		require 'partials/bigbluebutton-pre-upload-presentation-metabox-display.php';
+	}
+
+	/**
+	 * Display Extra options metabox.
+	 *
+	 * @since   3.0.0
+	 *
+	 * @param   Object $object     The object that has the room ID.
+	 */
+	public function display_extra_options($object){
+		$duration_label = __( 'Duration', 'bigbluebutton' );
+		$duration_value = get_post_meta( $object->ID, 'bbb-room-duration', true );
+
+		$guestPolicy_label = __( 'Guest Policy', 'bigbluebutton');
+		$guestPolicy_value = get_post_meta( $object->ID, 'bbb-room-guestPolicy', true );
+		$guestPolicy_select = $this->formatGuestPolicy($guestPolicy_value);
+
+		wp_nonce_field( 'bbb-room-extra-options-nonce', 'bbb-room-extra-options-nonce' );
+		require 'partials/bigbluebutton-extra-options-metabox-display.php';
+	}
+
+	/**
+	 * Format Guest Policy options
+	 *
+	 */
+	private function formatGuestPolicy($value = "ALWAYS_ACCEPT"){
+		$policies = array("ALWAYS_ACCEPT", "ASK_MODERATOR", "ALWAYS_DENY");
+
+		$html = '<select name="bbb-room-guestPolicy">';
+		foreach ($policies as $key => $policy){
+			$selected = "";
+			if($policy == $value){
+				$selected = "selected";
+			}
+			$html .= "<option {$selected} value='{$policy}'>{$policy}</option>";
+		}
+		$html .= "</select>";
+
+		return $html;
 	}
 }

@@ -57,6 +57,7 @@ class Bigbluebutton_Admin_Api {
 			// Add room codes to postmeta data.
 			update_post_meta( $post_id, 'bbb-room-moderator-code', $moderator_code );
 			update_post_meta( $post_id, 'bbb-room-viewer-code', $viewer_code );
+			update_post_meta( $post_id, 'bbb-room-maxParticipants', $_POST['bbb-maxParticipants'] );
 
 			if ( ! get_post_meta( $post_id, 'bbb-room-meeting-id', true ) ) {
 				update_post_meta( $post_id, 'bbb-room-meeting-id', sha1( home_url() . Bigbluebutton_Admin_Helper::generate_random_code( 12 ) ) );
@@ -65,6 +66,12 @@ class Bigbluebutton_Admin_Api {
 			// Update room recordable value.
 			update_post_meta( $post_id, 'bbb-room-recordable', ( $recordable ? 'true' : 'false' ) );
 			update_post_meta( $post_id, 'bbb-room-wait-for-moderator', ( $wait_for_mod ? 'true' : 'false' ) );
+
+			if($_POST['bbb-pre-upload-presentation'] !== ""){
+				update_post_meta( $post_id, 'bbb-room-pre-upload-presentation', $_POST['bbb-pre-upload-presentation'] );
+			}
+			update_post_meta( $post_id, 'bbb-room-duration', $_POST['bbb-room-duration'] );
+			update_post_meta( $post_id, 'bbb-room-guestPolicy', $_POST['bbb-room-guestPolicy'] );
 
 		} else {
 			return $post_id;
